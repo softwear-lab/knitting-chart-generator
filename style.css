@@ -38,6 +38,26 @@ p {
   gap: 8px;
 }
 
+/* NOWE: Styl sprawiający, że element zajmie całą szerokość na samej górze panelu */
+.full-width {
+  flex-basis: 100%;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 12px;
+  margin-bottom: 5px;
+}
+
+/* Stylizacja checkboxa */
+.full-width input[type="checkbox"] {
+  transform: scale(1.2);
+  margin-right: 5px;
+  cursor: pointer;
+}
+
+.full-width label {
+  font-size: 15px;
+  cursor: pointer;
+}
+
 label {
   font-weight: bold;
   font-size: 14px;

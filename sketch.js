@@ -3,14 +3,21 @@ let widthInput;
 let generateBtn;
 let saveBtn;
 let processedImg;
-
-// Nowe zmienne dla opcji kolorów
 let colorModeSelect;
 let colorLevelsInput;
+
+// Nowa zmienna dla włącznika siatki
+let gridCheckbox;
 
 function setup() {
   let canvas = createCanvas(800, 600);
   canvas.parent('canvas-container');
+
+  // NOWE: Tworzenie checkboxa dla siatki (domyślnie zaznaczony - true)
+  gridCheckbox = createCheckbox(' Pokaż siatkę (kontury oczek)', true);
+  gridCheckbox.parent('grid-container');
+  // Kiedy użytkownik kliknie checkbox, natychmiast przerysuj ekran
+  gridCheckbox.changed(loop);
 
   // 1. Wgrywanie plików
   let uploadBtn = createFileInput(handleFile);
@@ -20,17 +27,15 @@ function setup() {
   widthInput = createInput('50'); 
   widthInput.parent('input-container');
 
-  // 3. Tryb kolorów (Menu rozwijane)
+  // 3. Tryb kolorów
   colorModeSelect = createSelect();
   colorModeSelect.parent('color-mode-container');
   colorModeSelect.option('Oryginalne kolory');
   colorModeSelect.option('Czarno-biały');
   colorModeSelect.option('Redukcja kolorów');
   
-  // Pole ilości kolorów (używane tylko w trybie "Redukcja kolorów")
   colorLevelsInput = createInput('4');
   colorLevelsInput.parent('color-count-container');
-  // Dodajemy małą etykietę (placeholder) ułatwiającą zrozumienie
   colorLevelsInput.attribute('placeholder', 'Ilość poziomów (2-255)');
 
   // 4. Przyciski
@@ -62,8 +67,14 @@ function draw() {
         let c = processedImg.get(x, y); 
         
         fill(c);             
-        stroke(150);         
-        strokeWeight(1);     
+        
+        // NOWE: Sprawdzamy, czy checkbox siatki jest zaznaczony
+        if (gridCheckbox.checked()) {
+          stroke(150);         // Rysuj szare obramowanie
+          strokeWeight(1);     
+        } else {
+          noStroke();          // Wyłącz rysowanie obramowania pikseli
+        }
         
         rect(offsetX + x * cellSize, offsetY + y * cellSize, cellSize, cellSize);
       }
@@ -104,27 +115,21 @@ function generateChart() {
   let ratio = img.height / img.width;
   let targetH = Math.floor(targetW * ratio);
 
-  // Tworzymy miniaturę na podstawie oryginalnego zdjęcia
   processedImg = createImage(targetW, targetH);
   processedImg.copy(img, 0, 0, img.width, img.height, 0, 0, targetW, targetH);
 
-  // Sprawdzamy, jaki tryb kolorów wybrał użytkownik
   let mode = colorModeSelect.value();
 
   if (mode === 'Czarno-biały') {
-    // Filtr THRESHOLD zmienia każdy piksel na czarny lub biały 
-    // Wartość 0.5 to próg jasności odcięcia
     processedImg.filter(THRESHOLD, 0.5); 
   } 
   else if (mode === 'Redukcja kolorów') {
     let levels = parseInt(colorLevelsInput.value());
-    // Zabezpieczenie przed wpisaniem nieprawidłowych wartości dla filtra
     if (isNaN(levels) || levels < 2) {
       levels = 2; 
     } else if (levels > 255) {
       levels = 255;
     }
-    // Filtr POSTERIZE ogranicza liczbę barw
     processedImg.filter(POSTERIZE, levels);
   }
 
