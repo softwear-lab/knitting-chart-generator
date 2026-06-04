@@ -12,6 +12,11 @@ body {
 h1 {
   margin-bottom: 5px;
   color: #2c3e50;
+  text-align: center;
+}
+
+p {
+  text-align: center;
 }
 
 #ui-container {
@@ -24,6 +29,7 @@ h1 {
   margin-bottom: 20px;
   flex-wrap: wrap;
   justify-content: center;
+  align-items: flex-start;
 }
 
 .control-group {
@@ -38,11 +44,12 @@ label {
   color: #555;
 }
 
-input[type="number"], input[type="text"] {
+input[type="number"], input[type="text"], select {
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  width: 100px;
+  width: 140px;
+  font-family: inherit;
 }
 
 button {
@@ -54,7 +61,8 @@ button {
   cursor: pointer;
   font-weight: bold;
   transition: background-color 0.2s;
-  margin-right: 5px;
+  margin-bottom: 5px;
+  width: 100%;
 }
 
 button:hover {
