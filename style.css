@@ -17,19 +17,35 @@ h1 {
 
 p {
   text-align: center;
+  margin-bottom: 30px;
 }
 
+/* * KONTENER GŁÓWNY
+ * flex-direction: row układa elementy poziomo (obok siebie)
+ */
+#main-content {
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
+  align-items: flex-start;
+  justify-content: center;
+  width: 100%;
+  max-width: 1200px;
+}
+
+/* * PANEL STEROWANIA (LEWA STRONA)
+ * Zmieniliśmy na sztywną szerokość (300px) i układ pionowy (column)
+ */
 #ui-container {
   display: flex;
+  flex-direction: column;
   gap: 20px;
   background-color: white;
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: flex-start;
+  width: 300px;
+  flex-shrink: 0; /* Zapobiega zgniataniu panelu przez duże płótno */
 }
 
 .control-group {
@@ -38,15 +54,11 @@ p {
   gap: 8px;
 }
 
-/* NOWE: Styl sprawiający, że element zajmie całą szerokość na samej górze panelu */
 .full-width {
-  flex-basis: 100%;
   border-bottom: 1px solid #eee;
   padding-bottom: 12px;
-  margin-bottom: 5px;
 }
 
-/* Stylizacja checkboxa */
 .full-width input[type="checkbox"] {
   transform: scale(1.2);
   margin-right: 5px;
@@ -64,12 +76,30 @@ label {
   color: #555;
 }
 
+/* Wszystkie pola tekstowe i menu zajmują teraz 100% szerokości panelu */
 input[type="number"], input[type="text"], select {
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  width: 140px;
+  width: 100%;
+  box-sizing: border-box; /* Zapewnia, że padding nie wypchnie elementu poza panel */
   font-family: inherit;
+}
+
+#custom-colors-container {
+  display: flex;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+input[type="color"] {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%; /* Próbniki dzielą się miejscem po równo */
+  height: 35px;
+  padding: 2px;
+  cursor: pointer;
+  background-color: white;
 }
 
 button {
@@ -89,26 +119,27 @@ button:hover {
   background-color: #2980b9;
 }
 
+/* * PŁÓTNO (PRAWA STRONA) 
+ */
 #canvas-container canvas {
   border: 2px solid #ddd;
   border-radius: 8px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  max-width: 100%;
 }
 
-/* Stylizacja kontenera dla własnej palety */
-#custom-colors-container {
-  display: flex;
-  gap: 10px;
-  margin-top: 5px;
-}
-
-/* Stylizacja elementów typu próbnik kolorów */
-input[type="color"] {
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  width: 65px;
-  height: 35px;
-  padding: 2px;
-  cursor: pointer;
-  background-color: white;
+/* * RESPONSYWNOŚĆ
+ * Jeśli ekran jest mniejszy niż 900px, złam układ obok siebie 
+ * i ułóż elementy z powrotem jeden pod drugim.
+ */
+@media (max-width: 900px) {
+  #main-content {
+    flex-direction: column;
+    align-items: center;
+  }
+  #ui-container {
+    width: 100%;
+    max-width: 400px;
+    box-sizing: border-box;
+  }
 }
