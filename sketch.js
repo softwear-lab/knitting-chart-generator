@@ -7,38 +7,50 @@ let colorModeSelect;
 let colorLevelsInput;
 let gridCheckbox;
 
+// Nowe zmienne dla próbników kolorów
+let color1Picker;
+let color2Picker;
+
 function setup() {
   let canvas = createCanvas(800, 600);
   canvas.parent('canvas-container');
 
-  // Włącznik siatki
   gridCheckbox = createCheckbox(' Pokaż siatkę (kontury oczek)', true);
   gridCheckbox.parent('grid-container');
   gridCheckbox.changed(loop);
 
-  // 1. Wgrywanie plików
   let uploadBtn = createFileInput(handleFile);
   uploadBtn.parent('upload-container');
 
-  // 2. Szerokość w oczkach
-  widthInput = createInput('190'); // Zmieniłem domyślną na 190 zgodnie z Twoim kodem w Pythonie
+  widthInput = createInput('190'); 
   widthInput.parent('input-container');
 
-  // 3. Tryb kolorów
   colorModeSelect = createSelect();
   colorModeSelect.parent('color-mode-container');
   colorModeSelect.option('Oryginalne kolory');
   colorModeSelect.option('Czarno-biały (Threshold)');
   colorModeSelect.option('Redukcja kolorów (Posterize)');
-  // NOWE OPCJE Z PYTHONA:
   colorModeSelect.option('Dithering Floyd-Steinberg');
-  colorModeSelect.option('Dithering + Zielona Paleta');
+  // Zmieniona nazwa, aby lepiej oddawała nową funkcjonalność:
+  colorModeSelect.option('Dithering + Własna Paleta');
   
   colorLevelsInput = createInput('4');
   colorLevelsInput.parent('color-count-container');
   colorLevelsInput.attribute('placeholder', 'Ilość poziomów (2-255)');
 
-  // 4. Przyciski
+  // NOWE: Tworzymy dwa próbniki kolorów (domyślnie Twoje zielenie ze skryptu)
+  // Próbnik dla jasnych oczek (domyślnie 'light_green')
+  color1Picker = createColorPicker('#c1d8bc'); 
+  color1Picker.parent('custom-colors-container');
+  // Próbnik dla ciemnych oczek (domyślnie 'darker_green')
+  color2Picker = createColorPicker('#536a47'); 
+  color2Picker.parent('custom-colors-container');
+
+  // Gdy użytkownik użyje próbnika, automatycznie odświeżamy obraz (jeśli już jest załadowany)
+  color1Picker.input(autoUpdateChart);
+  color2Picker.input(autoUpdateChart);
+  colorModeSelect.changed(autoUpdateChart); // Dodatkowo: zmiana trybu też sama odświeży obraz!
+
   generateBtn = createButton('Generuj schemat');
   generateBtn.parent('buttons-container');
   generateBtn.mousePressed(generateChart);
@@ -98,6 +110,13 @@ function handleFile(file) {
   }
 }
 
+// Funkcja pomocnicza: jeśli obraz jest wgrany, automatycznie aktualizuj schemat
+function autoUpdateChart() {
+  if (img) {
+    generateChart();
+  }
+}
+
 function generateChart() {
   if (!img) {
     alert("Najpierw wgraj zdjęcie!");
@@ -114,13 +133,11 @@ function generateChart() {
   let ratio = img.height / img.width;
   let targetH = Math.floor(targetW * ratio);
 
-  // Tworzymy miniaturę (odpowiednik funkcji resize z Pythona)
   processedImg = createImage(targetW, targetH);
   processedImg.copy(img, 0, 0, img.width, img.height, 0, 0, targetW, targetH);
 
   let mode = colorModeSelect.value();
 
-  // Wybór odpowiedniego algorytmu na podstawie menu
   if (mode === 'Czarno-biały (Threshold)') {
     processedImg.filter(THRESHOLD, 0.5); 
   } 
@@ -133,7 +150,7 @@ function generateChart() {
   else if (mode === 'Dithering Floyd-Steinberg') {
     applyFloydSteinberg(processedImg, false);
   }
-  else if (mode === 'Dithering + Zielona Paleta') {
+  else if (mode === 'Dithering + Własna Paleta') {
     applyFloydSteinberg(processedImg, true);
   }
 
@@ -148,24 +165,17 @@ function saveChart() {
   }
 }
 
-// -------------------------------------------------------------
-// NOWE FUNKCJE: Implementacja Pythona w JavaScript
-// -------------------------------------------------------------
-
 function applyFloydSteinberg(imageObj, usePalette) {
-  // Funkcja ładuje tablicę wszystkich pikseli do manipulacji
   imageObj.loadPixels();
   
   let w = imageObj.width;
   let h = imageObj.height;
 
-  // KROK 1: Konwersja obrazu na odcienie szarości
   for (let i = 0; i < imageObj.pixels.length; i += 4) {
     let r = imageObj.pixels[i];
     let g = imageObj.pixels[i + 1];
     let b = imageObj.pixels[i + 2];
     
-    // Obliczanie luminancji (wartości szarości)
     let gray = 0.299 * r + 0.587 * g + 0.114 * b; 
     
     imageObj.pixels[i] = gray;
@@ -173,22 +183,17 @@ function applyFloydSteinberg(imageObj, usePalette) {
     imageObj.pixels[i + 2] = gray;
   }
 
-  // KROK 2: Algorytm Floyd-Steinberg
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
       let index = (x + y * w) * 4;
-
       let oldVal = imageObj.pixels[index];
-      // Jeśli jasność > 128, ustaw na 255 (biały), w przeciwnym razie 0 (czarny)
       let newVal = oldVal < 128 ? 0 : 255; 
-      let err = oldVal - newVal; // Obliczamy "błąd" kwantyzacji
+      let err = oldVal - newVal; 
 
-      // Przypisanie nowego koloru czarno-białego
       imageObj.pixels[index] = newVal;
       imageObj.pixels[index + 1] = newVal;
       imageObj.pixels[index + 2] = newVal;
 
-      // Rozpraszanie błędu na sąsiadujące piksele wg ułamków z algorytmu
       addError(imageObj, x + 1, y, w, h, err, 7 / 16);
       addError(imageObj, x - 1, y + 1, w, h, err, 3 / 16);
       addError(imageObj, x, y + 1, w, h, err, 5 / 16);
@@ -196,34 +201,35 @@ function applyFloydSteinberg(imageObj, usePalette) {
     }
   }
 
-  // KROK 3: Opcjonalne nakładanie Twojej palety (zmiana koloru jak w Pythonie)
+  // ZMODYFIKOWANE: Użycie kolorów wybranych przez użytkownika
   if (usePalette) {
-    let lightGreen = [193, 216, 188]; // Wartości RGB dla 'light_green'
-    let darkerGreen = [83, 106, 71];  // Wartości RGB dla 'darker_green'
+    // Pobieramy kolory z próbników (zwracają obiekty kolorów p5)
+    let c1 = color1Picker.color(); // Jasny
+    let c2 = color2Picker.color(); // Ciemny
+
+    // Wyciągamy składowe R, G, B dla obu kolorów
+    let rgb1 = [red(c1), green(c1), blue(c1)];
+    let rgb2 = [red(c2), green(c2), blue(c2)];
 
     for (let i = 0; i < imageObj.pixels.length; i += 4) {
-      let val = imageObj.pixels[i]; // Wartość to teraz 0 (czarny) albo 255 (biały)
-      let c = val === 255 ? lightGreen : darkerGreen; // Podmiana koloru
+      let val = imageObj.pixels[i]; 
       
-      imageObj.pixels[i] = c[0];
-      imageObj.pixels[i + 1] = c[1];
-      imageObj.pixels[i + 2] = c[2];
+      // Jeśli piksel jest jasny (255), użyj pierwszego koloru, w przeciwnym razie drugiego
+      let finalColor = val === 255 ? rgb1 : rgb2; 
+      
+      imageObj.pixels[i] = finalColor[0];
+      imageObj.pixels[i + 1] = finalColor[1];
+      imageObj.pixels[i + 2] = finalColor[2];
     }
   }
 
-  // Zapisujemy zmiany w pikselach, aby można było narysować obraz
   imageObj.updatePixels();
 }
 
-// Funkcja pomocnicza do przekazywania błędu dla sąsiednich pikseli
 function addError(imageObj, x, y, w, h, err, factor) {
-  // Sprawdzamy, czy nie wyszliśmy poza krawędzie obrazka
   if (x >= 0 && x < w && y >= 0 && y < h) {
     let index = (x + y * w) * 4;
-    // Dodajemy błąd do aktualnej jasności
     let c = imageObj.pixels[index] + err * factor;
-    // p5.js radzi sobie z wartościami poza 0-255 automatycznie przy rysowaniu, 
-    // ale my modyfikujemy surową tablicę, więc dbamy o ograniczenia
     imageObj.pixels[index] = c;
     imageObj.pixels[index + 1] = c;
     imageObj.pixels[index + 2] = c;
