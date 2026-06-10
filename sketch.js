@@ -1,3 +1,38 @@
+const APP_STRINGS = {
+  // Modes menu.
+  MODE_ORIGINAL: 'Original Colors',
+  MODE_BW: 'Black & White (Threshold)',
+  MODE_POSTERIZE: 'Color Reduction (Posterize)',
+  MODE_FLOYD: 'Floyd-Steinberg Dithering',
+  MODE_FLOYD_PALETTE: 'Dithering + Custom Palette',
+  MODE_ATKINSON: 'Atkinson Dithering',
+  MODE_ATKINSON_PALETTE: 'Atkinson + Custom Palette',
+
+  // Buttons, labels.
+  CHECKBOX_GRID: ' Show grid (stitch outlines)',
+  PLACEHOLDER_LEVELS: 'Number of levels (2-255)',
+  BTN_GENERATE: 'Generate chart',
+  BTN_DOWNLOAD: 'Download chart',
+
+  // Alerts.
+  CANVAS_EMPTY: "Upload an image, select a mode, and click 'Generate chart'.",
+  ALERT_WRONG_TYPE: "Please upload an image file (e.g., JPG or PNG).",
+  ALERT_NO_IMAGE: "Please upload an image first!",
+  ALERT_BAD_WIDTH: "Please enter a valid width (a number greater than 0).",
+  ALERT_NO_CHART: "There is no chart to save!",
+
+  FILENAME: 'knitting-chart'
+};
+
+const DEFAULTS = {
+  CANVAS_WIDTH: 800,
+  CANVAS_HEIGHT: 600,
+  GRID_ENABLED: false,
+  OUTPUT_WIDTH: 200,
+  COLOR1_PICKER: '#c1d8bc',
+  COLOR2_PICKER: '#536a47'
+};
+
 let img;
 let widthInput;
 let generateBtn;
@@ -10,48 +45,50 @@ let gridCheckbox;
 let color1Picker;
 let color2Picker;
 
+
+
 function setup() {
-  let canvas = createCanvas(800, 600);
+  let canvas = createCanvas(DEFAULTS.CANVAS_WIDTH, DEFAULTS.CANVAS_WIDTH);
   canvas.parent('canvas-container');
 
-  gridCheckbox = createCheckbox(' Show grid (stitch outlines)', false);
+  gridCheckbox = createCheckbox(APP_STRINGS.CHECKBOX_GRID, DEFAULTS.GRID_ENABLED);
   gridCheckbox.parent('grid-container');
   gridCheckbox.changed(loop);
 
   let uploadBtn = createFileInput(handleFile);
   uploadBtn.parent('upload-container');
 
-  widthInput = createInput('200'); 
+  widthInput = createInput(DEFAULTS.OUTPUT_WIDTH); 
   widthInput.parent('input-container');
 
   colorModeSelect = createSelect();
   colorModeSelect.parent('color-mode-container');
-  colorModeSelect.option('Original Colors');
-  colorModeSelect.option('Black & White (Threshold)');
-  colorModeSelect.option('Color Reduction (Posterize)');
-  colorModeSelect.option('Floyd-Steinberg Dithering');
-  colorModeSelect.option('Dithering + Custom Palette');
-  colorModeSelect.option('Atkinson Dithering');
-  colorModeSelect.option('Atkinson + Custom Palette');
+  colorModeSelect.option(APP_STRINGS.MODE_ORIGINAL);
+  colorModeSelect.option(APP_STRINGS.MODE_BW);
+  colorModeSelect.option(APP_STRINGS.MODE_POSTERIZE);
+  colorModeSelect.option(APP_STRINGS.MODE_FLOYD);
+  colorModeSelect.option(APP_STRINGS.MODE_FLOYD_PALETTE);
+  colorModeSelect.option(APP_STRINGS.MODE_ATKINSON);
+  colorModeSelect.option(APP_STRINGS.MODE_ATKINSON_PALETTE);
   
   colorLevelsInput = createInput();
   colorLevelsInput.parent('color-count-container');
-  colorLevelsInput.attribute('placeholder', 'Number of levels (2-255)');
+  colorLevelsInput.attribute('placeholder', APP_STRINGS.PLACEHOLDER_LEVELS);
 
-  color1Picker = createColorPicker('#c1d8bc'); 
+  color1Picker = createColorPicker(DEFAULTS.COLOR1_PICKER); 
   color1Picker.parent('custom-colors-container');
-  color2Picker = createColorPicker('#536a47'); 
+  color2Picker = createColorPicker(DEFAULTS.COLOR2_PICKER); 
   color2Picker.parent('custom-colors-container');
 
   color1Picker.input(autoUpdateChart);
   color2Picker.input(autoUpdateChart);
   colorModeSelect.changed(autoUpdateChart);
 
-  generateBtn = createButton('Generate chart');
+  generateBtn = createButton(APP_STRINGS.BTN_GENERATE);
   generateBtn.parent('buttons-container');
   generateBtn.mousePressed(generateChart);
 
-  saveBtn = createButton('Download chart');
+  saveBtn = createButton(APP_STRINGS.BTN_DOWNLOAD);
   saveBtn.parent('buttons-container');
   saveBtn.mousePressed(saveChart);
 
@@ -89,7 +126,7 @@ function draw() {
   } else {
     fill(100);
     noStroke();
-    text("Upload an image, select a mode, and click 'Generate chart'.", width / 2, height / 2);
+    text(APP_STRINGS.CANVAS_EMPTY, width / 2, height / 2);
   }
   
   noLoop(); 
@@ -102,7 +139,7 @@ function handleFile(file) {
       loop();              
     });
   } else {
-    alert("Please upload an image file (e.g., JPG or PNG).");
+    alert(APP_STRINGS.ALERT_WRONG_TYPE);
   }
 }
 
@@ -114,14 +151,14 @@ function autoUpdateChart() {
 
 function generateChart() {
   if (!img) {
-    alert("Please upload an image first!");
+    alert(APP_STRINGS.ALERT_NO_IMAGE);
     return;
   }
 
   let targetW = parseInt(widthInput.value());
   
   if (isNaN(targetW) || targetW <= 0) {
-    alert("Please enter a valid width (a number greater than 0).");
+    alert(APP_STRINGS.ALERT_BAD_WIDTH);
     return;
   }
 
@@ -133,26 +170,25 @@ function generateChart() {
 
   let mode = colorModeSelect.value();
 
-  // Zaktualizowane warunki wyboru algorytmów na język angielski
-  if (mode === 'Black & White (Threshold)') {
+  if (mode === APP_STRINGS.MODE_BW) {
     processedImg.filter(THRESHOLD, 0.5); 
   } 
-  else if (mode === 'Color Reduction (Posterize)') {
+  else if (mode === APP_STRINGS.MODE_POSTERIZE) {
     let levels = parseInt(colorLevelsInput.value());
     if (isNaN(levels) || levels < 2) levels = 2; 
     if (levels > 255) levels = 255;
     processedImg.filter(POSTERIZE, levels);
   }
-  else if (mode === 'Floyd-Steinberg Dithering') {
+  else if (mode === APP_STRINGS.MODE_FLOYD) {
     applyFloydSteinberg(processedImg, false);
   }
-  else if (mode === 'Dithering + Custom Palette') {
+  else if (mode === APP_STRINGS.MODE_FLOYD_PALETTE) {
     applyFloydSteinberg(processedImg, true);
   }
-  else if (mode === 'Atkinson Dithering') {
+  else if (mode === APP_STRINGS.MODE_ATKINSON) {
     applyAtkinson(processedImg, false);
   }
-  else if (mode === 'Atkinson + Custom Palette') {
+  else if (mode === APP_STRINGS.MODE_ATKINSON_PALETTE) {
     applyAtkinson(processedImg, true);
   }
 
@@ -161,14 +197,12 @@ function generateChart() {
 
 function saveChart() {
   if (processedImg) {
-    // Nazwa pliku również została zmieniona na angielską
-    processedImg.save('knitting-chart', 'png');
+    processedImg.save(APP_STRINGS.FILENAME, 'png');
   } else {
-    alert("There is no chart to save!");
+    alert(APP_STRINGS.ALERT_NO_CHART);
   }
 }
 
-// --- ALGORYTM 1: Floyd-Steinberg ---
 function applyFloydSteinberg(imageObj, usePalette) {
   imageObj.loadPixels();
   let w = imageObj.width;
@@ -205,7 +239,6 @@ function applyFloydSteinberg(imageObj, usePalette) {
   applyCustomPalette(imageObj, usePalette);
 }
 
-// --- ALGORYTM 2: Atkinson ---
 function applyAtkinson(imageObj, usePalette) {
   imageObj.loadPixels();
   let w = imageObj.width;
@@ -244,7 +277,6 @@ function applyAtkinson(imageObj, usePalette) {
   applyCustomPalette(imageObj, usePalette);
 }
 
-// --- FUNKCJE POMOCNICZE ---
 function applyCustomPalette(imageObj, usePalette) {
   if (usePalette) {
     let c1 = color1Picker.color(); 
