@@ -14,14 +14,14 @@ function setup() {
   let canvas = createCanvas(800, 600);
   canvas.parent('canvas-container');
 
-  gridCheckbox = createCheckbox(' Pokaż siatkę (kontury oczek)', true);
+  gridCheckbox = createCheckbox(' Pokaż siatkę (kontury oczek)', false);
   gridCheckbox.parent('grid-container');
   gridCheckbox.changed(loop);
 
   let uploadBtn = createFileInput(handleFile);
   uploadBtn.parent('upload-container');
 
-  widthInput = createInput('190'); 
+  widthInput = createInput('200'); 
   widthInput.parent('input-container');
 
   colorModeSelect = createSelect();
@@ -31,11 +31,10 @@ function setup() {
   colorModeSelect.option('Redukcja kolorów (Posterize)');
   colorModeSelect.option('Dithering Floyd-Steinberg');
   colorModeSelect.option('Dithering + Własna Paleta');
-  // NOWE OPCJE: Dithering Atkinson
   colorModeSelect.option('Dithering Atkinson');
   colorModeSelect.option('Atkinson + Własna Paleta');
   
-  colorLevelsInput = createInput('4');
+  colorLevelsInput = createInput();
   colorLevelsInput.parent('color-count-container');
   colorLevelsInput.attribute('placeholder', 'Ilość poziomów (2-255)');
 
