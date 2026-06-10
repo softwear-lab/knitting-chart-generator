@@ -7,7 +7,6 @@ let colorModeSelect;
 let colorLevelsInput;
 let gridCheckbox;
 
-// Nowe zmienne dla próbników kolorów
 let color1Picker;
 let color2Picker;
 
@@ -31,25 +30,23 @@ function setup() {
   colorModeSelect.option('Czarno-biały (Threshold)');
   colorModeSelect.option('Redukcja kolorów (Posterize)');
   colorModeSelect.option('Dithering Floyd-Steinberg');
-  // Zmieniona nazwa, aby lepiej oddawała nową funkcjonalność:
   colorModeSelect.option('Dithering + Własna Paleta');
+  // NOWE OPCJE: Dithering Atkinson
+  colorModeSelect.option('Dithering Atkinson');
+  colorModeSelect.option('Atkinson + Własna Paleta');
   
   colorLevelsInput = createInput('4');
   colorLevelsInput.parent('color-count-container');
   colorLevelsInput.attribute('placeholder', 'Ilość poziomów (2-255)');
 
-  // NOWE: Tworzymy dwa próbniki kolorów (domyślnie Twoje zielenie ze skryptu)
-  // Próbnik dla jasnych oczek (domyślnie 'light_green')
   color1Picker = createColorPicker('#c1d8bc'); 
   color1Picker.parent('custom-colors-container');
-  // Próbnik dla ciemnych oczek (domyślnie 'darker_green')
   color2Picker = createColorPicker('#536a47'); 
   color2Picker.parent('custom-colors-container');
 
-  // Gdy użytkownik użyje próbnika, automatycznie odświeżamy obraz (jeśli już jest załadowany)
   color1Picker.input(autoUpdateChart);
   color2Picker.input(autoUpdateChart);
-  colorModeSelect.changed(autoUpdateChart); // Dodatkowo: zmiana trybu też sama odświeży obraz!
+  colorModeSelect.changed(autoUpdateChart);
 
   generateBtn = createButton('Generuj schemat');
   generateBtn.parent('buttons-container');
@@ -110,7 +107,6 @@ function handleFile(file) {
   }
 }
 
-// Funkcja pomocnicza: jeśli obraz jest wgrany, automatycznie aktualizuj schemat
 function autoUpdateChart() {
   if (img) {
     generateChart();
@@ -153,21 +149,29 @@ function generateChart() {
   else if (mode === 'Dithering + Własna Paleta') {
     applyFloydSteinberg(processedImg, true);
   }
+  // NOWE: Obsługa wyboru algorytmu Atkinson
+  else if (mode === 'Dithering Atkinson') {
+    applyAtkinson(processedImg, false);
+  }
+  else if (mode === 'Atkinson + Własna Paleta') {
+    applyAtkinson(processedImg, true);
+  }
 
   loop(); 
 }
 
 function saveChart() {
   if (processedImg) {
+    // Pamiętaj: zapisujemy czysty obraz, gotowy do wrzucenia na maszynę!
     processedImg.save('schemat-dziewiarski', 'png');
   } else {
     alert("Nie ma schematu do zapisania!");
   }
 }
 
+// --- ALGORYTM 1: Floyd-Steinberg ---
 function applyFloydSteinberg(imageObj, usePalette) {
   imageObj.loadPixels();
-  
   let w = imageObj.width;
   let h = imageObj.height;
 
@@ -175,9 +179,7 @@ function applyFloydSteinberg(imageObj, usePalette) {
     let r = imageObj.pixels[i];
     let g = imageObj.pixels[i + 1];
     let b = imageObj.pixels[i + 2];
-    
     let gray = 0.299 * r + 0.587 * g + 0.114 * b; 
-    
     imageObj.pixels[i] = gray;
     imageObj.pixels[i + 1] = gray;
     imageObj.pixels[i + 2] = gray;
@@ -201,20 +203,63 @@ function applyFloydSteinberg(imageObj, usePalette) {
     }
   }
 
-  // ZMODYFIKOWANE: Użycie kolorów wybranych przez użytkownika
-  if (usePalette) {
-    // Pobieramy kolory z próbników (zwracają obiekty kolorów p5)
-    let c1 = color1Picker.color(); // Jasny
-    let c2 = color2Picker.color(); // Ciemny
+  applyCustomPalette(imageObj, usePalette);
+}
 
-    // Wyciągamy składowe R, G, B dla obu kolorów
+// --- ALGORYTM 2: Atkinson ---
+function applyAtkinson(imageObj, usePalette) {
+  imageObj.loadPixels();
+  let w = imageObj.width;
+  let h = imageObj.height;
+
+  // Najpierw zamieniamy obraz na odcienie szarości (podobnie jak wyżej)
+  for (let i = 0; i < imageObj.pixels.length; i += 4) {
+    let r = imageObj.pixels[i];
+    let g = imageObj.pixels[i + 1];
+    let b = imageObj.pixels[i + 2];
+    let gray = 0.299 * r + 0.587 * g + 0.114 * b; 
+    imageObj.pixels[i] = gray;
+    imageObj.pixels[i + 1] = gray;
+    imageObj.pixels[i + 2] = gray;
+  }
+
+  // Aplikujemy rozpraszanie błędu metodą Atkinsona
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      let index = (x + y * w) * 4;
+      let oldVal = imageObj.pixels[index];
+      let newVal = oldVal < 128 ? 0 : 255; 
+      let err = oldVal - newVal; 
+
+      imageObj.pixels[index] = newVal;
+      imageObj.pixels[index + 1] = newVal;
+      imageObj.pixels[index + 2] = newVal;
+
+      // Atkinson rozrzuca błąd po 1/8 wartości w określonym kształcie:
+      addError(imageObj, x + 1, y, w, h, err, 1 / 8);     // Prawo
+      addError(imageObj, x + 2, y, w, h, err, 1 / 8);     // Prawo x2
+      addError(imageObj, x - 1, y + 1, w, h, err, 1 / 8); // Dół, Lewo
+      addError(imageObj, x, y + 1, w, h, err, 1 / 8);     // Dół
+      addError(imageObj, x + 1, y + 1, w, h, err, 1 / 8); // Dół, Prawo
+      addError(imageObj, x, y + 2, w, h, err, 1 / 8);     // Dół x2
+    }
+  }
+
+  applyCustomPalette(imageObj, usePalette);
+}
+
+// --- FUNKCJE POMOCNICZE ---
+
+// Nowa funkcja wyciągnięta dla porządku - aplikuje własne kolory dla obu algorytmów ditheringu
+function applyCustomPalette(imageObj, usePalette) {
+  if (usePalette) {
+    let c1 = color1Picker.color(); 
+    let c2 = color2Picker.color(); 
     let rgb1 = [red(c1), green(c1), blue(c1)];
     let rgb2 = [red(c2), green(c2), blue(c2)];
 
     for (let i = 0; i < imageObj.pixels.length; i += 4) {
       let val = imageObj.pixels[i]; 
-      
-      // Jeśli piksel jest jasny (255), użyj pierwszego koloru, w przeciwnym razie drugiego
       let finalColor = val === 255 ? rgb1 : rgb2; 
       
       imageObj.pixels[i] = finalColor[0];
@@ -222,10 +267,10 @@ function applyFloydSteinberg(imageObj, usePalette) {
       imageObj.pixels[i + 2] = finalColor[2];
     }
   }
-
   imageObj.updatePixels();
 }
 
+// Rozpraszanie błędu dla konkretnych ułamków (factor)
 function addError(imageObj, x, y, w, h, err, factor) {
   if (x >= 0 && x < w && y >= 0 && y < h) {
     let index = (x + y * w) * 4;
