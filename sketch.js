@@ -159,7 +159,7 @@ function generateChart() {
 
 function saveChart() {
   if (processedImg) {
-    saveCanvas('moj-schemat-dziewiarski', 'png');
+    processedImg.save('schemat-dziewiarski', 'png');
   } else {
     alert("Nie ma schematu do zapisania!");
   }
