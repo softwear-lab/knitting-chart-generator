@@ -14,29 +14,29 @@ function setup() {
   let canvas = createCanvas(800, 600);
   canvas.parent('canvas-container');
 
-  gridCheckbox = createCheckbox(' Pokaż siatkę (kontury oczek)', false);
+  gridCheckbox = createCheckbox(' Show grid (stitch outlines)', true);
   gridCheckbox.parent('grid-container');
   gridCheckbox.changed(loop);
 
   let uploadBtn = createFileInput(handleFile);
   uploadBtn.parent('upload-container');
 
-  widthInput = createInput('200'); 
+  widthInput = createInput('190'); 
   widthInput.parent('input-container');
 
   colorModeSelect = createSelect();
   colorModeSelect.parent('color-mode-container');
-  colorModeSelect.option('Oryginalne kolory');
-  colorModeSelect.option('Czarno-biały (Threshold)');
-  colorModeSelect.option('Redukcja kolorów (Posterize)');
-  colorModeSelect.option('Dithering Floyd-Steinberg');
-  colorModeSelect.option('Dithering + Własna Paleta');
-  colorModeSelect.option('Dithering Atkinson');
-  colorModeSelect.option('Atkinson + Własna Paleta');
+  colorModeSelect.option('Original Colors');
+  colorModeSelect.option('Black & White (Threshold)');
+  colorModeSelect.option('Color Reduction (Posterize)');
+  colorModeSelect.option('Floyd-Steinberg Dithering');
+  colorModeSelect.option('Dithering + Custom Palette');
+  colorModeSelect.option('Atkinson Dithering');
+  colorModeSelect.option('Atkinson + Custom Palette');
   
-  colorLevelsInput = createInput();
+  colorLevelsInput = createInput('4');
   colorLevelsInput.parent('color-count-container');
-  colorLevelsInput.attribute('placeholder', 'Ilość poziomów (2-255)');
+  colorLevelsInput.attribute('placeholder', 'Number of levels (2-255)');
 
   color1Picker = createColorPicker('#c1d8bc'); 
   color1Picker.parent('custom-colors-container');
@@ -47,11 +47,11 @@ function setup() {
   color2Picker.input(autoUpdateChart);
   colorModeSelect.changed(autoUpdateChart);
 
-  generateBtn = createButton('Generuj schemat');
+  generateBtn = createButton('Generate chart');
   generateBtn.parent('buttons-container');
   generateBtn.mousePressed(generateChart);
 
-  saveBtn = createButton('Pobierz schemat');
+  saveBtn = createButton('Download chart');
   saveBtn.parent('buttons-container');
   saveBtn.mousePressed(saveChart);
 
@@ -89,7 +89,7 @@ function draw() {
   } else {
     fill(100);
     noStroke();
-    text("Wgraj zdjęcie, wybierz tryb i kliknij 'Generuj schemat'.", width / 2, height / 2);
+    text("Upload an image, select a mode, and click 'Generate chart'.", width / 2, height / 2);
   }
   
   noLoop(); 
@@ -102,7 +102,7 @@ function handleFile(file) {
       loop();              
     });
   } else {
-    alert("Proszę wgrać plik graficzny (np. JPG lub PNG).");
+    alert("Please upload an image file (e.g., JPG or PNG).");
   }
 }
 
@@ -114,14 +114,14 @@ function autoUpdateChart() {
 
 function generateChart() {
   if (!img) {
-    alert("Najpierw wgraj zdjęcie!");
+    alert("Please upload an image first!");
     return;
   }
 
   let targetW = parseInt(widthInput.value());
   
   if (isNaN(targetW) || targetW <= 0) {
-    alert("Podaj poprawną szerokość (liczbę większą od 0).");
+    alert("Please enter a valid width (a number greater than 0).");
     return;
   }
 
@@ -133,26 +133,26 @@ function generateChart() {
 
   let mode = colorModeSelect.value();
 
-  if (mode === 'Czarno-biały (Threshold)') {
+  // Zaktualizowane warunki wyboru algorytmów na język angielski
+  if (mode === 'Black & White (Threshold)') {
     processedImg.filter(THRESHOLD, 0.5); 
   } 
-  else if (mode === 'Redukcja kolorów (Posterize)') {
+  else if (mode === 'Color Reduction (Posterize)') {
     let levels = parseInt(colorLevelsInput.value());
     if (isNaN(levels) || levels < 2) levels = 2; 
     if (levels > 255) levels = 255;
     processedImg.filter(POSTERIZE, levels);
   }
-  else if (mode === 'Dithering Floyd-Steinberg') {
+  else if (mode === 'Floyd-Steinberg Dithering') {
     applyFloydSteinberg(processedImg, false);
   }
-  else if (mode === 'Dithering + Własna Paleta') {
+  else if (mode === 'Dithering + Custom Palette') {
     applyFloydSteinberg(processedImg, true);
   }
-  // NOWE: Obsługa wyboru algorytmu Atkinson
-  else if (mode === 'Dithering Atkinson') {
+  else if (mode === 'Atkinson Dithering') {
     applyAtkinson(processedImg, false);
   }
-  else if (mode === 'Atkinson + Własna Paleta') {
+  else if (mode === 'Atkinson + Custom Palette') {
     applyAtkinson(processedImg, true);
   }
 
@@ -161,10 +161,10 @@ function generateChart() {
 
 function saveChart() {
   if (processedImg) {
-    // Pamiętaj: zapisujemy czysty obraz, gotowy do wrzucenia na maszynę!
-    processedImg.save('schemat-dziewiarski', 'png');
+    // Nazwa pliku również została zmieniona na angielską
+    processedImg.save('knitting-chart', 'png');
   } else {
-    alert("Nie ma schematu do zapisania!");
+    alert("There is no chart to save!");
   }
 }
 
@@ -211,7 +211,6 @@ function applyAtkinson(imageObj, usePalette) {
   let w = imageObj.width;
   let h = imageObj.height;
 
-  // Najpierw zamieniamy obraz na odcienie szarości (podobnie jak wyżej)
   for (let i = 0; i < imageObj.pixels.length; i += 4) {
     let r = imageObj.pixels[i];
     let g = imageObj.pixels[i + 1];
@@ -222,7 +221,6 @@ function applyAtkinson(imageObj, usePalette) {
     imageObj.pixels[i + 2] = gray;
   }
 
-  // Aplikujemy rozpraszanie błędu metodą Atkinsona
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
       let index = (x + y * w) * 4;
@@ -234,13 +232,12 @@ function applyAtkinson(imageObj, usePalette) {
       imageObj.pixels[index + 1] = newVal;
       imageObj.pixels[index + 2] = newVal;
 
-      // Atkinson rozrzuca błąd po 1/8 wartości w określonym kształcie:
-      addError(imageObj, x + 1, y, w, h, err, 1 / 8);     // Prawo
-      addError(imageObj, x + 2, y, w, h, err, 1 / 8);     // Prawo x2
-      addError(imageObj, x - 1, y + 1, w, h, err, 1 / 8); // Dół, Lewo
-      addError(imageObj, x, y + 1, w, h, err, 1 / 8);     // Dół
-      addError(imageObj, x + 1, y + 1, w, h, err, 1 / 8); // Dół, Prawo
-      addError(imageObj, x, y + 2, w, h, err, 1 / 8);     // Dół x2
+      addError(imageObj, x + 1, y, w, h, err, 1 / 8);    
+      addError(imageObj, x + 2, y, w, h, err, 1 / 8);     
+      addError(imageObj, x - 1, y + 1, w, h, err, 1 / 8); 
+      addError(imageObj, x, y + 1, w, h, err, 1 / 8);     
+      addError(imageObj, x + 1, y + 1, w, h, err, 1 / 8); 
+      addError(imageObj, x, y + 2, w, h, err, 1 / 8);     
     }
   }
 
@@ -248,8 +245,6 @@ function applyAtkinson(imageObj, usePalette) {
 }
 
 // --- FUNKCJE POMOCNICZE ---
-
-// Nowa funkcja wyciągnięta dla porządku - aplikuje własne kolory dla obu algorytmów ditheringu
 function applyCustomPalette(imageObj, usePalette) {
   if (usePalette) {
     let c1 = color1Picker.color(); 
@@ -269,7 +264,6 @@ function applyCustomPalette(imageObj, usePalette) {
   imageObj.updatePixels();
 }
 
-// Rozpraszanie błędu dla konkretnych ułamków (factor)
 function addError(imageObj, x, y, w, h, err, factor) {
   if (x >= 0 && x < w && y >= 0 && y < h) {
     let index = (x + y * w) * 4;
