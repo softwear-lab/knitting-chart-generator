@@ -14,14 +14,14 @@ function setup() {
   let canvas = createCanvas(800, 600);
   canvas.parent('canvas-container');
 
-  gridCheckbox = createCheckbox(' Show grid (stitch outlines)', true);
+  gridCheckbox = createCheckbox(' Show grid (stitch outlines)', false);
   gridCheckbox.parent('grid-container');
   gridCheckbox.changed(loop);
 
   let uploadBtn = createFileInput(handleFile);
   uploadBtn.parent('upload-container');
 
-  widthInput = createInput('190'); 
+  widthInput = createInput('200'); 
   widthInput.parent('input-container');
 
   colorModeSelect = createSelect();
@@ -34,7 +34,7 @@ function setup() {
   colorModeSelect.option('Atkinson Dithering');
   colorModeSelect.option('Atkinson + Custom Palette');
   
-  colorLevelsInput = createInput('4');
+  colorLevelsInput = createInput();
   colorLevelsInput.parent('color-count-container');
   colorLevelsInput.attribute('placeholder', 'Number of levels (2-255)');
 
