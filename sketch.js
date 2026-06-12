@@ -7,6 +7,14 @@ const APP_STRINGS = {
   MODE_FLOYD_PALETTE: 'Dithering + Custom Palette',
   MODE_ATKINSON: 'Atkinson Dithering',
   MODE_ATKINSON_PALETTE: 'Atkinson + Custom Palette',
+  MODE_STUCKI: 'Stucki Dithering',
+  MODE_STUCKI_PALETTE: 'Stucki + Custom Palette',
+  MODE_BURKES: 'Burkes Dithering',
+  MODE_BURKES_PALETTE: 'Burkes + Custom Palette',
+  MODE_SIERRA: 'Sierra Dithering',
+  MODE_SIERRA_PALETTE: 'Sierra + Custom Palette',
+  MODE_JJN: 'Jarvis-Judice-Ninke Dithering',
+  MODE_JJN_PALETTE: 'JJN + Custom Palette',
 
   // Buttons, labels.
   CHECKBOX_GRID: ' Show grid (stitch outlines)',
@@ -32,6 +40,31 @@ const DEFAULTS = {
   COLOR1_PICKER: '#c1d8bc',
   COLOR2_PICKER: '#536a47'
 };
+
+const STUCKI_MATRIX = [
+  { dx: 1, dy: 0, weight: 8 / 42 }, { dx: 2, dy: 0, weight: 4 / 42 },
+  { dx: -2, dy: 1, weight: 2 / 42 }, { dx: -1, dy: 1, weight: 4 / 42 }, { dx: 0, dy: 1, weight: 8 / 42 }, { dx: 1, dy: 1, weight: 4 / 42 }, { dx: 2, dy: 1, weight: 2 / 42 },
+  { dx: -2, dy: 2, weight: 1 / 42 }, { dx: -1, dy: 2, weight: 2 / 42 }, { dx: 0, dy: 2, weight: 4 / 42 }, { dx: 1, dy: 2, weight: 2 / 42 }, { dx: 2, dy: 2, weight: 1 / 42 }
+];
+
+const BURKES_MATRIX = [
+  { dx: 1, dy: 0, weight: 8 / 32 }, { dx: 2, dy: 0, weight: 4 / 32 },
+  { dx: -2, dy: 1, weight: 2 / 32 }, { dx: -1, dy: 1, weight: 4 / 32 }, { dx: 0, dy: 1, weight: 8 / 32 }, { dx: 1, dy: 1, weight: 4 / 32 }, { dx: 2, dy: 1, weight: 2 / 32 }
+];
+
+// Sierra (tzw. "Sierra-3" - pełny algorytm)
+const SIERRA_MATRIX = [
+  { dx: 1, dy: 0, weight: 5 / 32 }, { dx: 2, dy: 0, weight: 3 / 32 },
+  { dx: -2, dy: 1, weight: 2 / 32 }, { dx: -1, dy: 1, weight: 4 / 32 }, { dx: 0, dy: 1, weight: 5 / 32 }, { dx: 1, dy: 1, weight: 4 / 32 }, { dx: 2, dy: 1, weight: 2 / 32 },
+  { dx: -1, dy: 2, weight: 2 / 32 }, { dx: 0, dy: 2, weight: 3 / 32 }, { dx: 1, dy: 2, weight: 2 / 32 }
+];
+
+// Jarvis-Judice-Ninke
+const JJN_MATRIX = [
+  { dx: 1, dy: 0, weight: 7 / 48 }, { dx: 2, dy: 0, weight: 5 / 48 },
+  { dx: -2, dy: 1, weight: 3 / 48 }, { dx: -1, dy: 1, weight: 5 / 48 }, { dx: 0, dy: 1, weight: 7 / 48 }, { dx: 1, dy: 1, weight: 5 / 48 }, { dx: 2, dy: 1, weight: 3 / 48 },
+  { dx: -2, dy: 2, weight: 1 / 48 }, { dx: -1, dy: 2, weight: 3 / 48 }, { dx: 0, dy: 2, weight: 5 / 48 }, { dx: 1, dy: 2, weight: 3 / 48 }, { dx: 2, dy: 2, weight: 1 / 48 }
+];
 
 let img;
 let widthInput;
@@ -70,7 +103,15 @@ function setup() {
   colorModeSelect.option(APP_STRINGS.MODE_FLOYD_PALETTE);
   colorModeSelect.option(APP_STRINGS.MODE_ATKINSON);
   colorModeSelect.option(APP_STRINGS.MODE_ATKINSON_PALETTE);
-  
+  colorModeSelect.option(APP_STRINGS.MODE_STUCKI);
+  colorModeSelect.option(APP_STRINGS.MODE_STUCKI_PALETTE);
+  colorModeSelect.option(APP_STRINGS.MODE_BURKES);
+  colorModeSelect.option(APP_STRINGS.MODE_BURKES_PALETTE);
+  colorModeSelect.option(APP_STRINGS.MODE_SIERRA);
+  colorModeSelect.option(APP_STRINGS.MODE_SIERRA_PALETTE);
+  colorModeSelect.option(APP_STRINGS.MODE_JJN);
+  colorModeSelect.option(APP_STRINGS.MODE_JJN_PALETTE);
+
   colorLevelsInput = createInput();
   colorLevelsInput.parent('color-count-container');
   colorLevelsInput.attribute('placeholder', APP_STRINGS.PLACEHOLDER_LEVELS);
@@ -191,6 +232,30 @@ function generateChart() {
   else if (mode === APP_STRINGS.MODE_ATKINSON_PALETTE) {
     applyAtkinson(processedImg, true);
   }
+  else if (mode === APP_STRINGS.MODE_STUCKI) {
+    applyStucki(processedImg, false);
+  }
+  else if (mode === APP_STRINGS.MODE_STUCKI_PALETTE) {
+    applyStucki(processedImg, true);
+  }
+  else if (mode === APP_STRINGS.MODE_BURKES) {
+    applyBurkes(processedImg, false);
+  }
+  else if (mode === APP_STRINGS.MODE_BURKES_PALETTE) {
+    applyBurkes(processedImg, true);
+  }
+  else if (mode === APP_STRINGS.MODE_SIERRA) {
+    applySierra(processedImg, false);
+  }
+  else if (mode === APP_STRINGS.MODE_SIERRA_PALETTE) {
+    applySierra(processedImg, true);
+  }
+  else if (mode === APP_STRINGS.MODE_JJN) {
+    applyJJN(processedImg, false);
+  }
+  else if (mode === APP_STRINGS.MODE_JJN_PALETTE) {
+    applyJJN(processedImg, true);
+  } 
 
   loop(); 
 }
@@ -304,4 +369,61 @@ function addError(imageObj, x, y, w, h, err, factor) {
     imageObj.pixels[index + 1] = c;
     imageObj.pixels[index + 2] = c;
   }
+}
+
+function applyErrorDiffusion(imageObj, matrix, usePalette) {
+  imageObj.loadPixels();
+  let w = imageObj.width;
+  let h = imageObj.height;
+
+  // Konwersja na odcienie szarości
+  for (let i = 0; i < imageObj.pixels.length; i += 4) {
+    let r = imageObj.pixels[i];
+    let g = imageObj.pixels[i + 1];
+    let b = imageObj.pixels[i + 2];
+    let gray = 0.299 * r + 0.587 * g + 0.114 * b; 
+    imageObj.pixels[i] = gray;
+    imageObj.pixels[i + 1] = gray;
+    imageObj.pixels[i + 2] = gray;
+  }
+
+  // Aplikacja ditheringu
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      let index = (x + y * w) * 4;
+      let oldVal = imageObj.pixels[index];
+      let newVal = oldVal < 128 ? 0 : 255; 
+      let err = oldVal - newVal; 
+
+      // Ustawiamy nowy kolor czarny/biały
+      imageObj.pixels[index] = newVal;
+      imageObj.pixels[index + 1] = newVal;
+      imageObj.pixels[index + 2] = newVal;
+
+      // Rozpraszamy błąd za pomocą przekazanej macierzy
+      for (let step of matrix) {
+        addError(imageObj, x + step.dx, y + step.dy, w, h, err, step.weight);
+      }
+    }
+  }
+
+  // Nałożenie ewentualnej niestandardowej palety
+  applyCustomPalette(imageObj, usePalette);
+}
+
+// 3. Redukujemy oryginalne funkcje do prostych wywołań
+function applyStucki(imageObj, usePalette) {
+  applyErrorDiffusion(imageObj, STUCKI_MATRIX, usePalette);
+}
+
+function applyBurkes(imageObj, usePalette) {
+  applyErrorDiffusion(imageObj, BURKES_MATRIX, usePalette);
+}
+
+function applySierra(imageObj, usePalette) {
+  applyErrorDiffusion(imageObj, SIERRA_MATRIX, usePalette);
+}
+
+function applyJJN(imageObj, usePalette) {
+  applyErrorDiffusion(imageObj, JJN_MATRIX, usePalette);
 }
