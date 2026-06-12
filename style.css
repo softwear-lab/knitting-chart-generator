@@ -128,10 +128,7 @@ button:hover {
   max-width: 100%;
 }
 
-/* * RESPONSYWNOŚĆ
- * Jeśli ekran jest mniejszy niż 900px, złam układ obok siebie 
- * i ułóż elementy z powrotem jeden pod drugim.
- */
+/* Update the existing media query at the bottom of style.css */
 @media (max-width: 900px) {
   #main-content {
     flex-direction: column;
@@ -141,5 +138,17 @@ button:hover {
     width: 100%;
     max-width: 400px;
     box-sizing: border-box;
+  }
+  
+  /* Add this to make sure the canvas container and the canvas inside it scale */
+  #canvas-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+  
+  #canvas-container canvas {
+    max-width: 100%;
+    height: auto !important; /* Allow height to adjust proportionally */
   }
 }

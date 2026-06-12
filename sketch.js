@@ -81,7 +81,15 @@ let color2Picker;
 
 
 function setup() {
-  let canvas = createCanvas(DEFAULTS.CANVAS_WIDTH, DEFAULTS.CANVAS_WIDTH);
+// Get the width of the container instead of using a hardcoded default
+  let containerWidth = document.getElementById('canvas-container').clientWidth;
+  
+  // Set the canvas size based on the container, but keep a reasonable aspect ratio
+  // or use the window width for mobile
+  let canvasWidth = min(containerWidth, 800);
+  let canvasHeight = canvasWidth * (DEFAULTS.CANVAS_HEIGHT / DEFAULTS.CANVAS_WIDTH);
+  
+  let canvas = createCanvas(canvasWidth, canvasHeight);
   canvas.parent('canvas-container');
 
   gridCheckbox = createCheckbox(APP_STRINGS.CHECKBOX_GRID, DEFAULTS.GRID_ENABLED);
