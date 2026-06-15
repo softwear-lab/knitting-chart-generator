@@ -1,47 +1,706 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Knitting Chart Generator</title>
+  <!-- Google Fonts: Playfair Display (headings) & Outfit (body & UI) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap"
+    rel="stylesheet">
+
+  <!-- Optimize canvas 2D contexts for multiple readback operations (getImageData) -->
+  <script>
+    (function () {
+      const originalGetContext = HTMLCanvasElement.prototype.getContext;
+      HTMLCanvasElement.prototype.getContext = function (type, attributes) {
+        if (type === '2d') {
+          if (!attributes) {
+            attributes = {};
+          }
+          attributes.willReadFrequently = true;
+        }
+        return originalGetContext.call(this, type, attributes);
+      };
+    })();
+  </script>
+
+  <!-- p5.js Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
-  <link rel="stylesheet" href="style.css">
-  <script src="sketch.js" defer></script>
+
+  <!-- App Stylesheet -->
+  <link rel="stylesheet" href="style.css?v=1.0.1">
+
+  <!-- jsPDF Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <!-- heic-to Library for HEIC image support -->
+  <script src="https://cdn.jsdelivr.net/npm/heic-to@1.5.2/dist/iife/heic-to.js"></script>
+
+  <!-- App Logic -->
+  <script src="sketch.js?v=1.0.1" defer></script>
 </head>
+
 <body>
-  <h1>Knitting Chart Generator</h1>
-  <p>Upload an image, adjust parameters, and generate your chart!</p>
-  
-  <div id="main-content">
-    
-    <div id="ui-container">
-      <div class="control-group full-width" id="grid-container"></div>
+  <div class="app-container">
 
-      <div class="control-group">
-        <label>1. Upload image:</label>
-        <div id="upload-container"></div>
-      </div>
-      
-      <div class="control-group">
-        <label>2. Width (stitches):</label>
-        <div id="input-container"></div>
-      </div>
-
-      <div class="control-group">
-        <label>3. Color mode:</label>
-        <div id="color-mode-container"></div>
-        <div id="color-count-container" style="margin-top: 5px;"></div>
-        <div id="custom-colors-container"></div>
-      </div>
-      
-      <div class="control-group">
-        <label>4. Action:</label>
-        <div id="buttons-container"></div>
+    <!-- Mobile Navigation Top Bar -->
+    <div class="mobile-top-bar">
+      <button id="btn-toggle-drawer" class="btn-hamburger">☰ Settings</button>
+      <span class="mobile-app-title" id="mobile-app-title">Knitting Chart Generator</span>
+      <div class="lang-selector-container">
+        <select id="lang-select-mobile" class="lang-select">
+          <option value="en" selected>EN</option>
+          <option value="pl">PL</option>
+        </select>
       </div>
     </div>
 
-    <div id="canvas-container"></div>
-    
+    <!-- Top Brand Header -->
+    <header class="app-header">
+      <div class="header-logo">🧶</div>
+      <div class="header-text">
+        <h1 id="app-title">Knitting Chart Generator</h1>
+        <p class="subtitle" id="app-subtitle">Convert any photo into a stitch-by-stitch knitting pattern with dynamic
+          yarn calculators</p>
+      </div>
+      <!-- <div class="lang-selector-container">
+        <span style="font-size: 1.1rem; line-height: 1;">🌐</span>
+        <select id="lang-select-desktop" class="lang-select">
+          <option value="en" selected>English</option>
+          <option value="pl">Polski</option>
+        </select>
+      </div> -->
+    </header>
+
+    <!-- Main Workspace Area -->
+    <div class="main-content">
+
+      <!-- Left Column: Step-by-Step Settings Panel -->
+      <aside class="sidebar-panel">
+
+        <!-- Mobile Sidebar Close Header -->
+        <div class="sidebar-mobile-header">
+          <h3 id="sidebar-mobile-title">Settings</h3>
+          <button type="button" class="btn-close-drawer" id="btn-close-drawer">✕</button>
+        </div>
+
+        <!-- Step 1: Upload Image -->
+        <div class="step-card" id="step-card-upload">
+          <div class="step-header">
+            <span class="step-badge">1</span>
+            <h3 id="step-upload-title">Upload Image</h3>
+            <span class="step-chevron">▼</span>
+          </div>
+          <div class="step-body">
+            <div class="upload-dropzone" id="dropzone">
+              <div class="dropzone-icon">📷</div>
+              <div class="dropzone-text">
+                <span class="primary-text" id="upload-primary-text">Drag & drop image here</span>
+                <span class="secondary-text" id="upload-secondary-text">or click to browse files</span>
+                <span class="file-limits" id="upload-file-limits">Supports JPG, PNG, WEBP, HEIC</span>
+              </div>
+            </div>
+            <input type="file" id="image-upload" accept="image/*,.heic,.HEIC">
+            <!-- Uploaded Preview Thumb -->
+            <div class="upload-status" id="upload-status-box" style="display: none;">
+              <div class="status-details">
+                <div class="status-thumbnail-wrapper">
+                  <img id="thumbnail-img" src="" alt="preview">
+                </div>
+                <div class="status-meta">
+                  <span class="status-filename" id="status-filename">filename.png</span>
+                  <span class="status-size" id="status-filesize">0 KB</span>
+                </div>
+              </div>
+              <button type="button" class="btn-remove-file" id="btn-remove-file" title="Remove image">✕</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: Dimensions -->
+        <div class="step-card disabled collapsed" id="step-card-dimensions">
+          <div class="step-header">
+            <span class="step-badge">2</span>
+            <h3 id="step-stitch-title">Stitch Settings</h3>
+            <span class="step-chevron">▼</span>
+          </div>
+          <div class="step-body">
+            <div class="control-group">
+              <div class="label-row">
+                <label for="chart-width-val" id="chart-width-label">Width (stitches)</label>
+                <input type="number" id="chart-width-val" value="200" min="10" max="300">
+              </div>
+              <div class="slider-wrapper">
+                <input type="range" id="chart-width-slider" min="10" max="300" value="200">
+              </div>
+              <p class="control-help" id="chart-width-help">Fewer stitches create a more grid-like, abstract design.
+                Height will scale proportionally.</p>
+            </div>
+
+            <!-- Brightness Slider -->
+            <div class="control-group">
+              <div class="label-row">
+                <label for="chart-brightness-val" id="chart-brightness-label">Brightness</label>
+                <input type="number" id="chart-brightness-val" value="0" min="-100" max="100">
+              </div>
+              <div class="slider-wrapper">
+                <input type="range" id="chart-brightness-slider" min="-100" max="100" value="0">
+              </div>
+            </div>
+
+            <!-- Contrast Slider -->
+            <div class="control-group">
+              <div class="label-row">
+                <label for="chart-contrast-val" id="chart-contrast-label">Contrast</label>
+                <input type="number" id="chart-contrast-val" value="0" min="-100" max="100">
+              </div>
+              <div class="slider-wrapper">
+                <input type="range" id="chart-contrast-slider" min="-100" max="100" value="0">
+              </div>
+            </div>
+
+            <!-- Auto Enhance Contrast (Histogram EQ) -->
+            <div class="control-group">
+              <div style="display: flex; align-items: center;">
+                <label class="grid-checkbox-switch">
+                  <input type="checkbox" id="hist-eq-checkbox">
+                  <span class="switch-slider"></span>
+                  <span class="switch-label" id="hist-eq-label">Auto Enhance Contrast</span>
+                </label>
+              </div>
+              <p class="control-help" id="hist-eq-help">Applies histogram equalization to improve tonal range of
+                washed-out images before processing.</p>
+            </div>
+
+            <!-- Anti-Confetti Smoothing Slider -->
+            <div class="control-group">
+              <div class="label-row">
+                <label for="chart-smoothing-val" id="chart-smoothing-label">Anti-Confetti (Smoothing)</label>
+                <input type="number" id="chart-smoothing-val" value="0" min="0" max="3">
+              </div>
+              <div class="slider-wrapper">
+                <input type="range" id="chart-smoothing-slider" min="0" max="3" value="0" step="1">
+              </div>
+              <p class="control-help" id="chart-smoothing-help">Removes stray single stitches. 0 is off, 1-3 increases
+                edge-preserving smoothing.</p>
+            </div>
+
+            <!-- Bilateral Filter -->
+            <div class="control-group">
+              <div class="label-row">
+                <label for="bilateral-val" id="bilateral-label">Edge-Preserving Smooth</label>
+                <input type="number" id="bilateral-val" value="0" min="0" max="5" readonly
+                  style="width: 40px; border: none; background: none; font-weight: bold; text-align: right; color: var(--color-text);">
+              </div>
+              <div class="slider-wrapper">
+                <input type="range" id="bilateral-slider" min="0" max="5" value="0" step="1">
+              </div>
+              <p class="control-help" id="bilateral-help">Smooths noise while keeping sharp color boundaries intact (0 =
+                off, 1-5 = intensity).</p>
+            </div>
+
+            <!-- Block Painting (Kuwahara Filter) -->
+            <div class="control-group">
+              <div class="label-row">
+                <label for="kuwahara-val" id="kuwahara-label">Block Painting (Kuwahara)</label>
+                <input type="number" id="kuwahara-val" value="0" min="0" max="5" readonly
+                  style="width: 40px; border: none; background: none; font-weight: bold; text-align: right; color: var(--color-text);">
+              </div>
+              <div class="slider-wrapper">
+                <input type="range" id="kuwahara-slider" min="0" max="5" value="0" step="1">
+              </div>
+              <p class="control-help" id="kuwahara-help">Simplifies shapes into flat painterly blocks while keeping
+                edges sharp (0 = off, 1-5 = intensity).</p>
+            </div>
+
+            <!-- Morphological Cleanup -->
+            <div class="control-group" id="morph-cleanup-container">
+              <label for="morph-cleanup-select" id="morph-cleanup-label">Morphological Cleanup</label>
+              <div class="select-wrapper">
+                <select id="morph-cleanup-select">
+                  <option value="none" selected>None</option>
+                  <option value="erode">Erode (Shrink Regions)</option>
+                  <option value="dilate">Dilate (Grow Regions)</option>
+                  <option value="open">Open (Remove Small Spots)</option>
+                  <option value="close">Close (Fill Small Gaps)</option>
+                </select>
+              </div>
+              <p class="control-help" id="morph-cleanup-help">Refines shape boundaries using mathematical morphology.
+                Open removes noise; Close fills holes.</p>
+            </div>
+
+            <!-- Stitch Aspect Ratio Select -->
+            <div class="control-group">
+              <label for="stitch-aspect-select" id="stitch-aspect-label">Stitch Aspect Ratio</label>
+              <div class="select-wrapper">
+                <select id="stitch-aspect-select">
+                  <option value="1.0" selected>Square (1:1)</option>
+                  <option value="1.333">Standard Knit (4:3)</option>
+                  <option value="1.25">Sock Knit (5:4)</option>
+                  <option value="1.2">Fine Knit (6:5)</option>
+                </select>
+              </div>
+              <p class="control-help" id="stitch-aspect-help">Real knit stitches are wider than tall. Adjusts display,
+                PDF, and XLS to match physical proportions.</p>
+            </div>
+
+            <!-- Knitting Method (Flat vs Circular) -->
+            <div class="control-group" id="knitting-method-container">
+              <label for="knitting-method-select" id="knitting-method-label">Knitting Method</label>
+              <div class="select-wrapper">
+                <select id="knitting-method-select">
+                  <option value="flat" selected>Flat (Back & Forth)</option>
+                  <option value="circular">Circular (In the Round)</option>
+                </select>
+              </div>
+              <p class="control-help" id="knitting-method-help">Determines row reading direction and stitch conversion
+                for wrong-side rows in written instructions.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3: Colors -->
+        <div class="step-card disabled collapsed" id="step-card-colors">
+          <div class="step-header">
+            <span class="step-badge">3</span>
+            <h3 id="step-colors-title">Filter & Color Modes</h3>
+            <span class="step-chevron">▼</span>
+          </div>
+          <div class="step-body">
+            <div class="control-group">
+              <label for="color-mode-select" id="color-mode-label">Color Algorithm</label>
+              <div class="select-wrapper">
+                <select id="color-mode-select">
+                  <option value="Original Colors">Original Colors</option>
+                  <option value="Black & White (Threshold)">Black & White (Threshold)</option>
+                  <option value="Edge Outline">Edge Outline</option>
+                  <option value="Color Reduction (Posterize)">Color Reduction (Posterize)</option>
+                  <option value="K-Means Color Reduction">K-Means Color Reduction</option>
+                  <option value="Floyd-Steinberg Dithering">Floyd-Steinberg Dithering</option>
+                  <option value="Atkinson Dithering">Atkinson Dithering</option>
+                  <option value="Stucki Dithering">Stucki Dithering</option>
+                  <option value="Burkes Dithering">Burkes Dithering</option>
+                  <option value="Sierra Dithering">Sierra Dithering</option>
+                  <option value="Jarvis-Judice-Ninke Dithering">Jarvis-Judice-Ninke Dithering</option>
+                  <option value="Custom Palette Mapping">Custom Palette Mapping</option>
+                  <option value="Bayer Ordered Dithering">Bayer Ordered Dithering</option>
+                  <option value="Octree Color Reduction">Octree Color Reduction</option>
+                  <option value="Halftone Dot Pattern">Halftone Dot Pattern</option>
+                  <option value="Glitch Art Effect">Glitch Art Effect</option>
+                  <option value="Ripple Halftone (2 Colors)">Ripple Halftone (2 Colors)</option>
+                  <option value="Cross-Hatch Sketch (2 Colors)">Cross-Hatch Sketch (2 Colors)</option>
+                  <option value="Offset Stencil Pop Art (3 Colors)">Offset Stencil Pop Art (3 Colors)</option>
+                  <option value="Relief Texture (1 Color)">Relief Texture (1 Color)</option>
+
+                  <option value="Shadow Illusion (2 Colors)">Shadow Illusion (2 Colors)</option>
+                  <option value="Bargello Wave (4 Colors)">Bargello Wave (4 Colors)</option>
+                  <option value="Stained Glass Intarsia (5 Colors)">Stained Glass Intarsia (5 Colors)</option>
+                  <option value="Comic Halftone (2 Colors)">Comic Halftone (2 Colors)</option>
+
+                  <option value="Contour Waves (2 Colors)">Contour Waves (2 Colors)</option>
+                  <option value="Truchet Maze (2 Colors)">Truchet Maze (2 Colors)</option>
+                  <option value="Ink Stippling (2 Colors)">Ink Stippling (2 Colors)</option>
+                  <option value="Cable-Rib Illusion (2 Colors)">Cable-Rib Illusion (2 Colors)</option>
+                  <option value="Herringbone Hatch (2 Colors)">Herringbone Hatch (2 Colors)</option>
+                  <option value="Voronoi Mosaic (2 Colors)">Voronoi Mosaic (2 Colors)</option>
+
+                  <option value="Moiré Op-Art (2 Colors)">Moiré Op-Art (2 Colors)</option>
+                  <option value="Spiral Halftone (2 Colors)">Spiral Halftone (2 Colors)</option>
+                  <option value="Houndstooth Check (2 Colors)">Houndstooth Check (2 Colors)</option>
+                  <option value="Turing Pattern (2 Colors)">Turing Pattern (2 Colors)</option>
+                  <option value="Cellular Automata (2 Colors)">Cellular Automata (2 Colors)</option>
+
+                </select>
+              </div>
+            </div>
+
+            <!-- Filter Mode Specific Settings Wrapper -->
+            <div class="mode-settings-wrapper" id="mode-settings-wrapper" style="display: none;">
+              <!-- Flow Sensitivity Option (Conditional for Edge Outline) -->
+              <div class="control-group" id="flow-sensitivity-container" style="display: none;">
+                <div class="label-row">
+                  <label for="flow-sensitivity-slider" id="flow-sensitivity-label">Stitch Flow Sensitivity</label>
+                  <input type="text" id="flow-sensitivity-val" value="50%" readonly
+                    style="width: 50px; border: none; background: none; font-weight: bold; text-align: right; color: var(--color-text);">
+                </div>
+                <div class="slider-wrapper">
+                  <input type="range" id="flow-sensitivity-slider" min="10" max="90" value="50" step="5">
+                </div>
+                <p class="control-help" id="flow-sensitivity-help">Controls the intensity threshold for converting
+                  contour lines to directional decrease stitches (ssk/k2tog).</p>
+                <div style="margin-top: 10px; display: flex; align-items: center;">
+                  <label class="grid-checkbox-switch">
+                    <input type="checkbox" id="flow-invert-checkbox">
+                    <span class="switch-slider"></span>
+                    <span class="switch-label" id="flow-invert-label">Swap SSK & K2Tog Directions</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Bayer Matrix Size Option (Conditional) -->
+              <div class="control-group" id="bayer-matrix-container" style="display: none;">
+                <label for="bayer-matrix-select" id="bayer-matrix-label">Bayer Texture Scale</label>
+                <div class="select-wrapper">
+                  <select id="bayer-matrix-select">
+                    <option value="2">2x2 (Coarse / Large Pattern)</option>
+                    <option value="4" selected>4x4 (Medium / Standard Pattern)</option>
+                    <option value="8">8x8 (Fine / Small Pattern)</option>
+                  </select>
+                </div>
+                <p class="control-help" id="bayer-matrix-help">Controls the grid size of the dithering texture pattern
+                  relative to the stitches.</p>
+              </div>
+
+              <!-- Posterize Option (Conditional) -->
+              <div class="control-group" id="levels-container" style="display: none;">
+                <label for="color-levels-input" id="color-levels-label">Color Count (Levels)</label>
+                <input type="number" id="color-levels-input" min="2" max="32" value="4">
+                <p class="control-help" id="color-levels-help">Reduces the image to a specific number of color tones.
+                </p>
+              </div>
+
+              <!-- Custom Palette Pickers (Conditional) -->
+              <div class="control-group" id="custom-palette-container" style="display: none;">
+                <div class="label-row">
+                  <label id="yarn-palette-label">Yarn Color Palette</label>
+                  <div class="palette-size-wrapper" id="palette-size-container"
+                    style="display: flex; align-items: center; gap: 6px;">
+                    <label for="palette-size-input" id="yarn-palette-size-label"
+                      style="font-size: 0.8rem; margin: 0; font-weight: 500;">Colors:</label>
+                    <input type="number" id="palette-size-input" min="2" max="8" value="4"
+                      style="width: 50px; padding: 4px 6px; font-size: 0.85rem; border: 1px solid var(--color-border); border-radius: 4px;">
+                  </div>
+                </div>
+                <div class="palette-grid"
+                  style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 4px;">
+                  <!-- Color 1 -->
+                  <div class="color-picker-box" id="picker-box-1"
+                    style="display: flex; flex-direction: column; gap: 4px;">
+                    <span class="picker-label" id="yarn-color-1-label"
+                      style="font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted);">Color 1</span>
+                    <div class="picker-inner"
+                      style="display: flex; align-items: center; gap: 8px; background: #ffffff; border: 1px solid var(--color-border); padding: 4px 8px; border-radius: 6px;">
+                      <input type="color" id="yarn-color-1" value="#ffffff"
+                        style="border: none; background: none; padding: 0; width: 24px; height: 24px; cursor: pointer;">
+                      <span class="color-hex-label" id="yarn-color-1-hex"
+                        style="font-size: 0.8rem; font-family: monospace; font-weight: 600; color: var(--color-text);">#FFFFFF</span>
+                    </div>
+                  </div>
+                  <!-- Color 2 -->
+                  <div class="color-picker-box" id="picker-box-2"
+                    style="display: flex; flex-direction: column; gap: 4px;">
+                    <span class="picker-label" id="yarn-color-2-label"
+                      style="font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted);">Color 2</span>
+                    <div class="picker-inner"
+                      style="display: flex; align-items: center; gap: 8px; background: #ffffff; border: 1px solid var(--color-border); padding: 4px 8px; border-radius: 6px;">
+                      <input type="color" id="yarn-color-2" value="#000000"
+                        style="border: none; background: none; padding: 0; width: 24px; height: 24px; cursor: pointer;">
+                      <span class="color-hex-label" id="yarn-color-2-hex"
+                        style="font-size: 0.8rem; font-family: monospace; font-weight: 600; color: var(--color-text);">#000000</span>
+                    </div>
+                  </div>
+                  <!-- Color 3 -->
+                  <div class="color-picker-box" id="picker-box-3"
+                    style="display: flex; flex-direction: column; gap: 4px;">
+                    <span class="picker-label" id="yarn-color-3-label"
+                      style="font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted);">Color 3</span>
+                    <div class="picker-inner"
+                      style="display: flex; align-items: center; gap: 8px; background: #ffffff; border: 1px solid var(--color-border); padding: 4px 8px; border-radius: 6px;">
+                      <input type="color" id="yarn-color-3" value="#dca1a1"
+                        style="border: none; background: none; padding: 0; width: 24px; height: 24px; cursor: pointer;">
+                      <span class="color-hex-label" id="yarn-color-3-hex"
+                        style="font-size: 0.8rem; font-family: monospace; font-weight: 600; color: var(--color-text);">#DCA1A1</span>
+                    </div>
+                  </div>
+                  <!-- Color 4 -->
+                  <div class="color-picker-box" id="picker-box-4"
+                    style="display: flex; flex-direction: column; gap: 4px;">
+                    <span class="picker-label" id="yarn-color-4-label"
+                      style="font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted);">Color 4</span>
+                    <div class="picker-inner"
+                      style="display: flex; align-items: center; gap: 8px; background: #ffffff; border: 1px solid var(--color-border); padding: 4px 8px; border-radius: 6px;">
+                      <input type="color" id="yarn-color-4" value="#a2a1dc"
+                        style="border: none; background: none; padding: 0; width: 24px; height: 24px; cursor: pointer;">
+                      <span class="color-hex-label" id="yarn-color-4-hex"
+                        style="font-size: 0.8rem; font-family: monospace; font-weight: 600; color: var(--color-text);">#A2A1DC</span>
+                    </div>
+                  </div>
+                  <!-- Color 5 -->
+                  <div class="color-picker-box" id="picker-box-5"
+                    style="display: flex; flex-direction: column; gap: 4px;">
+                    <span class="picker-label" id="yarn-color-5-label"
+                      style="font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted);">Color 5</span>
+                    <div class="picker-inner"
+                      style="display: flex; align-items: center; gap: 8px; background: #ffffff; border: 1px solid var(--color-border); padding: 4px 8px; border-radius: 6px;">
+                      <input type="color" id="yarn-color-5" value="#f3dfb6"
+                        style="border: none; background: none; padding: 0; width: 24px; height: 24px; cursor: pointer;">
+                      <span class="color-hex-label" id="yarn-color-5-hex"
+                        style="font-size: 0.8rem; font-family: monospace; font-weight: 600; color: var(--color-text);">#F3DFB6</span>
+                    </div>
+                  </div>
+                  <!-- Color 6 -->
+                  <div class="color-picker-box" id="picker-box-6"
+                    style="display: flex; flex-direction: column; gap: 4px;">
+                    <span class="picker-label" id="yarn-color-6-label"
+                      style="font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted);">Color 6</span>
+                    <div class="picker-inner"
+                      style="display: flex; align-items: center; gap: 8px; background: #ffffff; border: 1px solid var(--color-border); padding: 4px 8px; border-radius: 6px;">
+                      <input type="color" id="yarn-color-6" value="#bcf2f5"
+                        style="border: none; background: none; padding: 0; width: 24px; height: 24px; cursor: pointer;">
+                      <span class="color-hex-label" id="yarn-color-6-hex"
+                        style="font-size: 0.8rem; font-family: monospace; font-weight: 600; color: var(--color-text);">#BCF2F5</span>
+                    </div>
+                  </div>
+                  <!-- Color 7 -->
+                  <div class="color-picker-box" id="picker-box-7"
+                    style="display: flex; flex-direction: column; gap: 4px;">
+                    <span class="picker-label" id="yarn-color-7-label"
+                      style="font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted);">Color 7</span>
+                    <div class="picker-inner"
+                      style="display: flex; align-items: center; gap: 8px; background: #ffffff; border: 1px solid var(--color-border); padding: 4px 8px; border-radius: 6px;">
+                      <input type="color" id="yarn-color-7" value="#e3bcf5"
+                        style="border: none; background: none; padding: 0; width: 24px; height: 24px; cursor: pointer;">
+                      <span class="color-hex-label" id="yarn-color-7-hex"
+                        style="font-size: 0.8rem; font-family: monospace; font-weight: 600; color: var(--color-text);">#E3BCF5</span>
+                    </div>
+                  </div>
+                  <!-- Color 8 -->
+                  <div class="color-picker-box" id="picker-box-8"
+                    style="display: flex; flex-direction: column; gap: 4px;">
+                    <span class="picker-label" id="yarn-color-8-label"
+                      style="font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted);">Color 8</span>
+                    <div class="picker-inner"
+                      style="display: flex; align-items: center; gap: 8px; background: #ffffff; border: 1px solid var(--color-border); padding: 4px 8px; border-radius: 6px;">
+                      <input type="color" id="yarn-color-8" value="#d4d4d4"
+                        style="border: none; background: none; padding: 0; width: 24px; height: 24px; cursor: pointer;">
+                      <span class="color-hex-label" id="yarn-color-8-hex"
+                        style="font-size: 0.8rem; font-family: monospace; font-weight: 600; color: var(--color-text);">#D4D4D4</span>
+                    </div>
+                  </div>
+                </div>
+                <!-- Color Distance Metric Selector -->
+                <div class="control-group" id="color-distance-metric-container"
+                  style="display: none; margin-top: 12px; margin-bottom: 0;">
+                  <label for="color-distance-select" id="color-distance-label"
+                    style="font-size: 0.8rem; font-weight: 600; color: var(--color-text-muted); display: block; margin-bottom: 4px;">Color
+                    Matching Metric</label>
+                  <div class="select-wrapper">
+                    <select id="color-distance-select"
+                      style="font-size: 0.8rem; padding: 6px 8px; width: 100%; border: 1px solid var(--color-border); border-radius: 4px; background: #ffffff;">
+                      <option value="CIEDE2000" selected>CIEDE2000 (Perceptual LAB)</option>
+                      <option value="RGB">Euclidean RGB (Fast)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stray Stitch Cleaner Option (Global) -->
+            <div class="control-group" id="stray-stitch-container">
+              <div style="display: flex; align-items: center;">
+                <label class="grid-checkbox-switch">
+                  <input type="checkbox" id="stray-stitch-checkbox">
+                  <span class="switch-slider"></span>
+                  <span class="switch-label" id="stray-stitch-label">Clean Stray Stitches</span>
+                </label>
+              </div>
+              <p class="control-help" id="stray-stitch-help">Automatically merges isolated single-pixel stitches into
+                their most prominent surrounding color block to make knitting easier.</p>
+            </div>
+
+
+            <!-- Row-by-Row Color Limit -->
+            <div class="control-group" id="row-color-limit-container">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <label class="grid-checkbox-switch">
+                  <input type="checkbox" id="row-color-limit-checkbox">
+                  <span class="switch-slider"></span>
+                  <span class="switch-label" id="row-color-limit-label">Limit Colors Per Row</span>
+                </label>
+                <div style="display: flex; align-items: center; gap: 4px;">
+                  <label for="row-color-limit-input" id="row-color-limit-max-label"
+                    style="font-size: 0.8rem; font-weight: 500; color: var(--color-text-muted); margin: 0;">Max:</label>
+                  <input type="number" id="row-color-limit-input" min="2" max="3" value="2"
+                    style="width: 45px; padding: 4px 6px; font-size: 0.85rem; border: 1px solid var(--color-border); border-radius: 4px;">
+                </div>
+              </div>
+              <p class="control-help" id="row-color-limit-help">Constrains each row to a maximum number of active yarn
+                colors for stranded/Fair Isle knitting compatibility.</p>
+            </div>
+
+            <!-- AYAB Machine Lace Mode -->
+            <div class="control-group" id="ayab-lace-container">
+              <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                <label class="grid-checkbox-switch">
+                  <input type="checkbox" id="ayab-lace-checkbox">
+                  <span class="switch-slider"></span>
+                  <span class="switch-label" id="ayab-lace-label">AYAB Machine Lace Mode</span>
+                </label>
+              </div>
+              <div style="display: flex; align-items: center; gap: 15px; margin-top: 4px;">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <label for="ayab-lace-l-passes" id="ayab-lace-l-passes-label"
+                    style="font-size: 0.8rem; font-weight: 500; color: var(--color-text-muted); margin: 0;">L-Passes:</label>
+                  <input type="number" id="ayab-lace-l-passes" min="1" max="10" value="2"
+                    style="width: 45px; padding: 4px 6px; font-size: 0.85rem; border: 1px solid var(--color-border); border-radius: 4px;">
+                </div>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <label for="ayab-lace-k-passes" id="ayab-lace-k-passes-label"
+                    style="font-size: 0.8rem; font-weight: 500; color: var(--color-text-muted); margin: 0;">K-Passes:</label>
+                  <input type="number" id="ayab-lace-k-passes" min="1" max="10" value="2"
+                    style="width: 45px; padding: 4px 6px; font-size: 0.85rem; border: 1px solid var(--color-border); border-radius: 4px;">
+                </div>
+              </div>
+              <p class="control-help" id="ayab-lace-help">Expands the chart for Brother electronic machines running
+                AYAB, inserting L-carriage transfer passes and K-carriage knitting passes.</p>
+            </div>
+
+
+          </div>
+        </div>
+
+        <!-- Step 4: Actions -->
+        <div class="step-card disabled collapsed" id="step-card-actions">
+          <div class="step-header">
+            <span class="step-badge">4</span>
+            <h3 id="step-actions-title">Generate & Export</h3>
+            <span class="step-chevron">▼</span>
+          </div>
+          <div class="step-body">
+            <div class="control-group" style="margin-bottom: 6px;">
+              <label for="pdf-pattern-title" id="pdf-pattern-title-label">Pattern PDF Title</label>
+              <input type="text" id="pdf-pattern-title" value="My Knitting Project"
+                placeholder="Enter title for PDF...">
+            </div>
+            <div class="action-buttons-group">
+              <button id="btn-generate" class="btn btn-primary" disabled>
+                <span class="btn-icon">⚡</span> Generate Chart
+              </button>
+              <button id="btn-download" class="btn btn-secondary" disabled>
+                <span class="btn-icon">💾</span> Export Chart (PNG)
+              </button>
+              <button id="btn-export-pdf" class="btn btn-outline-sage" disabled>
+                <span class="btn-icon">📄</span> Export Pattern (PDF)
+              </button>
+              <button id="btn-export-xls" class="btn btn-outline-sage" disabled>
+                <span class="btn-icon">📊</span> Export Spreadsheet (XLS)
+              </button>
+              <button id="btn-reset" class="btn btn-tertiary">
+                <span class="btn-icon">🔄</span> Reset App
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </aside>
+
+      <!-- Right Column: Interactive Workspace -->
+      <main class="workspace-panel">
+
+        <!-- Canvas Frame -->
+        <div class="preview-card">
+          <div class="preview-header">
+            <div class="preview-title">
+              <h2>Stitch Preview Grid</h2>
+              <div class="chart-info-tag" id="chart-info-tag">No active chart</div>
+            </div>
+
+            <!-- View Controls -->
+            <div class="preview-toolbar">
+              <label class="grid-checkbox-switch">
+                <input type="checkbox" id="grid-checkbox">
+                <span class="switch-slider"></span>
+                <span class="switch-label">Show Outlines</span>
+              </label>
+              <label class="grid-checkbox-switch" style="margin-left: 15px;">
+                <input type="checkbox" id="symbols-checkbox">
+                <span class="switch-slider"></span>
+                <span class="switch-label">Show Symbols</span>
+              </label>
+            </div>
+          </div>
+
+
+
+          <!-- Canvas Drawing Board -->
+          <div class="canvas-viewport" id="viewport-frame">
+            <div id="canvas-container"></div>
+            <!-- Loading Overlay -->
+            <div id="loading-overlay" class="loading-overlay" style="display: none;">
+              <div class="spinner"></div>
+              <p>Processing Image...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stitch & Yarn Legend -->
+        <div class="legend-card collapsed" id="legend-card-yarn">
+          <div class="legend-header">
+            <div style="text-align: left;">
+              <h2>Yarn Consumption Calculator</h2>
+              <p class="legend-description">This list displays the estimated stitches and yarn color blocks needed.</p>
+            </div>
+            <span class="step-chevron">▼</span>
+          </div>
+          <div class="legend-body-wrapper">
+            <!-- Yarn Gauge Calculator Inputs -->
+            <div class="calculator-config">
+              <div class="calc-field">
+                <label for="calc-stitch-length">Yarn/Stitch (cm)</label>
+                <input type="number" id="calc-stitch-length" value="3.0" min="0.1" max="25.0" step="0.1">
+              </div>
+              <div class="calc-field">
+                <label for="calc-skein-length">Meters/Skein</label>
+                <input type="number" id="calc-skein-length" value="200" min="10" max="2000" step="10">
+              </div>
+            </div>
+            <div class="legend-body" id="legend-container">
+              <div class="empty-legend-message">
+                <div class="empty-wool-icon">🧶</div>
+                <p>Upload an image and click <strong>Generate Chart</strong> to calculate stitch colors.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Written Instructions Step Card -->
+        <div class="legend-card disabled collapsed" id="step-card-written-instructions"
+          style="margin-top: 24px; opacity: 0.5; pointer-events: none;">
+          <div class="legend-header">
+            <div style="text-align: left; flex: 1;">
+              <h2>Written Instructions</h2>
+              <p class="legend-description" style="margin: 4px 0 0 0;">Follow these sequential row-by-row instructions
+                to knit this pattern.</p>
+            </div>
+            <span class="step-chevron">▼</span>
+          </div>
+          <div class="instructions-body-wrapper">
+            <div class="instructions-actions" style="display: flex; justify-content: flex-end; margin-bottom: 8px;">
+              <button id="btn-copy-instructions" class="btn btn-secondary btn-sm" disabled
+                style="background-color: var(--color-input-bg); color: var(--color-text); border: 1px solid var(--color-border); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">Copy
+                Text</button>
+            </div>
+            <div class="instructions-body" style="padding: 4px 0;">
+              <textarea id="written-instructions-textarea" readonly
+                placeholder="Generate chart to view written instructions..."
+                style="width: 100%; height: 200px; border: 1px solid var(--color-border); border-radius: var(--border-radius-sm); padding: 12px; font-family: 'Courier New', Courier, monospace; font-size: 0.85rem; line-height: 1.5; background-color: var(--color-input-bg); color: var(--color-text); resize: vertical; box-sizing: border-box;"></textarea>
+            </div>
+          </div>
+        </div>
+
+      </main>
+
+    </div>
   </div>
+
+
+
+  <!-- Drawer Backdrop Overlay -->
+  <div class="drawer-backdrop" id="drawer-backdrop"></div>
 </body>
+
 </html>
