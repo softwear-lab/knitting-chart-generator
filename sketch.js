@@ -2,7 +2,7 @@ const APP_STRINGS = {
   // Modes menu.
   MODE_ORIGINAL: 'Original Colors',
   MODE_BW: 'Black & White (Threshold)',
-  MODE_EDGE: 'Edge Outline',
+
   MODE_POSTERIZE: 'Color Reduction (Posterize)',
   MODE_KMEANS: 'K-Means Color Reduction',
   MODE_FLOYD: 'Floyd-Steinberg Dithering',
@@ -19,7 +19,6 @@ const APP_STRINGS = {
   MODE_RIPPLE: 'Ripple Halftone (2 Colors)',
   MODE_HATCH: 'Cross-Hatch Sketch (2 Colors)',
   MODE_STENCIL: 'Offset Stencil Pop Art (3 Colors)',
-  MODE_RELIEF: 'Relief Texture (1 Color)',
 
   MODE_SHADOW: 'Shadow Illusion (2 Colors)',
   MODE_BARGELLO: 'Bargello Wave (4 Colors)',
@@ -41,13 +40,485 @@ const APP_STRINGS = {
 
 
   // Alerts, placeholders.
-  CANVAS_EMPTY: "Upload an image and click 'Generate chart' to begin.",
+  CANVAS_EMPTY: "Upload an image to begin.",
   ALERT_WRONG_TYPE: "Please upload an image file (e.g., JPG, PNG, or WEBP).",
   ALERT_NO_IMAGE: "Please upload an image first!",
   ALERT_BAD_WIDTH: "Please enter a valid width (a number greater than 9).",
   ALERT_NO_CHART: "There is no chart to save!",
+  ALERT_INVALID_BASE64: "Invalid base64 image data.",
+  ALERT_INVALID_FORMAT: "Invalid image file format.",
+  ALERT_HEIC_NOT_LOADED: "HEIC conversion library is not loaded. Please ensure you have an active internet connection.",
+  ALERT_HEIC_FAILED: "Failed to convert HEIC image. Please upload a standard image format (JPG, PNG, WEBP).",
+  ALERT_LOAD_FAILED: "Failed to load image file.",
 
   FILENAME: 'knitting-chart'
+};
+
+const TRANSLATIONS = {
+  en: {
+    'mobile-app-title': 'Knitting Chart Generator',
+    'app-title': 'Knitting Chart Generator',
+    'app-subtitle': 'Convert any photo into a stitch-by-stitch knitting pattern with dynamic yarn calculators',
+    'sidebar-mobile-title': 'Settings',
+    'step-stitch-title': 'Stitch Settings',
+    'chart-width-label': 'Width (stitches)',
+    'chart-width-help': 'Fewer stitches create a more grid-like, abstract design. Height will scale proportionally.',
+    'chart-brightness-label': 'Brightness',
+    'chart-contrast-label': 'Contrast',
+    'hist-eq-label': 'Auto Enhance Contrast',
+    'hist-eq-help': 'Applies histogram equalization to improve tonal range of washed-out images before processing.',
+    'chart-smoothing-label': 'Anti-Confetti (Smoothing)',
+    'chart-smoothing-help': 'Removes stray single stitches. 0 is off, 1-3 increases edge-preserving smoothing.',
+    'bilateral-label': 'Edge-Preserving Smooth',
+    'bilateral-help': 'Smooths noise while keeping sharp color boundaries intact (0 = off, 1-5 = intensity).',
+    'kuwahara-label': 'Block Painting (Kuwahara)',
+    'kuwahara-help': 'Simplifies shapes into flat painterly blocks while keeping edges sharp (0 = off, 1-5 = intensity).',
+    'morph-cleanup-label': 'Morphological Cleanup',
+    'morph-cleanup-help': 'Refines shape boundaries using mathematical morphology. Open removes noise; Close fills holes.',
+    'stitch-aspect-label': 'Stitch Aspect Ratio',
+    'stitch-aspect-help': 'Real knit stitches are wider than tall. Adjusts display, PDF, and XLS to match physical proportions.',
+    'knitting-method-label': 'Knitting Method',
+    'knitting-method-help': 'Determines row reading direction and stitch conversion for wrong-side rows in written instructions.',
+    'step-colors-title': 'Filter & Color Modes',
+    'color-mode-label': 'Color Algorithm',
+    'bayer-matrix-label': 'Bayer Texture Scale',
+    'bayer-matrix-help': 'Controls the grid size of the dithering texture pattern relative to the stitches.',
+    'color-levels-label': 'Color Count (Levels)',
+    'color-levels-help': 'Reduces the image to a specific number of color tones.',
+    'yarn-palette-label': 'Yarn Color Palette',
+    'yarn-palette-size-label': 'Colors:',
+    'yarn-color-1-label': 'Color 1',
+    'yarn-color-2-label': 'Color 2',
+    'yarn-color-3-label': 'Color 3',
+    'yarn-color-4-label': 'Color 4',
+    'yarn-color-5-label': 'Color 5',
+    'yarn-color-6-label': 'Color 6',
+    'yarn-color-7-label': 'Color 7',
+    'yarn-color-8-label': 'Color 8',
+    'color-distance-label': 'Color Matching Metric',
+    'stray-stitch-label': 'Clean Stray Stitches',
+    'stray-stitch-help': 'Automatically merges isolated single-pixel stitches into their most prominent surrounding color block to make knitting easier.',
+    'row-color-limit-label': 'Limit Colors Per Row',
+    'row-color-limit-max-label': 'Max:',
+    'row-color-limit-help': 'Constrains each row to a maximum number of active yarn colors for stranded/Fair Isle knitting compatibility.',
+    'step-actions-title': 'Generate & Export',
+    'pdf-pattern-title-label': 'Pattern PDF Title',
+    'btn-generate': '<span class="btn-icon">⚡</span> Generate Chart',
+    'btn-download': '<span class="btn-icon">💾</span> Export Chart (PNG)',
+    'btn-export-pdf': '<span class="btn-icon">📄</span> Export Pattern (PDF)',
+    'btn-export-xls': '<span class="btn-icon">📊</span> Export Spreadsheet (XLS)',
+    'btn-reset': '<span class="btn-icon">🔄</span> Reset App',
+    'preview-grid-title': 'Stitch Preview Grid',
+    'btn-change-image-canvas': '<span class="btn-icon">🔄</span> Change Image',
+    'btn-remove-image-canvas': '<span class="btn-icon">🗑️</span> Remove Image',
+    'show-outlines-label': 'Show Outlines',
+    'show-symbols-label': 'Show Symbols',
+    'viewport-upload-primary': 'Drag & drop image here',
+    'viewport-upload-secondary': 'or click to browse files',
+    'viewport-upload-limits': 'Supports JPG, PNG, WEBP, HEIC',
+    'loading-text': 'Processing Image...',
+    'yarn-calculator-title': 'Yarn Consumption Calculator',
+    'yarn-calculator-desc': 'This list displays the estimated stitches and yarn color blocks needed.',
+    'yarn-stitch-length-label': 'Yarn/Stitch (cm)',
+    'yarn-skein-length-label': 'Meters/Skein',
+    'written-instructions-title': 'Written Instructions',
+    'written-instructions-desc': 'Follow these sequential row-by-row instructions to knit this pattern.',
+    'btn-copy-instructions': 'Copy Text',
+    
+    selects: {
+      'morph-cleanup-select': {
+        'none': 'None',
+        'erode': 'Erode (Shrink Regions)',
+        'dilate': 'Dilate (Grow Regions)',
+        'open': 'Open (Remove Small Spots)',
+        'close': 'Close (Fill Small Gaps)'
+      },
+      'stitch-aspect-select': {
+        '1.0': 'Square (1:1)',
+        '1.333': 'Standard Knit (4:3)',
+        '1.25': 'Sock Knit (5:4)',
+        '1.2': 'Fine Knit (6:5)'
+      },
+      'knitting-method-select': {
+        'flat': 'Flat (Back & Forth)',
+        'circular': 'Circular (In the Round)'
+      },
+      'color-mode-select': {
+        'Standard & Multi-Color Modes': 'Standard & Multi-Color Modes',
+        'Dithering & Texturing': 'Dithering & Texturing',
+        'Artistic & Halftones': 'Artistic & Halftones',
+        'Geometric & Algorithmic Patterns': 'Geometric & Algorithmic Patterns',
+        'Original Colors': 'Original Colors',
+        'Custom Palette Mapping': 'Custom Palette Mapping',
+        'K-Means Color Reduction': 'K-Means Color Reduction',
+        'Octree Color Reduction': 'Octree Color Reduction',
+        'Color Reduction (Posterize)': 'Color Reduction (Posterize)',
+        'Bayer Ordered Dithering': 'Bayer Ordered Dithering',
+        'Floyd-Steinberg Dithering': 'Floyd-Steinberg Dithering',
+        'Atkinson Dithering': 'Atkinson Dithering',
+        'Stucki Dithering': 'Stucki Dithering',
+        'Burkes Dithering': 'Burkes Dithering',
+        'Sierra Dithering': 'Sierra Dithering',
+        'Jarvis-Judice-Ninke Dithering': 'Jarvis-Judice-Ninke Dithering',
+        'Black & White (Threshold)': 'Black & White (Threshold)',
+        'Halftone Dot Pattern': 'Halftone Dot Pattern',
+        'Comic Halftone (2 Colors)': 'Comic Halftone (2 Colors)',
+        'Ripple Halftone (2 Colors)': 'Ripple Halftone (2 Colors)',
+        'Spiral Halftone (2 Colors)': 'Spiral Halftone (2 Colors)',
+        'Cross-Hatch Sketch (2 Colors)': 'Cross-Hatch Sketch (2 Colors)',
+        'Ink Stippling (2 Colors)': 'Ink Stippling (2 Colors)',
+        'Offset Stencil Pop Art (3 Colors)': 'Offset Stencil Pop Art (3 Colors)',
+        'Glitch Art Effect': 'Glitch Art Effect',
+        'Shadow Illusion (2 Colors)': 'Shadow Illusion (2 Colors)',
+        'Bargello Wave (4 Colors)': 'Bargello Wave (4 Colors)',
+        'Stained Glass Intarsia (5 Colors)': 'Stained Glass Intarsia (5 Colors)',
+        'Contour Waves (2 Colors)': 'Contour Waves (2 Colors)',
+        'Truchet Maze (2 Colors)': 'Truchet Maze (2 Colors)',
+        'Cable-Rib Illusion (2 Colors)': 'Cable-Rib Illusion (2 Colors)',
+        'Herringbone Hatch (2 Colors)': 'Herringbone Hatch (2 Colors)',
+        'Voronoi Mosaic (2 Colors)': 'Voronoi Mosaic (2 Colors)',
+        'Moiré Op-Art (2 Colors)': 'Moiré Op-Art (2 Colors)',
+        'Houndstooth Check (2 Colors)': 'Houndstooth Check (2 Colors)',
+        'Turing Pattern (2 Colors)': 'Turing Pattern (2 Colors)',
+        'Cellular Automata (2 Colors)': 'Cellular Automata (2 Colors)'
+      },
+      'bayer-matrix-select': {
+        '2': '2x2 (Coarse / Large Pattern)',
+        '4': '4x4 (Medium / Standard Pattern)',
+        '8': '8x8 (Fine / Small Pattern)'
+      },
+      'color-distance-select': {
+        'CIEDE2000': 'CIEDE2000 (Perceptual LAB)',
+        'RGB': 'Euclidean RGB (Fast)'
+      }
+    },
+    
+    algoParams: {
+      "Dot Spacing": "Dot Spacing",
+      "Controls the grid spacing between halftone dots.": "Controls the grid spacing between halftone dots.",
+      "Glitch Intensity": "Glitch Intensity",
+      "Controls the frequency and displacement of glitches.": "Controls the frequency and displacement of glitches.",
+      "Color Aberration": "Color Aberration",
+      "Controls the red and blue channel shifting offset.": "Controls the red and blue channel shifting offset.",
+      "Ripple Spacing": "Ripple Spacing",
+      "Controls the distance between ripple concentric circles.": "Controls the distance between ripple concentric circles.",
+      "Hatch Spacing": "Hatch Spacing",
+      "Controls the spacing of the cross-hatch shading lines.": "Controls the spacing of the cross-hatch shading lines.",
+      "Offset Distance": "Offset Distance",
+      "Controls the displacement distance of the shadow stencil.": "Controls the displacement distance of the shadow stencil.",
+      "Wave Amplitude": "Wave Amplitude",
+      "Controls the vertical height of the Bargello flame wave.": "Controls the vertical height of the Bargello flame wave.",
+      "Wave Scale": "Wave Scale",
+      "Controls the frequency/wavelength of the stepped wave.": "Controls the frequency/wavelength of the stepped wave.",
+      "Controls the size and grid period of the comic halftone dots.": "Controls the size and grid period of the comic halftone dots.",
+      "Wave Spacing": "Wave Spacing",
+      "Controls the vertical distance between the waves.": "Controls the vertical distance between the waves.",
+      "Wave Meander": "Wave Meander",
+      "Controls the waviness/displacement of the contour lines.": "Controls the waviness/displacement of the contour lines.",
+      "Maze Block Size": "Maze Block Size",
+      "Controls the thickness and grid spacing of the Truchet maze paths.": "Controls the thickness and grid spacing of the Truchet maze paths.",
+      "Stipple Noise": "Stipple Noise",
+      "Controls the graininess/noise spread of the stippling pattern.": "Controls the graininess/noise spread of the stippling pattern.",
+      "Rib Width": "Rib Width",
+      "Controls the width of the vertical columns in the cable-rib texture.": "Controls the width of the vertical columns in the cable-rib texture.",
+      "Controls the spacing of herringbone diagonal lines.": "Controls the spacing of herringbone diagonal lines.",
+      "Column Width": "Column Width",
+      "Controls the width of the herringbone columns.": "Controls the width of the herringbone columns.",
+      "Cell Size": "Cell Size",
+      "Controls the size/scale of the Voronoi mosaic cells.": "Controls the size/scale of the Voronoi mosaic cells.",
+      "Pattern Density": "Pattern Density",
+      "Controls the thickness and density of Moiré interference stripes.": "Controls the thickness and density of Moiré interference stripes.",
+      "Spiral Spacing": "Spiral Spacing",
+      "Controls the spacing of spiral turns.": "Controls the spacing of spiral turns.",
+      "Stripe Thickness": "Stripe Thickness",
+      "Controls the row height thickness of the shadow illusion stripes.": "Controls the row height thickness of the shadow illusion stripes.",
+      "Iterations": "Iterations",
+      "Controls how many simulation steps the Turing reaction-diffusion runs.": "Controls how many simulation steps the Turing reaction-diffusion runs.",
+      "Generations": "Generations",
+      "Controls the number of cycles run in Conway's Game of Life.": "Controls the number of cycles run in Conway's Game of Life."
+    },
+    
+    alerts: {
+      CANVAS_EMPTY: "Upload an image to begin.",
+      ALERT_WRONG_TYPE: "Please upload an image file (e.g., JPG, PNG, or WEBP).",
+      ALERT_NO_IMAGE: "Please upload an image first!",
+      ALERT_BAD_WIDTH: "Please enter a valid width (a number greater than 9).",
+      ALERT_NO_CHART: "There is no chart to save!",
+      ALERT_INVALID_BASE64: "Invalid base64 image data.",
+      ALERT_INVALID_FORMAT: "Invalid image file format.",
+      ALERT_HEIC_NOT_LOADED: "HEIC conversion library is not loaded. Please ensure you have an active internet connection.",
+      ALERT_HEIC_FAILED: "Failed to convert HEIC image. Please upload a standard image format (JPG, PNG, WEBP).",
+      ALERT_LOAD_FAILED: "Failed to load image file."
+    },
+    
+    placeholders: {
+      'pdf-pattern-title': 'Enter title for PDF...',
+      'written-instructions-textarea': 'Upload an image to view written instructions...'
+    }
+  },
+  pl: {
+    'mobile-app-title': 'Generator Wzorów Dziewiarskich',
+    'app-title': 'Generator Wzorów Dziewiarskich',
+    'app-subtitle': 'Zamień dowolne zdjęcie w dziany wzór oczko po oczku z dynamicznym kalkulatorem włóczki',
+    'sidebar-mobile-title': 'Ustawienia',
+    'step-stitch-title': 'Ustawienia oczek',
+    'chart-width-label': 'Szerokość (oczka)',
+    'chart-width-help': 'Mniejsza liczba oczek tworzy bardziej uproszczony, geometryczny wzór. Wysokość zostanie dopasowana proporcjonalnie.',
+    'chart-brightness-label': 'Jasność',
+    'chart-contrast-label': 'Kontrast',
+    'hist-eq-label': 'Automatyczny kontrast',
+    'hist-eq-help': 'Stosuje wyrównanie histogramu w celu poprawy zakresu tonalnego wyblakłych obrazów przed przetworzeniem.',
+    'chart-smoothing-label': 'Wygładzanie (Anti-Confetti)',
+    'chart-smoothing-help': 'Usuwa pojedyncze, rozproszone oczka. 0 oznacza wyłączone, 1-3 zwiększa intensywność wygładzania z zachowaniem krawędzi.',
+    'bilateral-label': 'Wygładzanie z zachowaniem krawędzi',
+    'bilateral-help': 'Wygładza szum, zachowując ostre granice kolorów (0 = wyłączone, 1-5 = intensywność).',
+    'kuwahara-label': 'Efekt malarski (Kuwahara)',
+    'kuwahara-help': 'Upraszcza kształty do płaskich plam malarskich, zachowując ostre krawędzie (0 = wyłączone, 1-5 = intensywność).',
+    'morph-cleanup-label': 'Oczyszczanie morfologiczne',
+    'morph-cleanup-help': 'Wygładza granice kształtów za pomocą morfologii matematycznej. Otwarcie usuwa szum; Zamknięcie wypełnia luki.',
+    'stitch-aspect-label': 'Proporcje oczka',
+    'stitch-aspect-help': 'Prawdziwe oczka są szersze niż wyższe. Dostosowuje wyświetlanie, PDF i XLS do fizycznych proporcji.',
+    'knitting-method-label': 'Metoda dziania',
+    'knitting-method-help': 'Określa kierunek odczytu rzędów i konwersję oczek dla lewej strony robótki w pisemnej instrukcji.',
+    'step-colors-title': 'Filtry i tryby kolorów',
+    'color-mode-label': 'Algorytm koloru',
+    'bayer-matrix-label': 'Skala tekstury Bayera',
+    'bayer-matrix-help': 'Kontroluje rozmiar siatki wzoru ditheringu w stosunku do oczek.',
+    'color-levels-label': 'Liczba kolorów (Poziomy)',
+    'color-levels-help': 'Redukuje obraz do określonej liczby tonów barwnych.',
+    'yarn-palette-label': 'Paleta kolorów włóczki',
+    'yarn-palette-size-label': 'Kolory:',
+    'yarn-color-1-label': 'Kolor 1',
+    'yarn-color-2-label': 'Kolor 2',
+    'yarn-color-3-label': 'Kolor 3',
+    'yarn-color-4-label': 'Kolor 4',
+    'yarn-color-5-label': 'Kolor 5',
+    'yarn-color-6-label': 'Kolor 6',
+    'yarn-color-7-label': 'Kolor 7',
+    'yarn-color-8-label': 'Kolor 8',
+    'color-distance-label': 'Dopasowanie kolorów',
+    'stray-stitch-label': 'Usuwaj pojedyncze oczka',
+    'stray-stitch-help': 'Automatycznie łączy pojedyncze, odosobnione oczka z dominującym sąsiednim kolorem w celu ułatwienia pracy.',
+    'row-color-limit-label': 'Ogranicz kolory w rzędzie',
+    'row-color-limit-max-label': 'Maks:',
+    'row-color-limit-help': 'Ogranicza każdy rząd do maksymalnej liczby aktywnych kolorów włóczek w celu ułatwienia żakardu.',
+    'step-actions-title': 'Generowanie i eksport',
+    'pdf-pattern-title-label': 'Tytuł wzoru w PDF',
+    'btn-generate': '<span class="btn-icon">⚡</span> Generuj schemat',
+    'btn-download': '<span class="btn-icon">💾</span> Eksportuj schemat (PNG)',
+    'btn-export-pdf': '<span class="btn-icon">📄</span> Eksportuj wzór (PDF)',
+    'btn-export-xls': '<span class="btn-icon">📊</span> Eksportuj arkusz (XLS)',
+    'btn-reset': '<span class="btn-icon">🔄</span> Resetuj aplikację',
+    'preview-grid-title': 'Podgląd siatki oczek',
+    'btn-change-image-canvas': '<span class="btn-icon">🔄</span> Zmień obraz',
+    'btn-remove-image-canvas': '<span class="btn-icon">🗑️</span> Usuń obraz',
+    'show-outlines-label': 'Pokaż linie siatki',
+    'show-symbols-label': 'Pokaż symbole',
+    'viewport-upload-primary': 'Przeciągnij i upuść obraz tutaj',
+    'viewport-upload-secondary': 'lub kliknij, aby przeglądać pliki',
+    'viewport-upload-limits': 'Obsługuje JPG, PNG, WEBP, HEIC',
+    'loading-text': 'Przetwarzanie obrazu...',
+    'yarn-calculator-title': 'Kalkulator zużycia włóczki',
+    'yarn-calculator-desc': 'Poniższa lista wyświetla szacowaną liczbę oczek i potrzebne motki włóczki.',
+    'yarn-stitch-length-label': 'Włóczka/Oczko (cm)',
+    'yarn-skein-length-label': 'Metry/Motek',
+    'written-instructions-title': 'Pisemna instrukcja',
+    'written-instructions-desc': 'Postępuj zgodnie z poniższymi instrukcjami rząd po rzędzie, aby wydziergać ten wzór.',
+    'btn-copy-instructions': 'Kopiuj tekst',
+    
+    selects: {
+      'morph-cleanup-select': {
+        'none': 'Brak',
+        'erode': 'Erozja (Zwężanie)',
+        'dilate': 'Dylatacja (Rozszerzanie)',
+        'open': 'Otwarcie (Usuwanie małych punktów)',
+        'close': 'Zamknięcie (Wypełnianie szczelin)'
+      },
+      'stitch-aspect-select': {
+        '1.0': 'Kwadratowe (1:1)',
+        '1.333': 'Ścieg standardowy (4:3)',
+        '1.25': 'Ścieg skarpetkowy (5:4)',
+        '1.2': 'Ścieg drobny (6:5)'
+      },
+      'knitting-method-select': {
+        'flat': 'Płasko (tam i z powrotem)',
+        'circular': 'Okrągło (w koło)'
+      },
+      'color-mode-select': {
+        'Standard & Multi-Color Modes': 'Tryby standardowe i wielokolorowe',
+        'Dithering & Texturing': 'Dithering i teksturowanie',
+        'Artistic & Halftones': 'Artystyczne i półtony',
+        'Geometric & Algorithmic Patterns': 'Wzory geometryczne i algorytmiczne',
+        'Original Colors': 'Oryginalne kolory',
+        'Custom Palette Mapping': 'Mapowanie własnej palety',
+        'K-Means Color Reduction': 'Redukcja kolorów K-Means',
+        'Octree Color Reduction': 'Redukcja kolorów Octree',
+        'Color Reduction (Posterize)': 'Redukcja kolorów (Posterize)',
+        'Bayer Ordered Dithering': 'Dithering uporządkowany Bayera',
+        'Floyd-Steinberg Dithering': 'Dithering Floyda-Steinberga',
+        'Atkinson Dithering': 'Dithering Atkinsona',
+        'Stucki Dithering': 'Dithering Stuckiego',
+        'Burkes Dithering': 'Dithering Burkesa',
+        'Sierra Dithering': 'Dithering Sierra',
+        'Jarvis-Judice-Ninke Dithering': 'Dithering Jarvisa-Judice\'a-Ninke',
+        'Black & White (Threshold)': 'Czarno-biały (Próg)',
+        'Halftone Dot Pattern': 'Halftone - wzór kropek',
+        'Comic Halftone (2 Colors)': 'Halftone komiksowy (2 kolory)',
+        'Ripple Halftone (2 Colors)': 'Halftone falisty (2 kolory)',
+        'Spiral Halftone (2 Colors)': 'Halftone spiralny (2 kolory)',
+        'Cross-Hatch Sketch (2 Colors)': 'Szkic krzyżowy (2 kolory)',
+        'Ink Stippling (2 Colors)': 'Kropkowanie atramentem (2 kolory)',
+        'Offset Stencil Pop Art (3 Colors)': 'Pop-art szablon z przesunięciem (3 kolory)',
+        'Glitch Art Effect': 'Efekt Glitch Art',
+        'Shadow Illusion (2 Colors)': 'Iluzja cienia (2 kolory)',
+        'Bargello Wave (4 Colors)': 'Fala Bargello (4 kolory)',
+        'Stained Glass Intarsia (5 Colors)': 'Intarsja witrażowa (5 kolorów)',
+        'Contour Waves (2 Colors)': 'Fale konturowe (2 kolory)',
+        'Truchet Maze (2 Colors)': 'Labirynt Trucheta (2 kolory)',
+        'Cable-Rib Illusion (2 Colors)': 'Iluzja warkocza/ściągacza (2 kolory)',
+        'Herringbone Hatch (2 Colors)': 'Jodełka (2 kolory)',
+        'Voronoi Mosaic (2 Colors)': 'Mozaika Voronoia (2 kolory)',
+        'Moiré Op-Art (2 Colors)': 'Op-art Moiré (2 kolory)',
+        'Houndstooth Check (2 Colors)': 'Pepitka (2 kolory)',
+        'Turing Pattern (2 Colors)': 'Wzór Turinga (2 kolory)',
+        'Cellular Automata (2 Colors)': 'Automat komórkowy (2 kolory)'
+      },
+      'bayer-matrix-select': {
+        '2': '2x2 (Gruby / Duży wzór)',
+        '4': '4x4 (Średni / Standardowy wzór)',
+        '8': '8x8 (Drobny / Mały wzór)'
+      },
+      'color-distance-select': {
+        'CIEDE2000': 'CIEDE2000 (Percepcyjny LAB)',
+        'RGB': 'Euklidesowy RGB (Szybki)'
+      }
+    },
+    
+    algoParams: {
+      "Dot Spacing": "Odstępy kropek",
+      "Controls the grid spacing between halftone dots.": "Kontroluje odstępy siatki między kropkami halftone.",
+      "Glitch Intensity": "Intensywność glitchu",
+      "Controls the frequency and displacement of glitches.": "Kontroluje częstotliwość i przesunięcie zakłóceń.",
+      "Color Aberration": "Aberracja kolorów",
+      "Controls the red and blue channel shifting offset.": "Kontroluje przesunięcie kanałów czerwonego i niebieskiego.",
+      "Ripple Spacing": "Odstępy fal",
+      "Controls the distance between ripple concentric circles.": "Kontroluje odległość między współśrodkowymi kręgami fal.",
+      "Hatch Spacing": "Gęstość kreskowania",
+      "Controls the spacing of the cross-hatch shading lines.": "Kontroluje odległość między liniami cieniowania kreskowego.",
+      "Offset Distance": "Odległość przesunięcia",
+      "Controls the displacement distance of the shadow stencil.": "Kontroluje odległość przesunięcia szablonu cienia.",
+      "Wave Amplitude": "Amplituda fali",
+      "Controls the vertical height of the Bargello flame wave.": "Kontroluje pionową wysokość płomienistej fali Bargello.",
+      "Wave Scale": "Skala fali",
+      "Controls the frequency/wavelength of the stepped wave.": "Kontroluje częstotliwość/długość fali schodkowej.",
+      "Controls the size and grid period of the comic halftone dots.": "Kontroluje rozmiar i okres siatki kropek komiksowych.",
+      "Wave Spacing": "Odstępy fal",
+      "Controls the vertical distance between the waves.": "Kontroluje odległość pionową między falami.",
+      "Wave Meander": "Falistość",
+      "Controls the waviness/displacement of the contour lines.": "Kontroluje falistość/przesunięcie linii konturowych.",
+      "Maze Block Size": "Rozmiar bloku labiryntu",
+      "Controls the thickness and grid spacing of the Truchet maze paths.": "Kontroluje grubość i rozstaw siatki ścieżek labiryntu Trucheta.",
+      "Stipple Noise": "Szum kropkowania",
+      "Controls the graininess/noise spread of the stippling pattern.": "Kontroluje ziarnistość/rozproszenie szumu we wzorze kropkowania.",
+      "Rib Width": "Szerokość ściągacza",
+      "Controls the width of the vertical columns in the cable-rib texture.": "Kontroluje szerokość pionowych kolumn w teksturze warkoczowo-ściągaczowej.",
+      "Controls the spacing of herringbone diagonal lines.": "Kontroluje odstępy między liniami ukośnymi jodełki.",
+      "Column Width": "Szerokość kolumny",
+      "Controls the width of the herringbone columns.": "Kontroluje szerokość kolumn jodełki.",
+      "Cell Size": "Rozmiar komórki",
+      "Controls the size/scale of the Voronoi mosaic cells.": "Kontroluje rozmiar/skalę komórek mozaiki Voronoia.",
+      "Pattern Density": "Gęstość wzoru",
+      "Controls the thickness and density of Moiré interference stripes.": "Kontroluje grubość i gęstość pasków interferencyjnych Moiré.",
+      "Spiral Spacing": "Odstępy spirali",
+      "Controls the spacing of spiral turns.": "Kontroluje odległość między zwojami spirali.",
+      "Stripe Thickness": "Grubość paska",
+      "Controls the row height thickness of the shadow illusion stripes.": "Kontroluje wysokość rzędu pasków iluzji cienia.",
+      "Iterations": "Iteracje",
+      "Controls how many simulation steps the Turing reaction-diffusion runs.": "Kontroluje liczbę kroków symulacji reakcji-dyfuzji Turinga.",
+      "Generations": "Pokolenia",
+      "Controls the number of cycles run in Conway's Game of Life.": "Kontroluje liczbę cykli uruchamianych w Grze w Życie Conwaya."
+    },
+    
+    alerts: {
+      CANVAS_EMPTY: "Załaduj obraz, aby rozpocząć.",
+      ALERT_WRONG_TYPE: "Proszę załadować plik graficzny (np. JPG, PNG lub WEBP).",
+      ALERT_NO_IMAGE: "Proszę najpierw załadować obraz!",
+      ALERT_BAD_WIDTH: "Proszę podać poprawną szerokość (liczba większa niż 9).",
+      ALERT_NO_CHART: "Brak schematu do zapisania!",
+      ALERT_INVALID_BASE64: "Nieprawidłowe dane obrazu base64.",
+      ALERT_INVALID_FORMAT: "Nieprawidłowy format pliku obrazu.",
+      ALERT_HEIC_NOT_LOADED: "Biblioteka konwersji HEIC nie została załadowana. Upewnij się, że masz aktywne połączenie z Internetem.",
+      ALERT_HEIC_FAILED: "Konwersja obrazu HEIC nie powiodła się. Proszę załadować obraz w standardowym formacie (JPG, PNG, WEBP).",
+      ALERT_LOAD_FAILED: "Nie udało się załadować pliku obrazu."
+    },
+    
+    placeholders: {
+      'pdf-pattern-title': 'Wpisz tytuł dla PDF...',
+      'written-instructions-textarea': 'Załaduj obraz, aby wyświetlić instrukcję...'
+    }
+  }
+};
+
+
+const ALGO_PARAMS = {
+  [APP_STRINGS.MODE_HALFTONE]: {
+    param1: { label: "Dot Spacing", min: 2, max: 16, value: 4, step: 1, help: "Controls the grid spacing between halftone dots." }
+  },
+  [APP_STRINGS.MODE_GLITCH]: {
+    param1: { label: "Glitch Intensity", min: 1, max: 10, value: 5, step: 1, help: "Controls the frequency and displacement of glitches." },
+    param2: { label: "Color Aberration", min: 0, max: 5, value: 2, step: 1, help: "Controls the red and blue channel shifting offset." }
+  },
+  [APP_STRINGS.MODE_RIPPLE]: {
+    param1: { label: "Ripple Spacing", min: 3, max: 25, value: 6, step: 1, help: "Controls the distance between ripple concentric circles." }
+  },
+  [APP_STRINGS.MODE_HATCH]: {
+    param1: { label: "Hatch Spacing", min: 3, max: 15, value: 5, step: 1, help: "Controls the spacing of the cross-hatch shading lines." }
+  },
+  [APP_STRINGS.MODE_STENCIL]: {
+    param1: { label: "Offset Distance", min: 1, max: 15, value: 3, step: 1, help: "Controls the displacement distance of the shadow stencil." }
+  },
+  [APP_STRINGS.MODE_BARGELLO]: {
+    param1: { label: "Wave Amplitude", min: 1, max: 15, value: 4, step: 1, help: "Controls the vertical height of the Bargello flame wave." },
+    param2: { label: "Wave Scale", min: 5, max: 30, value: 10, step: 1, help: "Controls the frequency/wavelength of the stepped wave." }
+  },
+  [APP_STRINGS.MODE_COMIC]: {
+    param1: { label: "Dot Spacing", min: 4, max: 24, value: 8, step: 1, help: "Controls the size and grid period of the comic halftone dots." }
+  },
+  [APP_STRINGS.MODE_WAVES]: {
+    param1: { label: "Wave Spacing", min: 2, max: 16, value: 4, step: 1, help: "Controls the vertical distance between the waves." },
+    param2: { label: "Wave Meander", min: 0, max: 10, value: 3, step: 1, help: "Controls the waviness/displacement of the contour lines." }
+  },
+  [APP_STRINGS.MODE_MAZE]: {
+    param1: { label: "Maze Block Size", min: 3, max: 12, value: 4, step: 1, help: "Controls the thickness and grid spacing of the Truchet maze paths." }
+  },
+  [APP_STRINGS.MODE_STIPPLING]: {
+    param1: { label: "Stipple Noise", min: 50, max: 350, value: 180, step: 1, help: "Controls the graininess/noise spread of the stippling pattern." }
+  },
+  [APP_STRINGS.MODE_CABLERIB]: {
+    param1: { label: "Rib Width", min: 2, max: 12, value: 4, step: 1, help: "Controls the width of the vertical columns in the cable-rib texture." }
+  },
+  [APP_STRINGS.MODE_HERRINGBONE]: {
+    param1: { label: "Hatch Spacing", min: 3, max: 12, value: 5, step: 1, help: "Controls the spacing of herringbone diagonal lines." },
+    param2: { label: "Column Width", min: 4, max: 16, value: 6, step: 1, help: "Controls the width of the herringbone columns." }
+  },
+  [APP_STRINGS.MODE_VORONOI]: {
+    param1: { label: "Cell Size", min: 4, max: 24, value: 8, step: 1, help: "Controls the size/scale of the Voronoi mosaic cells." }
+  },
+  [APP_STRINGS.MODE_MOIRE]: {
+    param1: { label: "Pattern Density", min: 20, max: 150, value: 60, step: 1, help: "Controls the thickness and density of Moiré interference stripes." }
+  },
+  [APP_STRINGS.MODE_SPIRAL]: {
+    param1: { label: "Spiral Spacing", min: 3, max: 25, value: 6, step: 1, help: "Controls the spacing of spiral turns." }
+  },
+  [APP_STRINGS.MODE_SHADOW]: {
+    param1: { label: "Stripe Thickness", min: 1, max: 6, value: 2, step: 1, help: "Controls the row height thickness of the shadow illusion stripes." }
+  },
+  [APP_STRINGS.MODE_TURING]: {
+    param1: { label: "Iterations", min: 2, max: 20, value: 8, step: 1, help: "Controls how many simulation steps the Turing reaction-diffusion runs." }
+  },
+  [APP_STRINGS.MODE_AUTOMATA]: {
+    param1: { label: "Generations", min: 1, max: 15, value: 4, step: 1, help: "Controls the number of cycles run in Conway's Game of Life." }
+  }
 };
 
 const DEFAULTS = {
@@ -139,9 +610,7 @@ let knittingMethodSelect;
 let btnCopyInstructions;
 let writtenInstructionsTextarea;
 let colorDistanceSelect;
-let flowSensitivitySlider;
-let flowSensitivityVal;
-let flowInvertCheckbox;
+
 let bayerMatrixSelect;
 let strayStitchCheckbox;
 let histEqCheckbox;
@@ -151,15 +620,12 @@ let morphCleanupSelect;
 let rowColorLimitCheckbox;
 let rowColorLimitInput;
 
-let ayabLaceCheckbox;
-let ayabLaceLPassesInput;
-let ayabLaceKPassesInput;
-let ayabLaceRowMapping = null; // Array mapping expanded row indexes to {type, designRow, passIndex}
-let designSymbolsGrid = null;
-
+let algoParamContainer1, algoParamLabel1, algoParamVal1, algoParamSlider1, algoParamHelp1;
+let algoParamContainer2, algoParamLabel2, algoParamVal2, algoParamSlider2, algoParamHelp2;
 
 // Settings cache
 let currentSettings = {};
+let currentLanguage = 'en';
 
 function setup() {
   // Canvas creation
@@ -195,9 +661,7 @@ function setup() {
   btnCopyInstructions = document.getElementById('btn-copy-instructions');
   writtenInstructionsTextarea = document.getElementById('written-instructions-textarea');
   colorDistanceSelect = document.getElementById('color-distance-select');
-  flowSensitivitySlider = document.getElementById('flow-sensitivity-slider');
-  flowSensitivityVal = document.getElementById('flow-sensitivity-val');
-  flowInvertCheckbox = document.getElementById('flow-invert-checkbox');
+
   bayerMatrixSelect = document.getElementById('bayer-matrix-select');
   strayStitchCheckbox = document.getElementById('stray-stitch-checkbox');
   histEqCheckbox = document.getElementById('hist-eq-checkbox');
@@ -206,9 +670,20 @@ function setup() {
   morphCleanupSelect = document.getElementById('morph-cleanup-select');
   rowColorLimitCheckbox = document.getElementById('row-color-limit-checkbox');
   rowColorLimitInput = document.getElementById('row-color-limit-input');
-  ayabLaceCheckbox = document.getElementById('ayab-lace-checkbox');
-  ayabLaceLPassesInput = document.getElementById('ayab-lace-l-passes');
-  ayabLaceKPassesInput = document.getElementById('ayab-lace-k-passes');
+
+  algoParamContainer1 = document.getElementById('algo-parameter-container-1');
+  algoParamLabel1 = document.getElementById('algo-parameter-label-1');
+  algoParamVal1 = document.getElementById('algo-parameter-val-1');
+  algoParamSlider1 = document.getElementById('algo-parameter-slider-1');
+  algoParamHelp1 = document.getElementById('algo-parameter-help-1');
+
+  algoParamContainer2 = document.getElementById('algo-parameter-container-2');
+  algoParamLabel2 = document.getElementById('algo-parameter-label-2');
+  algoParamVal2 = document.getElementById('algo-parameter-val-2');
+  algoParamSlider2 = document.getElementById('algo-parameter-slider-2');
+  algoParamHelp2 = document.getElementById('algo-parameter-help-2');
+
+
 
   
   // Custom Palette Bindings
@@ -255,9 +730,7 @@ function setup() {
   stitchAspectSelect.value = "1.0";
   knittingMethodSelect.value = "flat";
   colorDistanceSelect.value = "CIEDE2000";
-  flowSensitivitySlider.value = 50;
-  flowSensitivityVal.value = "50%";
-  if (flowInvertCheckbox) flowInvertCheckbox.checked = false;
+
   if (bayerMatrixSelect) bayerMatrixSelect.value = 4;
   if (strayStitchCheckbox) strayStitchCheckbox.checked = false;
   if (histEqCheckbox) histEqCheckbox.checked = false;
@@ -265,9 +738,8 @@ function setup() {
   if (morphCleanupSelect) morphCleanupSelect.value = 'none';
   if (rowColorLimitCheckbox) rowColorLimitCheckbox.checked = false;
   if (rowColorLimitInput) rowColorLimitInput.value = 2;
-  if (ayabLaceCheckbox) ayabLaceCheckbox.checked = false;
-  if (ayabLaceLPassesInput) ayabLaceLPassesInput.value = 2;
-  if (ayabLaceKPassesInput) ayabLaceKPassesInput.value = 2;
+
+
 
   // Initialize Settings Cache
   cacheCurrentSettings();
@@ -372,6 +844,42 @@ function setup() {
     updateLegend();
   });
 
+  // Algo Parameter 1 input & slider sync
+  if (algoParamVal1 && algoParamSlider1) {
+    algoParamVal1.addEventListener('input', () => {
+      algoParamSlider1.value = algoParamVal1.value;
+    });
+    algoParamVal1.addEventListener('change', (e) => {
+      let val = parseFloat(e.target.value);
+      handleSettingChange(algoParamVal1, val, 'algoParam1');
+    });
+    algoParamSlider1.addEventListener('input', () => {
+      algoParamVal1.value = algoParamSlider1.value;
+    });
+    algoParamSlider1.addEventListener('change', (e) => {
+      let val = parseFloat(e.target.value);
+      handleSettingChange(algoParamSlider1, val, 'algoParam1');
+    });
+  }
+
+  // Algo Parameter 2 input & slider sync
+  if (algoParamVal2 && algoParamSlider2) {
+    algoParamVal2.addEventListener('input', () => {
+      algoParamSlider2.value = algoParamVal2.value;
+    });
+    algoParamVal2.addEventListener('change', (e) => {
+      let val = parseFloat(e.target.value);
+      handleSettingChange(algoParamVal2, val, 'algoParam2');
+    });
+    algoParamSlider2.addEventListener('input', () => {
+      algoParamVal2.value = algoParamSlider2.value;
+    });
+    algoParamSlider2.addEventListener('change', (e) => {
+      let val = parseFloat(e.target.value);
+      handleSettingChange(algoParamSlider2, val, 'algoParam2');
+    });
+  }
+
   // Advanced features input listeners
   kuwaharaSlider.addEventListener('input', () => {
     kuwaharaVal.value = kuwaharaSlider.value;
@@ -394,18 +902,7 @@ function setup() {
     handleSettingChange(colorDistanceSelect, e.target.value, 'colorDistance');
   });
 
-  flowSensitivitySlider.addEventListener('input', () => {
-    flowSensitivityVal.value = flowSensitivitySlider.value + "%";
-  });
-  flowSensitivitySlider.addEventListener('change', (e) => {
-    handleSettingChange(flowSensitivitySlider, parseInt(e.target.value), 'flowSensitivity');
-  });
 
-  if (flowInvertCheckbox) {
-    flowInvertCheckbox.addEventListener('change', (e) => {
-      handleSettingChange(flowInvertCheckbox, e.target.checked, 'flowInverted');
-    });
-  }
 
   if (bayerMatrixSelect) {
     bayerMatrixSelect.addEventListener('change', (e) => {
@@ -449,21 +946,8 @@ function setup() {
     });
   }
 
-  if (ayabLaceCheckbox) {
-    ayabLaceCheckbox.addEventListener('change', (e) => {
-      handleSettingChange(ayabLaceCheckbox, e.target.checked, 'ayabLace');
-    });
-  }
-  if (ayabLaceLPassesInput) {
-    ayabLaceLPassesInput.addEventListener('change', (e) => {
-      handleSettingChange(ayabLaceLPassesInput, parseInt(e.target.value), 'ayabLaceL');
-    });
-  }
-  if (ayabLaceKPassesInput) {
-    ayabLaceKPassesInput.addEventListener('change', (e) => {
-      handleSettingChange(ayabLaceKPassesInput, parseInt(e.target.value), 'ayabLaceK');
-    });
-  }
+
+
 
 
   btnCopyInstructions.addEventListener('click', () => {
@@ -476,9 +960,11 @@ function setup() {
   });
 
   // Action Buttons
-  btnGenerate.addEventListener('click', () => {
-    handleSettingChange(btnGenerate, null, 'regenerate');
-  });
+  if (btnGenerate) {
+    btnGenerate.addEventListener('click', () => {
+      handleSettingChange(btnGenerate, null, 'regenerate');
+    });
+  }
   btnDownload.addEventListener('click', saveChart);
   btnExportPDF.addEventListener('click', exportPDF);
   btnExportXLS.addEventListener('click', exportXLS);
@@ -514,9 +1000,79 @@ function setup() {
     }
   });
 
-  document.getElementById('btn-remove-file').addEventListener('click', () => {
-    executeRemoveImage();
-  });
+  // Viewport Upload Prompt (primary upload zone on the canvas preview area)
+  let viewportPrompt = document.getElementById('viewport-upload-prompt');
+  let viewportFrame = document.getElementById('viewport-frame');
+
+  if (viewportPrompt) {
+    // Click on the prompt opens file picker
+    viewportPrompt.addEventListener('click', () => {
+      fileInput.click();
+    });
+
+    // Drag-over on the prompt
+    viewportPrompt.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      viewportPrompt.classList.add('dragover');
+    });
+
+    viewportPrompt.addEventListener('dragleave', () => {
+      viewportPrompt.classList.remove('dragover');
+    });
+
+    viewportPrompt.addEventListener('drop', (e) => {
+      e.preventDefault();
+      viewportPrompt.classList.remove('dragover');
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        processUploadedFile(e.dataTransfer.files[0]);
+      }
+    });
+  }
+
+  // Also allow drag-and-drop on the viewport frame itself (even after an image is loaded)
+  if (viewportFrame) {
+    viewportFrame.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      if (viewportPrompt && !viewportPrompt.classList.contains('hidden')) return; // prompt handles it
+      viewportFrame.classList.add('dragover');
+    });
+
+    viewportFrame.addEventListener('dragleave', (e) => {
+      // Only remove if leaving the viewport entirely (not entering a child)
+      if (!viewportFrame.contains(e.relatedTarget)) {
+        viewportFrame.classList.remove('dragover');
+      }
+    });
+
+    viewportFrame.addEventListener('drop', (e) => {
+      e.preventDefault();
+      viewportFrame.classList.remove('dragover');
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        processUploadedFile(e.dataTransfer.files[0]);
+      }
+    });
+  }
+
+  let btnRemoveFile = document.getElementById('btn-remove-file');
+  if (btnRemoveFile) {
+    btnRemoveFile.addEventListener('click', () => {
+      executeRemoveImage();
+    });
+  }
+
+  let btnRemoveCanvas = document.getElementById('btn-remove-image-canvas');
+  if (btnRemoveCanvas) {
+    btnRemoveCanvas.addEventListener('click', () => {
+      executeRemoveImage();
+    });
+  }
+
+  let btnChangeCanvas = document.getElementById('btn-change-image-canvas');
+  if (btnChangeCanvas) {
+    btnChangeCanvas.addEventListener('click', () => {
+      fileInput.click();
+    });
+  }
 
 
 
@@ -546,12 +1102,14 @@ function setup() {
     btnToggleDrawer.addEventListener('click', () => {
       sidebarPanel.classList.add('active');
       drawerBackdrop.classList.add('active');
+      document.body.classList.add('drawer-open');
     });
   }
 
   const closeDrawer = () => {
     if (sidebarPanel) sidebarPanel.classList.remove('active');
     if (drawerBackdrop) drawerBackdrop.classList.remove('active');
+    document.body.classList.remove('drawer-open');
   };
 
   if (btnCloseDrawer) {
@@ -565,6 +1123,33 @@ function setup() {
   textFont('Outfit');
   textAlign(CENTER, CENTER);
   textSize(16);
+  // Language Selectors Sync and Init
+  let langSelectDesktop = document.getElementById('lang-select-desktop');
+  let langSelectMobile = document.getElementById('lang-select-mobile');
+
+  function syncAndSetLanguage(lang) {
+    if (langSelectDesktop) langSelectDesktop.value = lang;
+    if (langSelectMobile) langSelectMobile.value = lang;
+    localStorage.setItem('knitting-chart-lang', lang);
+    setLanguage(lang);
+  }
+
+  if (langSelectDesktop) {
+    langSelectDesktop.addEventListener('change', (e) => {
+      syncAndSetLanguage(e.target.value);
+    });
+  }
+  if (langSelectMobile) {
+    langSelectMobile.addEventListener('change', (e) => {
+      syncAndSetLanguage(e.target.value);
+    });
+  }
+
+  // Restore saved language
+  let savedLang = localStorage.getItem('knitting-chart-lang') || 'en';
+  syncAndSetLanguage(savedLang);
+
+  toggleConditionalFields();
 }
 
 function draw() {
@@ -604,7 +1189,7 @@ function draw() {
     }
 
     // Render symbols if enabled and cell size is readable
-    if (symbolsCheckbox.checked && adjustedGrid && params.cellSizeY >= 6 && params.cellSizeX >= 6) {
+    if (symbolsCheckbox.checked && adjustedGrid && params.cellSizeY >= 3 && params.cellSizeX >= 3) {
       processedImg.loadPixels();
       for (let y = 0; y < processedImg.height; y++) {
         if (!adjustedGrid[y]) continue;
@@ -650,13 +1235,13 @@ function drawStitchSymbol(symbol, cx, cy, szX, szY, r, g, b) {
   if (symbol === 'purl') {
     // Solid dot in center
     noStroke();
-    ellipse(centerX, centerY, sz * 0.22, sz * 0.22);
+    ellipse(centerX, centerY, Math.max(1.5, sz * 0.22), Math.max(1.5, sz * 0.22));
   } 
   else if (symbol === 'yo') {
     // Open circle in center
     noFill();
     strokeWeight(Math.max(1, sz * 0.08));
-    ellipse(centerX, centerY, sz * 0.45, sz * 0.45);
+    ellipse(centerX, centerY, Math.max(2.5, sz * 0.45), Math.max(2.5, sz * 0.45));
   } 
   else if (symbol === 'k2tog') {
     // Diagonal right-leaning line (bottom-left to top-right)
@@ -681,33 +1266,7 @@ function drawStitchSymbol(symbol, cx, cy, szX, szY, r, g, b) {
 function getAdjustedSymbols() {
   if (!processedImg) return [];
 
-  if (ayabLaceCheckbox && ayabLaceCheckbox.checked && ayabLaceRowMapping && designSymbolsGrid) {
-    let expandedGrid = [];
-    for (let y = 0; y < processedImg.height; y++) {
-      let mapping = ayabLaceRowMapping[y];
-      let row = [];
-      if (mapping) {
-        let designY = mapping.designRow;
-        for (let x = 0; x < processedImg.width; x++) {
-          if (mapping.type === 'L') {
-            let sym = (designSymbolsGrid[designY] && designSymbolsGrid[designY][x]) ? designSymbolsGrid[designY][x] : 'none';
-            if (sym === 'yo' || sym === 'ssk' || sym === 'k2tog') {
-              row.push(sym);
-            } else {
-              row.push('none');
-            }
-          } else {
-            row.push('none');
-          }
-        }
-      } else {
-        for (let x = 0; x < processedImg.width; x++) row.push('none');
-      }
-      expandedGrid.push(row);
-    }
-    return expandedGrid;
-  }
-  
+
   let cols = processedImg.width;
   let rows = processedImg.height;
   let grid = [];
@@ -854,8 +1413,7 @@ function cacheCurrentSettings() {
     yarnColors: yarnPickers.map(p => p.value),
     kuwahara: parseInt(kuwaharaSlider.value),
     colorDistance: colorDistanceSelect.value,
-    flowSensitivity: parseInt(flowSensitivitySlider.value),
-    flowInverted: flowInvertCheckbox ? flowInvertCheckbox.checked : false,
+
     bayerSize: bayerMatrixSelect ? parseInt(bayerMatrixSelect.value) : 4,
     cleanStrays: strayStitchCheckbox ? strayStitchCheckbox.checked : false,
     histEq: histEqCheckbox ? histEqCheckbox.checked : false,
@@ -863,9 +1421,8 @@ function cacheCurrentSettings() {
     morphCleanup: morphCleanupSelect ? morphCleanupSelect.value : 'none',
     rowColorLimit: rowColorLimitCheckbox ? rowColorLimitCheckbox.checked : false,
     rowColorMax: rowColorLimitInput ? parseInt(rowColorLimitInput.value) : 2,
-    ayabLace: ayabLaceCheckbox ? ayabLaceCheckbox.checked : false,
-    ayabLaceL: ayabLaceLPassesInput ? parseInt(ayabLaceLPassesInput.value) : 2,
-    ayabLaceK: ayabLaceKPassesInput ? parseInt(ayabLaceKPassesInput.value) : 2
+    algoParam1: algoParamVal1 ? parseFloat(algoParamVal1.value) : null,
+    algoParam2: algoParamVal2 ? parseFloat(algoParamVal2.value) : null
   };
 }
 
@@ -910,11 +1467,7 @@ function applySettingValue(propertyName, value) {
     kuwaharaVal.value = value;
   } else if (propertyName === 'colorDistance') {
     colorDistanceSelect.value = value;
-  } else if (propertyName === 'flowSensitivity') {
-    flowSensitivitySlider.value = value;
-    flowSensitivityVal.value = value + "%";
-  } else if (propertyName === 'flowInverted') {
-    if (flowInvertCheckbox) flowInvertCheckbox.checked = value;
+
   } else if (propertyName === 'bayerSize') {
     if (bayerMatrixSelect) bayerMatrixSelect.value = value;
   } else if (propertyName === 'cleanStrays') {
@@ -929,13 +1482,20 @@ function applySettingValue(propertyName, value) {
     if (rowColorLimitCheckbox) rowColorLimitCheckbox.checked = value;
   } else if (propertyName === 'rowColorMax') {
     if (rowColorLimitInput) rowColorLimitInput.value = value;
-  } else if (propertyName === 'ayabLace') {
-    if (ayabLaceCheckbox) ayabLaceCheckbox.checked = value;
-    toggleConditionalFields();
-  } else if (propertyName === 'ayabLaceL') {
-    if (ayabLaceLPassesInput) ayabLaceLPassesInput.value = value;
-  } else if (propertyName === 'ayabLaceK') {
-    if (ayabLaceKPassesInput) ayabLaceKPassesInput.value = value;
+  } else if (propertyName === 'algoParam1') {
+    let mode = colorModeSelect.value;
+    if (ALGO_PARAMS[mode] && ALGO_PARAMS[mode].param1) {
+      ALGO_PARAMS[mode].param1.value = value;
+      if (algoParamVal1) algoParamVal1.value = value;
+      if (algoParamSlider1) algoParamSlider1.value = value;
+    }
+  } else if (propertyName === 'algoParam2') {
+    let mode = colorModeSelect.value;
+    if (ALGO_PARAMS[mode] && ALGO_PARAMS[mode].param2) {
+      ALGO_PARAMS[mode].param2.value = value;
+      if (algoParamVal2) algoParamVal2.value = value;
+      if (algoParamSlider2) algoParamSlider2.value = value;
+    }
   }
 }
 
@@ -985,7 +1545,7 @@ function processUploadedFile(file) {
         file = new File([blob], "uploaded_image." + ext, { type: mime });
       } catch (e) {
         console.error("Failed to parse base64 data URL:", e);
-        alert("Invalid base64 image data.");
+        alert(APP_STRINGS.ALERT_INVALID_BASE64);
         return;
       }
     } else if (isBase64(file)) {
@@ -999,11 +1559,11 @@ function processUploadedFile(file) {
         file = new File([blob], "uploaded_image.jpg", { type: 'image/jpeg' });
       } catch (e) {
         console.error("Failed to parse raw base64 string:", e);
-        alert("Invalid base64 image data.");
+        alert(APP_STRINGS.ALERT_INVALID_BASE64);
         return;
       }
     } else {
-      alert("Invalid image file format.");
+      alert(APP_STRINGS.ALERT_INVALID_FORMAT);
       return;
     }
   }
@@ -1026,7 +1586,7 @@ function convertHeicAndUpload(file) {
   showLoader();
   
   if (typeof HeicTo === 'undefined') {
-    alert("HEIC conversion library is not loaded. Please ensure you have an active internet connection.");
+    alert(APP_STRINGS.ALERT_HEIC_NOT_LOADED);
     hideLoader();
     return;
   }
@@ -1053,7 +1613,7 @@ function convertHeicAndUpload(file) {
   .catch((error) => {
     console.error("HEIC conversion failed:", error);
     hideLoader();
-    alert("Failed to convert HEIC image. Please upload a standard image format (JPG, PNG, WEBP).");
+    alert(APP_STRINGS.ALERT_HEIC_FAILED);
   });
 }
 
@@ -1085,7 +1645,7 @@ function executeUpload(file) {
       generateChart();
     }, (err) => {
       console.error("Image loading error", err);
-      alert("Failed to load image file.");
+      alert(APP_STRINGS.ALERT_LOAD_FAILED);
     });
   };
   reader.onerror = (err) => {
@@ -1107,144 +1667,7 @@ function formatBytes(bytes) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
 }
 
-function applySobelEdgeDetection(imageObj, hexColor1, hexColor2) {
-  imageObj.loadPixels();
-  let w = imageObj.width;
-  let h = imageObj.height;
-  
-  // 1. Create a grayscale buffer of the image
-  let gray = new Uint8ClampedArray(w * h);
-  for (let i = 0; i < w * h; i++) {
-    let pxIdx = i * 4;
-    let r = imageObj.pixels[pxIdx];
-    let g = imageObj.pixels[pxIdx + 1];
-    let b = imageObj.pixels[pxIdx + 2];
-    gray[i] = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
-  }
-  
-  // Parse yarn palette colors to RGB
-  let c1 = hexToRgb(hexColor1);
-  let c2 = hexToRgb(hexColor2);
-  
-  let grads = new Float32Array(w * h);
-  let gxs = new Float32Array(w * h);
-  let gys = new Float32Array(w * h);
-  let edgeGValues = [];
 
-  for (let y = 0; y < h; y++) {
-    for (let x = 0; x < w; x++) {
-      let idx = x + y * w;
-      if (x === 0 || x === w - 1 || y === 0 || y === h - 1) {
-        grads[idx] = 0;
-        continue;
-      }
-      
-      let gx = 0;
-      let gy = 0;
-      
-      for (let ky = -1; ky <= 1; ky++) {
-        let py = y + ky;
-        for (let kx = -1; kx <= 1; kx++) {
-          let px = x + kx;
-          let val = gray[px + py * w];
-          
-          let coefX = 0;
-          if (kx === -1) coefX = ky === 0 ? -2 : -1;
-          else if (kx === 1) coefX = ky === 0 ? 2 : 1;
-          
-          let coefY = 0;
-          if (ky === -1) coefY = kx === 0 ? -2 : -1;
-          else if (ky === 1) coefY = kx === 0 ? 2 : 1;
-          
-          gx += val * coefX;
-          gy += val * coefY;
-        }
-      }
-      
-      let g = Math.sqrt(gx * gx + gy * gy);
-      grads[idx] = g;
-      gxs[idx] = gx;
-      gys[idx] = gy;
-      
-      if (g > 60) {
-        edgeGValues.push(g);
-      }
-    }
-  }
-
-  // Sort the G values of edge pixels to find the percentile
-  edgeGValues.sort((a, b) => a - b);
-  let flowSens = flowSensitivitySlider ? parseInt(flowSensitivitySlider.value) : 50;
-  
-  let G_flow = Infinity;
-  if (edgeGValues.length > 0) {
-    let thresholdIdx = Math.floor(edgeGValues.length * (1 - flowSens / 100));
-    thresholdIdx = Math.max(0, Math.min(edgeGValues.length - 1, thresholdIdx));
-    G_flow = edgeGValues[thresholdIdx];
-  }
-  let thresholdG = Math.max(60, G_flow);
-
-  // Clear any existing symbols
-  symbolMap = {};
-  let upperC1 = hexColor1.toUpperCase();
-  let upperC2 = hexColor2.toUpperCase();
-  symbolMap[upperC1] = 'none';
-  symbolMap[upperC2] = 'none';
-
-  // Create a copy of the pixel array to write to imageObj
-  for (let y = 0; y < h; y++) {
-    for (let x = 0; x < w; x++) {
-      let idx = x + y * w;
-      let pxIdx = idx * 4;
-      
-      if (x === 0 || x === w - 1 || y === 0 || y === h - 1) {
-        imageObj.pixels[pxIdx] = c1[0];
-        imageObj.pixels[pxIdx + 1] = c1[1];
-        imageObj.pixels[pxIdx + 2] = c1[2];
-        imageObj.pixels[pxIdx + 3] = 255;
-        continue;
-      }
-      
-      let g = grads[idx];
-      if (g > 60) {
-        imageObj.pixels[pxIdx] = c2[0];
-        imageObj.pixels[pxIdx + 1] = c2[1];
-        imageObj.pixels[pxIdx + 2] = c2[2];
-        imageObj.pixels[pxIdx + 3] = 255;
-        
-        if (g >= thresholdG) {
-          let gx = gxs[idx];
-          let gy = gys[idx];
-          let angleRad = Math.atan2(gy, gx);
-          let angleDeg = angleRad * 180 / Math.PI;
-          
-          let cellSymbol = 'none';
-          let isPositiveDiag = (angleDeg >= 30 && angleDeg <= 60) || (angleDeg >= -150 && angleDeg <= -120);
-          let isNegativeDiag = (angleDeg >= 120 && angleDeg <= 150) || (angleDeg >= -60 && angleDeg <= -30);
-          
-          let flowInverted = flowInvertCheckbox && flowInvertCheckbox.checked;
-          if (isPositiveDiag) {
-            cellSymbol = flowInverted ? 'k2tog' : 'ssk';
-          } else if (isNegativeDiag) {
-            cellSymbol = flowInverted ? 'ssk' : 'k2tog';
-          }
-          
-          if (cellSymbol !== 'none') {
-            symbolMap[`${x},${y}`] = cellSymbol;
-          }
-        }
-      } else {
-        imageObj.pixels[pxIdx] = c1[0];
-        imageObj.pixels[pxIdx + 1] = c1[1];
-        imageObj.pixels[pxIdx + 2] = c1[2];
-        imageObj.pixels[pxIdx + 3] = 255;
-      }
-    }
-  }
-  
-  imageObj.updatePixels();
-  symbolsCheckbox.checked = true;
-}
 
 function applyThreshold(imageObj) {
   imageObj.loadPixels();
@@ -1449,6 +1872,56 @@ function applyStrayStitchCleaner(imageObj) {
           imageObj.pixels[idx + 1] = bestColor[1];
           imageObj.pixels[idx + 2] = bestColor[2];
         }
+      }
+    }
+  }
+  
+  imageObj.updatePixels();
+}
+
+function applySmoothingFilter(imageObj, radius) {
+  imageObj.loadPixels();
+  let w = imageObj.width;
+  let h = imageObj.height;
+  
+  let srcPixels = new Uint8ClampedArray(imageObj.pixels);
+  
+  let getPixelKey = (x, y) => {
+    let idx = (x + y * w) * 4;
+    return `${srcPixels[idx]},${srcPixels[idx + 1]},${srcPixels[idx + 2]}`;
+  };
+
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      let idx = (x + y * w) * 4;
+      
+      let counts = {};
+      
+      for (let dy = -radius; dy <= radius; dy++) {
+        for (let dx = -radius; dx <= radius; dx++) {
+          let px = x + dx;
+          let py = y + dy;
+          if (px >= 0 && px < w && py >= 0 && py < h) {
+            let key = getPixelKey(px, py);
+            counts[key] = (counts[key] || 0) + 1;
+          }
+        }
+      }
+      
+      let bestKey = null;
+      let maxCount = -1;
+      for (let key in counts) {
+        if (counts[key] > maxCount) {
+          maxCount = counts[key];
+          bestKey = key;
+        }
+      }
+      
+      if (bestKey) {
+        let bestColor = bestKey.split(',').map(Number);
+        imageObj.pixels[idx] = bestColor[0];
+        imageObj.pixels[idx + 1] = bestColor[1];
+        imageObj.pixels[idx + 2] = bestColor[2];
       }
     }
   }
@@ -1774,83 +2247,11 @@ function applyRowColorLimit(imageObj, maxColors) {
   imageObj.updatePixels();
 }
 
-function applyMachineLaceExpansion(imageObj, lPasses, kPasses) {
-  let designGrid = getAdjustedSymbols();
-  let w = imageObj.width;
-  let h = imageObj.height;
-  
-  // Cache design symbols
-  designSymbolsGrid = designGrid;
-  
-  let expandedRows = [];
-  // Process design rows from bottom-to-top (h - 1 down to 0)
-  for (let designY = h - 1; designY >= 0; designY--) {
-    let rowSymbols = designGrid[designY] || [];
-    let hasTransfers = rowSymbols.some(sym => sym === 'yo' || sym === 'ssk' || sym === 'k2tog');
-    
-    if (hasTransfers) {
-      for (let p = 1; p <= lPasses; p++) {
-        expandedRows.push({ type: 'L', designRow: designY, passIndex: p });
-      }
-      for (let p = 1; p <= kPasses; p++) {
-        expandedRows.push({ type: 'K', designRow: designY, passIndex: p });
-      }
-    } else {
-      for (let p = 1; p <= kPasses; p++) {
-        expandedRows.push({ type: 'K', designRow: designY, passIndex: p });
-      }
-    }
-  }
-  
-  // Reverse expandedRows so that index 0 is top-most row (y=0) and index len-1 is bottom-most row
-  expandedRows.reverse();
-  
-  let expandedHeight = expandedRows.length;
-  ayabLaceRowMapping = expandedRows; // Cache globally
-  
-  // Create expanded image
-  let expandedImg = createImage(w, expandedHeight);
-  expandedImg.loadPixels();
-  
-  for (let y = 0; y < expandedHeight; y++) {
-    let mapping = expandedRows[y];
-    let designY = mapping.designRow;
-    let rowSymbols = designGrid[designY] || [];
-    
-    for (let x = 0; x < w; x++) {
-      let idx = (x + y * w) * 4;
-      if (mapping.type === 'L') {
-        let sym = rowSymbols[x] || 'none';
-        if (sym === 'yo' || sym === 'ssk' || sym === 'k2tog') {
-          // Select needle (Black)
-          expandedImg.pixels[idx] = 0;
-          expandedImg.pixels[idx+1] = 0;
-          expandedImg.pixels[idx+2] = 0;
-          expandedImg.pixels[idx+3] = 255;
-        } else {
-          // Unselected (White)
-          expandedImg.pixels[idx] = 255;
-          expandedImg.pixels[idx+1] = 255;
-          expandedImg.pixels[idx+2] = 255;
-          expandedImg.pixels[idx+3] = 255;
-        }
-      } else {
-        // Knit pass: plain rows (White)
-        expandedImg.pixels[idx] = 255;
-        expandedImg.pixels[idx+1] = 255;
-        expandedImg.pixels[idx+2] = 255;
-        expandedImg.pixels[idx+3] = 255;
-      }
-    }
-  }
-  
-  expandedImg.updatePixels();
-  processedImg = expandedImg;
-}
 
 
 
-function applyHalftone(imageObj, hexColorBg, hexColorDot) {
+
+function applyHalftone(imageObj, hexColorBg, hexColorDot, spacing) {
   imageObj.loadPixels();
   let w = imageObj.width;
   let h = imageObj.height;
@@ -1858,8 +2259,9 @@ function applyHalftone(imageObj, hexColorBg, hexColorDot) {
   let bgRGB = hexToRgb(hexColorBg || '#FFFFFF');
   let dotRGB = hexToRgb(hexColorDot || '#000000');
   
-  // Frequency multiplier to control dot size (repeat every 4 pixels)
-  let freq = Math.PI / 2;
+  // Frequency multiplier to control dot size (repeat every 'spacing' pixels)
+  spacing = spacing || 4;
+  let freq = (2 * Math.PI) / spacing;
   
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
@@ -1887,18 +2289,21 @@ function applyHalftone(imageObj, hexColorBg, hexColorDot) {
   imageObj.updatePixels();
 }
 
-function applyGlitch(imageObj) {
+function applyGlitch(imageObj, intensity, aberration) {
   imageObj.loadPixels();
   let w = imageObj.width;
   let h = imageObj.height;
   let srcPixels = new Uint8ClampedArray(imageObj.pixels);
   
+  intensity = intensity !== undefined ? intensity : 5;
+  aberration = aberration !== undefined ? aberration : 2;
+  
   // 1. Horizontal Displacement Slices
-  let numSlices = Math.floor(random(4, 9));
+  let numSlices = Math.floor(random(intensity / 2 + 1, intensity + 4));
   for (let i = 0; i < numSlices; i++) {
     let sliceY = Math.floor(random(0, h));
     let sliceH = Math.floor(random(2, Math.max(5, h / 8)));
-    let shiftX = Math.floor(random(-Math.max(2, w / 15), Math.max(2, w / 15)));
+    let shiftX = Math.floor(random(-Math.max(2, w / 15), Math.max(2, w / 15)) * (intensity / 5.0));
     
     for (let y = sliceY; y < Math.min(h, sliceY + sliceH); y++) {
       for (let x = 0; x < w; x++) {
@@ -1918,8 +2323,8 @@ function applyGlitch(imageObj) {
   let displacedPixels = new Uint8ClampedArray(imageObj.pixels);
   
   // 2. Chromatic Aberration (Red and Blue channel offset splits)
-  let rShift = Math.floor(random(1, 3));
-  let bShift = Math.floor(random(1, 3));
+  let rShift = aberration;
+  let bShift = aberration;
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
       let idx = (x + y * w) * 4;
@@ -1977,7 +2382,7 @@ function applyGlitch(imageObj) {
   imageObj.updatePixels();
 }
 
-function applyRippleHalftone(imageObj, bgHex, rippleHex) {
+function applyRippleHalftone(imageObj, bgHex, rippleHex, period) {
   imageObj.loadPixels();
   let w = imageObj.width;
   let h = imageObj.height;
@@ -1986,8 +2391,7 @@ function applyRippleHalftone(imageObj, bgHex, rippleHex) {
   let bg = hexToRgb(bgHex || '#FFFFFF');
   let rip = hexToRgb(rippleHex || '#000000');
   
-  // Adaptive spacing (period) for the ripples: 4% of image size, at least 4 pixels.
-  let period = Math.max(4, Math.round(Math.max(w, h) / 25));
+  period = period || 6;
   
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
@@ -2018,14 +2422,14 @@ function applyRippleHalftone(imageObj, bgHex, rippleHex) {
   imageObj.updatePixels();
 }
 
-function applyCrossHatch(imageObj, bgHex, hatchHex) {
+function applyCrossHatch(imageObj, bgHex, hatchHex, period) {
   imageObj.loadPixels();
   let w = imageObj.width;
   let h = imageObj.height;
   let bg = hexToRgb(bgHex || '#FFFFFF');
   let hatch = hexToRgb(hatchHex || '#000000');
   
-  let period = 5; // standard spacing
+  period = period || 5;
   
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
@@ -2070,7 +2474,7 @@ function applyCrossHatch(imageObj, bgHex, hatchHex) {
   imageObj.updatePixels();
 }
 
-function applyOffsetStencil(imageObj, bgHex, stencilHex, offsetHex) {
+function applyOffsetStencil(imageObj, bgHex, stencilHex, offsetHex, offsetDistance) {
   imageObj.loadPixels();
   let w = imageObj.width;
   let h = imageObj.height;
@@ -2101,9 +2505,10 @@ function applyOffsetStencil(imageObj, bgHex, stencilHex, offsetHex) {
     return lums[px + py * w] < threshold;
   };
   
-  // Dynamic offset based on image dimensions
-  let dx = Math.max(1, Math.round(w / 40));
-  let dy = Math.max(1, Math.round(h / 40));
+  // Offset based on user parameter
+  offsetDistance = offsetDistance !== undefined ? offsetDistance : 3;
+  let dx = offsetDistance;
+  let dy = offsetDistance;
   
   // Apply the stencil mapping
   for (let y = 0; y < h; y++) {
@@ -2131,55 +2536,7 @@ function applyOffsetStencil(imageObj, bgHex, stencilHex, offsetHex) {
   imageObj.updatePixels();
 }
 
-function applyReliefTexture(imageObj, yarnHex) {
-  imageObj.loadPixels();
-  let w = imageObj.width;
-  let h = imageObj.height;
-  let target = hexToRgb(yarnHex || '#FFFFFF');
-  
-  // Clear any existing coordinate-specific symbols
-  for (let key in symbolMap) {
-    if (key.includes(',')) {
-      delete symbolMap[key];
-    }
-  }
-  
-  // Calculate average luminance to set threshold dynamically
-  let totalL = 0;
-  let lums = new Float32Array(w * h);
-  for (let y = 0; y < h; y++) {
-    for (let x = 0; x < w; x++) {
-      let idx = (x + y * w) * 4;
-      let r = imageObj.pixels[idx];
-      let g = imageObj.pixels[idx + 1];
-      let b = imageObj.pixels[idx + 2];
-      let L = 0.299 * r + 0.587 * g + 0.114 * b;
-      lums[x + y * w] = L;
-      totalL += L;
-    }
-  }
-  let threshold = totalL / (w * h);
-  
-  for (let y = 0; y < h; y++) {
-    for (let x = 0; x < w; x++) {
-      let idx = (x + y * w) * 4;
-      let L = lums[x + y * w];
-      
-      // If dark, PURL stitch. If light, KNIT (blank).
-      if (L < threshold) {
-        symbolMap[`${x},${y}`] = 'purl';
-      } else {
-        symbolMap[`${x},${y}`] = 'none';
-      }
-      
-      imageObj.pixels[idx] = target[0];
-      imageObj.pixels[idx + 1] = target[1];
-      imageObj.pixels[idx + 2] = target[2];
-      imageObj.pixels[idx + 3] = 255;
-    }
-  }
-  imageObj.updatePixels();
-}
+
 
 function applyMosaicSlipStitch(imageObj, bgHex, patternHex) {
   // First map to custom 2-color palette
@@ -2242,7 +2599,7 @@ function applyMosaicSlipStitch(imageObj, bgHex, patternHex) {
   imageObj.updatePixels();
 }
 
-function applyShadowIllusion(imageObj, colorAHex, colorBHex) {
+function applyShadowIllusion(imageObj, colorAHex, colorBHex, thickness) {
   imageObj.loadPixels();
   let w = imageObj.width;
   let h = imageObj.height;
@@ -2261,13 +2618,15 @@ function applyShadowIllusion(imageObj, colorAHex, colorBHex) {
   }
   let threshold = totalL / (w * h);
   
+  thickness = thickness || 2;
+  
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
       let idx = (x + y * w) * 4;
       let L = lums[x + y * w];
       let isMotif = L < threshold; // Motif is the darker region
       
-      let stripe = Math.floor(y / 2) % 2; // alternates every 2 rows
+      let stripe = Math.floor(y / thickness) % 2; // alternates based on thickness
       let useColorA;
       
       if (isMotif) {
@@ -2288,7 +2647,7 @@ function applyShadowIllusion(imageObj, colorAHex, colorBHex) {
   imageObj.updatePixels();
 }
 
-function applyBargelloWave(imageObj, c1Hex, c2Hex, c3Hex, c4Hex) {
+function applyBargelloWave(imageObj, c1Hex, c2Hex, c3Hex, c4Hex, amplitude, scale) {
   // First map to 4 colors
   let palette = [c1Hex, c2Hex, c3Hex, c4Hex];
   applyCustomPaletteMapping(imageObj, palette);
@@ -2299,10 +2658,14 @@ function applyBargelloWave(imageObj, c1Hex, c2Hex, c3Hex, c4Hex) {
   
   let srcPixels = new Uint8ClampedArray(imageObj.pixels);
   
+  amplitude = amplitude !== undefined ? amplitude : 4;
+  scale = scale !== undefined ? scale : 10;
+  let freqScale = scale / 10.0;
+  
   // We displace each column of pixels vertically to create the Bargello flame wave
   for (let x = 0; x < w; x++) {
     // Generate a stepped wave offset for column x
-    let waveOffset = Math.round(Math.sin(x * 0.3) * 4 + Math.sin(x * 0.1) * 2);
+    let waveOffset = Math.round((Math.sin(x * 0.3 * freqScale) * 4 + Math.sin(x * 0.1 * freqScale) * 2) * (amplitude / 4.0));
     
     for (let y = 0; y < h; y++) {
       let destIdx = (x + y * w) * 4;
@@ -2370,7 +2733,7 @@ function applyStainedGlass(imageObj, c1, c2, c3, c4, outlineHex) {
   imageObj.updatePixels();
 }
 
-function applyComicHalftone(imageObj, bgHex, dotHex) {
+function applyComicHalftone(imageObj, bgHex, dotHex, period) {
   imageObj.loadPixels();
   let w = imageObj.width;
   let h = imageObj.height;
@@ -2386,7 +2749,7 @@ function applyComicHalftone(imageObj, bgHex, dotHex) {
     return 0.299 * srcPixels[idx] + 0.587 * srcPixels[idx + 1] + 0.114 * srcPixels[idx + 2];
   };
   
-  let period = Math.max(4, Math.round(Math.max(w, h) / 30));
+  period = period || 8;
   let hSpacing = period * Math.sqrt(3) / 2;
   
   for (let y = 0; y < h; y++) {
@@ -2473,16 +2836,15 @@ function applyRibbedScanlines(imageObj, bgHex, stripeHex) {
     }
   }
   imageObj.updatePixels();
-}
-
-function applyContourWaves(imageObj, bgHex, waveHex) {
+}function applyContourWaves(imageObj, bgHex, waveHex, period, amplitude) {
   imageObj.loadPixels();
   let w = imageObj.width;
   let h = imageObj.height;
   let bg = hexToRgb(bgHex || '#FFFFFF');
   let wave = hexToRgb(waveHex || '#000000');
   
-  let period = 4; // wave spacing
+  period = period || 4; // wave spacing
+  amplitude = amplitude !== undefined ? amplitude : 3;
   
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
@@ -2495,7 +2857,7 @@ function applyContourWaves(imageObj, bgHex, waveHex) {
       let val = L / 255.0; // 0 to 1
       
       // Meandering sine wave formula
-      let wavePhase = y + Math.sin(x * 0.25) * 2.5;
+      let wavePhase = y + Math.sin(x * 0.25) * amplitude;
       let frac = (wavePhase % period + period) % period; // handle negative modulo
       
       // If frac is less than thickness threshold (based on darkness), use wave color
@@ -2511,14 +2873,14 @@ function applyContourWaves(imageObj, bgHex, waveHex) {
   imageObj.updatePixels();
 }
 
-function applyTruchetMaze(imageObj, bgHex, mazeHex) {
+function applyTruchetMaze(imageObj, bgHex, mazeHex, blockSize) {
   imageObj.loadPixels();
   let w = imageObj.width;
   let h = imageObj.height;
   let bg = hexToRgb(bgHex || '#FFFFFF');
   let maze = hexToRgb(mazeHex || '#000000');
   
-  let blockSize = 4;
+  blockSize = blockSize || 4;
   
   // Store original pixels to read luminance
   let srcPixels = new Uint8ClampedArray(imageObj.pixels);
@@ -2540,7 +2902,7 @@ function applyTruchetMaze(imageObj, bgHex, mazeHex) {
       let innerY = y % blockSize;
       
       // Get average luminance of the block (read center of block)
-      let L = getLuminance(blockX * blockSize + 2, blockY * blockSize + 2);
+      let L = getLuminance(blockX * blockSize + Math.floor(blockSize / 2), blockY * blockSize + Math.floor(blockSize / 2));
       let val = L / 255.0; // 0 to 1
       
       // Pseudo-random tile orientation based on block coordinates
@@ -2571,7 +2933,7 @@ function applyTruchetMaze(imageObj, bgHex, mazeHex) {
   imageObj.updatePixels();
 }
 
-function applyInkStippling(imageObj, bgHex, stippleHex) {
+function applyInkStippling(imageObj, bgHex, stippleHex, noiseScale) {
   imageObj.loadPixels();
   let w = imageObj.width;
   let h = imageObj.height;
@@ -2584,6 +2946,8 @@ function applyInkStippling(imageObj, bgHex, stippleHex) {
     return x - Math.floor(x);
   };
   
+  noiseScale = noiseScale !== undefined ? noiseScale : 180;
+  
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
       let idx = (x + y * w) * 4;
@@ -2593,9 +2957,9 @@ function applyInkStippling(imageObj, bgHex, stippleHex) {
       
       let L = 0.299 * r + 0.587 * g + 0.114 * b;
       
-      // Generate deterministic noise between -100 and 100
+      // Generate deterministic noise
       let seed = x * 12.9898 + y * 78.233;
-      let noise = (randomVal(seed) - 0.5) * 180;
+      let noise = (randomVal(seed) - 0.5) * noiseScale;
       
       // Threshold the noisy luminance
       let isStipple = (L + noise) < 128;
@@ -2610,14 +2974,14 @@ function applyInkStippling(imageObj, bgHex, stippleHex) {
   imageObj.updatePixels();
 }
 
-function applyCableRibIllusion(imageObj, bgHex, ribHex) {
+function applyCableRibIllusion(imageObj, bgHex, ribHex, colWidth) {
   imageObj.loadPixels();
   let w = imageObj.width;
   let h = imageObj.height;
   let bg = hexToRgb(bgHex || '#FFFFFF');
   let rib = hexToRgb(ribHex || '#000000');
   
-  let colWidth = 4; // width of vertical ribs
+  colWidth = colWidth || 4; // width of vertical ribs
   
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
@@ -2647,15 +3011,15 @@ function applyCableRibIllusion(imageObj, bgHex, ribHex) {
   imageObj.updatePixels();
 }
 
-function applyHerringboneHatch(imageObj, bgHex, hatchHex) {
+function applyHerringboneHatch(imageObj, bgHex, hatchHex, period, colWidth) {
   imageObj.loadPixels();
   let w = imageObj.width;
   let h = imageObj.height;
   let bg = hexToRgb(bgHex || '#FFFFFF');
   let hatch = hexToRgb(hatchHex || '#000000');
   
-  let colWidth = 6;
-  let period = 5;
+  colWidth = colWidth || 6;
+  period = period || 5;
   
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
@@ -2692,14 +3056,14 @@ function applyHerringboneHatch(imageObj, bgHex, hatchHex) {
   imageObj.updatePixels();
 }
 
-function applyVoronoiMosaic(imageObj, bgHex, lineHex) {
+function applyVoronoiMosaic(imageObj, bgHex, lineHex, cellSize) {
   imageObj.loadPixels();
   let w = imageObj.width;
   let h = imageObj.height;
   let bg = hexToRgb(bgHex || '#FFFFFF');
   let line = hexToRgb(lineHex || '#000000');
   
-  let cellSize = 8; // Size of each grid block
+  cellSize = cellSize || 8; // Size of each grid block
   let cols = Math.ceil(w / cellSize);
   let rows = Math.ceil(h / cellSize);
   
@@ -2891,12 +3255,15 @@ function applyTypographyArt(imageObj, bgHex, textHex) {
   imageObj.updatePixels();
 }
 
-function applyMoireOpArt(imageObj, bgHex, lineHex) {
+function applyMoireOpArt(imageObj, bgHex, lineHex, density) {
   imageObj.loadPixels();
   let w = imageObj.width;
   let h = imageObj.height;
   let bg = hexToRgb(bgHex || '#FFFFFF');
   let line = hexToRgb(lineHex || '#000000');
+  
+  density = density || 60;
+  let freq = density / 100.0;
   
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
@@ -2909,11 +3276,11 @@ function applyMoireOpArt(imageObj, bgHex, lineHex) {
       let val = L / 255.0; // 0 to 1
       
       // Line grid 1: straight vertical columns
-      let grid1 = Math.sin(x * 0.6) > 0;
+      let grid1 = Math.sin(x * freq) > 0;
       
       // Line grid 2: wavy lines deformed by image darkness
       let deformation = (1.0 - val) * 6.0;
-      let grid2 = Math.sin(x * 0.6 + y * 0.05 + deformation) > 0;
+      let grid2 = Math.sin(x * freq + y * 0.05 + deformation) > 0;
       
       // XOR interference creates the Moiré bands
       let active = (grid1 !== grid2);
@@ -2928,7 +3295,7 @@ function applyMoireOpArt(imageObj, bgHex, lineHex) {
   imageObj.updatePixels();
 }
 
-function applySpiralHalftone(imageObj, bgHex, lineHex) {
+function applySpiralHalftone(imageObj, bgHex, lineHex, spacing) {
   imageObj.loadPixels();
   let w = imageObj.width;
   let h = imageObj.height;
@@ -2938,8 +3305,8 @@ function applySpiralHalftone(imageObj, bgHex, lineHex) {
   let cx = w / 2;
   let cy = h / 2;
   
-  // Adaptive spacing (period) for spiral turns
-  let spacing = Math.max(4, Math.round(Math.max(w, h) / 25));
+  // Spacing (period) for spiral turns
+  spacing = spacing || 6;
   let maxThickness = spacing * 0.65;
   
   for (let y = 0; y < h; y++) {
@@ -3020,7 +3387,7 @@ function applyHoundstoothCheck(imageObj, bgHex, checkHex) {
   imageObj.updatePixels();
 }
 
-function applyTuringPattern(imageObj, bgHex, stripeHex) {
+function applyTuringPattern(imageObj, bgHex, stripeHex, iterations) {
   imageObj.loadPixels();
   let w = imageObj.width;
   let h = imageObj.height;
@@ -3045,9 +3412,10 @@ function applyTuringPattern(imageObj, bgHex, stripeHex) {
     return grid[gx + gy * w];
   };
   
-  // 2. Run local-excitation wide-inhibition CA for 8 iterations
+  // 2. Run local-excitation wide-inhibition CA for 'iterations'
+  iterations = iterations || 8;
   let nextGrid = new Float32Array(w * h);
-  for (let iter = 0; iter < 8; iter++) {
+  for (let iter = 0; iter < iterations; iter++) {
     for (let y = 0; y < h; y++) {
       for (let x = 0; x < w; x++) {
         let idx = x + y * w;
@@ -3093,7 +3461,7 @@ function applyTuringPattern(imageObj, bgHex, stripeHex) {
   imageObj.updatePixels();
 }
 
-function applyCellularAutomata(imageObj, bgHex, cellHex) {
+function applyCellularAutomata(imageObj, bgHex, cellHex, generations) {
   imageObj.loadPixels();
   let w = imageObj.width;
   let h = imageObj.height;
@@ -3115,9 +3483,10 @@ function applyCellularAutomata(imageObj, bgHex, cellHex) {
     return grid[gx + gy * w];
   };
   
-  // Run 4 generations of Conway's Game of Life
+  // Run 'generations' of Conway's Game of Life
+  generations = generations || 4;
   let nextGrid = new Uint8Array(w * h);
-  for (let gen = 0; gen < 4; gen++) {
+  for (let gen = 0; gen < generations; gen++) {
     for (let y = 0; y < h; y++) {
       for (let x = 0; x < w; x++) {
         let idx = x + y * w;
@@ -3490,8 +3859,7 @@ function generateChart() {
   showLoader();
 
   setTimeout(() => {
-    ayabLaceRowMapping = null;
-    designSymbolsGrid = null;
+
 
     let ratio = img.height / img.width;
     let targetH = Math.floor(targetW * ratio);
@@ -3516,21 +3884,21 @@ function generateChart() {
       applyBilateralFilter(processedImg, bilateralRadius);
     }
 
+    // Apply Kuwahara Filter
+    let kuwaharaRadius = kuwaharaSlider ? parseInt(kuwaharaSlider.value) : 0;
+    if (kuwaharaRadius > 0) {
+      applyKuwaharaFilter(processedImg, kuwaharaRadius);
+    }
+
     // Apply Anti-Confetti (Smoothing) filter
     let smoothingRadius = parseInt(smoothingInputVal.value) || 0;
     if (smoothingRadius > 0) {
       applySmoothingFilter(processedImg, smoothingRadius);
     }
 
-    // Edge outline logic
-    let mode = colorModeSelect.value;
-    if (mode === APP_STRINGS.MODE_EDGE) {
-      let flowThreshold = parseFloat(flowSensitivitySlider.value) / 100;
-      let invertFlow = flowInvertCheckbox ? flowInvertCheckbox.checked : false;
-      applySobelEdgeDetection(processedImg, yarnColor1.value, yarnColor2.value, flowThreshold, invertFlow);
-    } 
     // Dithering and color reduction algorithms
-    else if (mode === APP_STRINGS.MODE_BW) {
+    let mode = colorModeSelect.value;
+    if (mode === APP_STRINGS.MODE_BW) {
       applyThreshold(processedImg);
     }
     else if (mode === APP_STRINGS.MODE_POSTERIZE) {
@@ -3574,70 +3942,86 @@ function generateChart() {
       applyOctreeQuantization(processedImg, levels);
     }
     else if (mode === APP_STRINGS.MODE_HALFTONE) {
-      applyHalftone(processedImg, yarnColor1.value, yarnColor2.value);
+      let p1 = ALGO_PARAMS[mode].param1.value;
+      applyHalftone(processedImg, yarnColor1.value, yarnColor2.value, p1);
     }
     else if (mode === APP_STRINGS.MODE_GLITCH) {
-      applyGlitch(processedImg);
+      let p1 = ALGO_PARAMS[mode].param1.value;
+      let p2 = ALGO_PARAMS[mode].param2.value;
+      applyGlitch(processedImg, p1, p2);
     }
     else if (mode === APP_STRINGS.MODE_RIPPLE) {
-      applyRippleHalftone(processedImg, yarnColor1.value, yarnColor2.value);
+      let p1 = ALGO_PARAMS[mode].param1.value;
+      applyRippleHalftone(processedImg, yarnColor1.value, yarnColor2.value, p1);
     }
     else if (mode === APP_STRINGS.MODE_HATCH) {
-      applyCrossHatch(processedImg, yarnColor1.value, yarnColor2.value);
+      let p1 = ALGO_PARAMS[mode].param1.value;
+      applyCrossHatch(processedImg, yarnColor1.value, yarnColor2.value, p1);
     }
     else if (mode === APP_STRINGS.MODE_STENCIL) {
-      applyOffsetStencil(processedImg, yarnColor1.value, yarnColor2.value, yarnPickers[2].value);
+      let p1 = ALGO_PARAMS[mode].param1.value;
+      applyOffsetStencil(processedImg, yarnColor1.value, yarnColor2.value, yarnPickers[2].value, p1);
     }
-    else if (mode === APP_STRINGS.MODE_RELIEF) {
-      applyReliefTexture(processedImg, yarnColor1.value);
-    }
-
     else if (mode === APP_STRINGS.MODE_SHADOW) {
-      applyShadowIllusion(processedImg, yarnColor1.value, yarnColor2.value);
+      let p1 = ALGO_PARAMS[mode].param1.value;
+      applyShadowIllusion(processedImg, yarnColor1.value, yarnColor2.value, p1);
     }
     else if (mode === APP_STRINGS.MODE_BARGELLO) {
-      applyBargelloWave(processedImg, yarnColor1.value, yarnColor2.value, yarnPickers[2].value, yarnPickers[3].value);
+      let p1 = ALGO_PARAMS[mode].param1.value;
+      let p2 = ALGO_PARAMS[mode].param2.value;
+      applyBargelloWave(processedImg, yarnColor1.value, yarnColor2.value, yarnPickers[2].value, yarnPickers[3].value, p1, p2);
     }
     else if (mode === APP_STRINGS.MODE_STAINED_GLASS) {
       applyStainedGlass(processedImg, yarnColor1.value, yarnColor2.value, yarnPickers[2].value, yarnPickers[3].value, yarnPickers[4].value);
     }
     else if (mode === APP_STRINGS.MODE_COMIC) {
-      applyComicHalftone(processedImg, yarnColor1.value, yarnColor2.value);
+      let p1 = ALGO_PARAMS[mode].param1.value;
+      applyComicHalftone(processedImg, yarnColor1.value, yarnColor2.value, p1);
     }
-
     else if (mode === APP_STRINGS.MODE_WAVES) {
-      applyContourWaves(processedImg, yarnColor1.value, yarnColor2.value);
+      let p1 = ALGO_PARAMS[mode].param1.value;
+      let p2 = ALGO_PARAMS[mode].param2.value;
+      applyContourWaves(processedImg, yarnColor1.value, yarnColor2.value, p1, p2);
     }
     else if (mode === APP_STRINGS.MODE_MAZE) {
-      applyTruchetMaze(processedImg, yarnColor1.value, yarnColor2.value);
+      let p1 = ALGO_PARAMS[mode].param1.value;
+      applyTruchetMaze(processedImg, yarnColor1.value, yarnColor2.value, p1);
     }
     else if (mode === APP_STRINGS.MODE_STIPPLING) {
-      applyInkStippling(processedImg, yarnColor1.value, yarnColor2.value);
+      let p1 = ALGO_PARAMS[mode].param1.value;
+      applyInkStippling(processedImg, yarnColor1.value, yarnColor2.value, p1);
     }
     else if (mode === APP_STRINGS.MODE_CABLERIB) {
-      applyCableRibIllusion(processedImg, yarnColor1.value, yarnColor2.value);
+      let p1 = ALGO_PARAMS[mode].param1.value;
+      applyCableRibIllusion(processedImg, yarnColor1.value, yarnColor2.value, p1);
     }
     else if (mode === APP_STRINGS.MODE_HERRINGBONE) {
-      applyHerringboneHatch(processedImg, yarnColor1.value, yarnColor2.value);
+      let p1 = ALGO_PARAMS[mode].param1.value;
+      let p2 = ALGO_PARAMS[mode].param2.value;
+      applyHerringboneHatch(processedImg, yarnColor1.value, yarnColor2.value, p1, p2);
     }
     else if (mode === APP_STRINGS.MODE_VORONOI) {
-      applyVoronoiMosaic(processedImg, yarnColor1.value, yarnColor2.value);
+      let p1 = ALGO_PARAMS[mode].param1.value;
+      applyVoronoiMosaic(processedImg, yarnColor1.value, yarnColor2.value, p1);
     }
-
     else if (mode === APP_STRINGS.MODE_MOIRE) {
-      applyMoireOpArt(processedImg, yarnColor1.value, yarnColor2.value);
+      let p1 = ALGO_PARAMS[mode].param1.value;
+      applyMoireOpArt(processedImg, yarnColor1.value, yarnColor2.value, p1);
     }
     else if (mode === APP_STRINGS.MODE_SPIRAL) {
-      applySpiralHalftone(processedImg, yarnColor1.value, yarnColor2.value);
+      let p1 = ALGO_PARAMS[mode].param1.value;
+      applySpiralHalftone(processedImg, yarnColor1.value, yarnColor2.value, p1);
     }
     else if (mode === APP_STRINGS.MODE_HOUNDSTOOTH) {
       applyHoundstoothCheck(processedImg, yarnColor1.value, yarnColor2.value);
     }
     else if (mode === APP_STRINGS.MODE_TURING) {
-      applyTuringPattern(processedImg, yarnColor1.value, yarnColor2.value);
+      let p1 = ALGO_PARAMS[mode].param1.value;
+      applyTuringPattern(processedImg, yarnColor1.value, yarnColor2.value, p1);
     }
     else if (mode === APP_STRINGS.MODE_AUTOMATA) {
-      applyCellularAutomata(processedImg, yarnColor1.value, yarnColor2.value);
+      let p1 = ALGO_PARAMS[mode].param1.value;
+      applyCellularAutomata(processedImg, yarnColor1.value, yarnColor2.value, p1);
     }
 
     // Clean Stray Stitches (Confetti Cleaner) if enabled
@@ -3656,12 +4040,7 @@ function generateChart() {
       applyRowColorLimit(processedImg, maxColors);
     }
 
-    // AYAB Machine Lace Mode Expansion
-    if (ayabLaceCheckbox && ayabLaceCheckbox.checked) {
-      let lPasses = ayabLaceLPassesInput ? parseInt(ayabLaceLPassesInput.value) : 2;
-      let kPasses = ayabLaceKPassesInput ? parseInt(ayabLaceKPassesInput.value) : 2;
-      applyMachineLaceExpansion(processedImg, lPasses, kPasses);
-    }
+
 
     // Save current states into setting cache
     cacheCurrentSettings();
@@ -3670,7 +4049,12 @@ function generateChart() {
     btnDownload.removeAttribute('disabled');
     btnExportPDF.removeAttribute('disabled');
     btnExportXLS.removeAttribute('disabled');
-    document.getElementById('chart-info-tag').textContent = `${processedImg.width} × ${processedImg.height} stitches`;
+    let filename = document.getElementById('status-filename') ? document.getElementById('status-filename').textContent : '';
+    let infoText = `${processedImg.width} × ${processedImg.height} stitches`;
+    if (filename) {
+      infoText = `${filename} (${infoText})`;
+    }
+    document.getElementById('chart-info-tag').textContent = infoText;
 
     // Draw & updates the Yarn Legend
     updateLegend();
@@ -3721,7 +4105,9 @@ function exportPDF() {
   
   // 2. Draw Subtitle
   let dateStr = new Date().toLocaleDateString();
-  let subtitle = `Generated on ${dateStr}  |  Grid size: ${processedImg.width} x ${processedImg.height} stitches`;
+  let subtitle = currentLanguage === 'pl'
+    ? `Utworzono: ${dateStr}  |  Rozmiar siatki: ${processedImg.width} x ${processedImg.height} oczek`
+    : `Generated on ${dateStr}  |  Grid size: ${processedImg.width} x ${processedImg.height} stitches`;
   doc.setFont("helvetica", "normal");
   doc.setFontSize(10);
   doc.setTextColor(100, 117, 109); // slate-muted
@@ -3771,7 +4157,7 @@ function exportPDF() {
   doc.setFont("helvetica", "bold");
   doc.setFontSize(12);
   doc.setTextColor(44, 53, 49);
-  doc.text("YARN CONSUMPTION CALCULATOR", 30, startY + 12);
+  doc.text(currentLanguage === 'pl' ? "KALKULATOR ZUŻYCIA WŁÓCZKI" : "YARN CONSUMPTION CALCULATOR", 30, startY + 12);
   
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
@@ -3800,7 +4186,9 @@ function exportPDF() {
       doc.setTextColor(100, 117, 109);
       let totalMeters = (sw.count * stitchLength) / 100;
       let skeins = Math.ceil(totalMeters / skeinLength);
-      doc.text(`${sw.count.toLocaleString()} sts (~${totalMeters.toFixed(1)} m, ${skeins} sk)`, colX + 34, colY + 1);
+      let stsLabel = currentLanguage === 'pl' ? "o." : "sts";
+      let skLabel = currentLanguage === 'pl' ? "mot." : "sk";
+      doc.text(`${sw.count.toLocaleString()} ${stsLabel} (~${totalMeters.toFixed(1)} m, ${skeins} ${skLabel})`, colX + 34, colY + 1);
     }
   });
 
@@ -3817,13 +4205,18 @@ function exportPDF() {
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10);
     doc.setTextColor(44, 53, 49);
-    doc.text("STITCH SYMBOLS GLOSSARY", 30, glossY + 9);
+    doc.text(currentLanguage === 'pl' ? "SŁOWNICZEK SYMBOLI ŚCIEGÓW" : "STITCH SYMBOLS GLOSSARY", 30, glossY + 9);
     
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8);
     doc.setTextColor(100, 117, 109);
     
-    const GLOSSARY_LABELS = {
+    const GLOSSARY_LABELS = currentLanguage === 'pl' ? {
+      'purl': '•  Oczko lewe (L)',
+      'yo': '○  Narzut (N) - dodanie oczka',
+      'k2tog': '/  2 razem na prawo (2razP) - pochylone w prawo',
+      'ssk': '\\  2 razem na prawo przez przeciągnięcie (2razPl) - pochylone w lewo'
+    } : {
       'purl': '•  Purl stitch',
       'yo': '○  Yarn Over (YO) - increase',
       'k2tog': '/  Knit 2 Together (K2Tog) - right decrease',
@@ -3844,7 +4237,7 @@ function exportPDF() {
   doc.setFont("helvetica", "italic");
   doc.setFontSize(8);
   doc.setTextColor(150, 150, 150);
-  doc.text("Created with Knitting Chart Generator", 105, 280, { align: "center" });
+  doc.text(currentLanguage === 'pl' ? "Utworzono za pomocą Generatora Wzorów Dziewiarskich" : "Created with Knitting Chart Generator", 105, 280, { align: "center" });
   
   // PAGE 2: STITCH PREVIEW GRID
   doc.addPage();
@@ -3872,12 +4265,12 @@ function exportPDF() {
   doc.setFont("helvetica", "bold");
   doc.setFontSize(14);
   doc.setTextColor(44, 53, 49);
-  doc.text("STITCH PATTERN CHART", 105, gridY - 18, { align: "center" });
+  doc.text(currentLanguage === 'pl' ? "SCHEMAT WZORU DZIEWIARSKIEGO" : "STITCH PATTERN CHART", 105, gridY - 18, { align: "center" });
   
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
   doc.setTextColor(100, 117, 109);
-  doc.text("Read chart from bottom-to-top. Columns count right-to-left.", 105, gridY - 13, { align: "center" });
+  doc.text(currentLanguage === 'pl' ? "Czytaj schemat od dołu do góry. Kolumny liczy się od prawej do lewej." : "Read chart from bottom-to-top. Columns count right-to-left.", 105, gridY - 13, { align: "center" });
   
   let adjustedGrid = [];
   if (symbolsCheckbox.checked) {
@@ -3999,16 +4392,9 @@ function exportPDF() {
     let label = "";
     let shouldLabel = false;
     
-    if (ayabLaceCheckbox && ayabLaceCheckbox.checked && ayabLaceRowMapping && ayabLaceRowMapping[y]) {
-      let mapping = ayabLaceRowMapping[y];
-      let totalDesignRows = designSymbolsGrid ? designSymbolsGrid.length : rows;
-      label = `R${totalDesignRows - mapping.designRow}-${mapping.type}${mapping.passIndex}`;
-      shouldLabel = true; // Label every row in lace mode to keep track of passes
-    } else {
-      let rowNum = rows - y;
-      label = `${rowNum}`;
-      shouldLabel = (rowNum === 1 || rowNum === rows || rowNum % 5 === 0);
-    }
+    let rowNum = rows - y;
+    label = `${rowNum}`;
+    shouldLabel = (rowNum === 1 || rowNum === rows || rowNum % 5 === 0);
     
     if (shouldLabel) {
       let ly = gridY + y * cellSizeY + cellSizeY / 2 + 1;
@@ -4039,7 +4425,7 @@ function exportPDF() {
   doc.setFont("helvetica", "bold");
   doc.setFontSize(14);
   doc.setTextColor(44, 53, 49);
-  doc.text("WRITTEN INSTRUCTIONS", 105, 25, { align: "center" });
+  doc.text(currentLanguage === 'pl' ? "PISEMNA INSTRUKCJA" : "WRITTEN INSTRUCTIONS", 105, 25, { align: "center" });
   
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
@@ -4064,7 +4450,7 @@ function exportPDF() {
       startY += 5.5; // Line height 5.5 mm
     });
   } else {
-    doc.text("No instructions generated.", 20, 35);
+    doc.text(currentLanguage === 'pl' ? "Brak wygenerowanej instrukcji." : "No instructions generated.", 20, 35);
   }
   
   // Save PDF pattern document
@@ -4075,16 +4461,7 @@ function exportPDF() {
 function getSwatchesData() {
   if (!processedImg) return [];
   
-  if (ayabLaceCheckbox && ayabLaceCheckbox.checked && ayabLaceRowMapping) {
-    let mainColor = yarnColor1 ? yarnColor1.value.toUpperCase() : '#FFFFFF';
-    let kRows = ayabLaceRowMapping.filter(m => m.type === 'K').length;
-    let count = kRows * processedImg.width;
-    return [{
-      hex: mainColor,
-      count: count,
-      percent: "100.0"
-    }];
-  }
+
 
   processedImg.loadPixels();
   let totalStitches = processedImg.width * processedImg.height;
@@ -4142,7 +4519,7 @@ function exportXLS() {
     <x:ExcelWorkbook>
       <x:ExcelWorksheets>
         <x:ExcelWorksheet>
-          <x:Name>Knitting Pattern</x:Name>
+          <x:Name>${currentLanguage === 'pl' ? "Wzór dziewiarski" : "Knitting Pattern"}</x:Name>
           <x:WorksheetOptions>
             <x:DisplayGridlines/>
           </x:WorksheetOptions>
@@ -4175,7 +4552,7 @@ function exportXLS() {
   <table>
     <!-- Header Row: columns labeled right-to-left -->
     <tr>
-      <td class="header-cell">Row \\ Col</td>
+      <td class="header-cell">${currentLanguage === 'pl' ? "Rząd \\\\ Kol" : "Row \\\\ Col"}</td>
   `;
 
   // Print column numbers right-to-left (cols down to 1)
@@ -4190,13 +4567,7 @@ function exportXLS() {
   // Data Rows: rows numbered bottom-to-top (rows down to 1)
   for (let y = 0; y < rows; y++) {
     let label = "";
-    if (ayabLaceCheckbox && ayabLaceCheckbox.checked && ayabLaceRowMapping && ayabLaceRowMapping[y]) {
-      let mapping = ayabLaceRowMapping[y];
-      let totalDesignRows = designSymbolsGrid ? designSymbolsGrid.length : rows;
-      label = `R${totalDesignRows - mapping.designRow}-${mapping.type}${mapping.passIndex}`;
-    } else {
-      label = `${rows - y}`;
-    }
+    label = `${rows - y}`;
     html += `<tr>`;
     // Leftmost row number cell
     html += `<td class="header-cell">${label}</td>`;
@@ -4263,7 +4634,7 @@ function resetApp() {
   smoothingSlider.value = 0;
   calcStitchLengthInput.value = 3.0;
   calcSkeinLengthInput.value = 200;
-  colorModeSelect.value = APP_STRINGS.MODE_ORIGINAL;
+  colorModeSelect.value = APP_STRINGS.MODE_BAYER;
   colorLevelsInput.value = 4;
   
   paletteSizeInput.value = DEFAULTS.PALETTE_SIZE;
@@ -4282,9 +4653,7 @@ function resetApp() {
   stitchAspectSelect.value = "1.0";
   knittingMethodSelect.value = "flat";
   colorDistanceSelect.value = "CIEDE2000";
-  flowSensitivitySlider.value = 50;
-  flowSensitivityVal.value = "50%";
-  if (flowInvertCheckbox) flowInvertCheckbox.checked = false;
+
   if (bayerMatrixSelect) bayerMatrixSelect.value = 4;
   if (strayStitchCheckbox) strayStitchCheckbox.checked = false;
   if (histEqCheckbox) histEqCheckbox.checked = false;
@@ -4292,10 +4661,7 @@ function resetApp() {
   if (morphCleanupSelect) morphCleanupSelect.value = 'none';
   if (rowColorLimitCheckbox) rowColorLimitCheckbox.checked = false;
   if (rowColorLimitInput) rowColorLimitInput.value = 2;
-  if (ayabLaceCheckbox) ayabLaceCheckbox.checked = false;
-  if (ayabLaceLPassesInput) ayabLaceLPassesInput.value = 2;
-  if (ayabLaceKPassesInput) ayabLaceKPassesInput.value = 2;
-  ayabLaceRowMapping = null;
+
   
   let patternTitleInput = document.getElementById('pdf-pattern-title');
   if (patternTitleInput) {
@@ -4310,23 +4676,22 @@ function resetApp() {
 }
 
 function updateStepCardsState(hasImage) {
-  let cardUpload = document.getElementById('step-card-upload');
   let cardDimensions = document.getElementById('step-card-dimensions');
   let cardColors = document.getElementById('step-card-colors');
   let cardActions = document.getElementById('step-card-actions');
   let cardWritten = document.getElementById('step-card-written-instructions');
   let dropzoneEl = document.getElementById('dropzone');
   let uploadStatusBox = document.getElementById('upload-status-box');
-
+  let btnChange = document.getElementById('btn-change-image-canvas');
+  let btnRemove = document.getElementById('btn-remove-image-canvas');
 
   if (hasImage) {
-    cardDimensions.classList.remove('disabled');
-    cardColors.classList.remove('disabled');
-    cardActions.classList.remove('disabled');
-    btnGenerate.removeAttribute('disabled');
+    if (cardDimensions) cardDimensions.classList.remove('disabled');
+    if (cardColors) cardColors.classList.remove('disabled');
+    if (cardActions) cardActions.classList.remove('disabled');
+    if (btnGenerate) btnGenerate.removeAttribute('disabled');
     
-    // Smart collapse/expand: collapse upload, expand active workflow steps
-    if (cardUpload) cardUpload.classList.add('collapsed');
+    // Smart collapse/expand: expand active workflow steps
     if (cardDimensions) cardDimensions.classList.remove('collapsed');
     if (cardColors) cardColors.classList.remove('collapsed');
     if (cardActions) cardActions.classList.remove('collapsed');
@@ -4337,19 +4702,26 @@ function updateStepCardsState(hasImage) {
       cardWritten.style.pointerEvents = 'auto';
     }
     
-    dropzoneEl.style.display = 'none';
-    uploadStatusBox.style.display = 'flex';
+    if (dropzoneEl) dropzoneEl.style.display = 'none';
+    if (uploadStatusBox) uploadStatusBox.style.display = 'flex';
+
+    // Hide viewport upload prompt since image is loaded
+    let vpPrompt = document.getElementById('viewport-upload-prompt');
+    if (vpPrompt) vpPrompt.classList.add('hidden');
+
+    // Show change/remove buttons on preview toolbar
+    if (btnChange) btnChange.style.display = 'inline-flex';
+    if (btnRemove) btnRemove.style.display = 'inline-flex';
   } else {
-    cardDimensions.classList.add('disabled');
-    cardColors.classList.add('disabled');
-    cardActions.classList.add('disabled');
-    btnGenerate.setAttribute('disabled', 'true');
+    if (cardDimensions) cardDimensions.classList.add('disabled');
+    if (cardColors) cardColors.classList.add('disabled');
+    if (cardActions) cardActions.classList.add('disabled');
+    if (btnGenerate) btnGenerate.setAttribute('disabled', 'true');
     btnDownload.setAttribute('disabled', 'true');
     btnExportPDF.setAttribute('disabled', 'true');
     btnExportXLS.setAttribute('disabled', 'true');
     
-    // Reset collapse states: expand upload, collapse disabled steps
-    if (cardUpload) cardUpload.classList.remove('collapsed');
+    // Reset collapse states: collapse disabled steps
     if (cardDimensions) cardDimensions.classList.add('collapsed');
     if (cardColors) cardColors.classList.add('collapsed');
     if (cardActions) cardActions.classList.add('collapsed');
@@ -4362,14 +4734,25 @@ function updateStepCardsState(hasImage) {
       if (btnCopyInstructions) btnCopyInstructions.setAttribute('disabled', 'true');
     }
     
-    dropzoneEl.style.display = 'block';
-    uploadStatusBox.style.display = 'none';
-    fileInput.value = '';
+    if (dropzoneEl) dropzoneEl.style.display = 'block';
+    if (uploadStatusBox) uploadStatusBox.style.display = 'none';
+    if (fileInput) fileInput.value = '';
+
+    // Show viewport upload prompt
+    let vpPrompt = document.getElementById('viewport-upload-prompt');
+    if (vpPrompt) vpPrompt.classList.remove('hidden');
+
+    // Hide change/remove buttons on preview toolbar
+    if (btnChange) btnChange.style.display = 'none';
+    if (btnRemove) btnRemove.style.display = 'none';
     
     // Reset thumbnail and status text
-    document.getElementById('thumbnail-img').src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-    document.getElementById('status-filename').textContent = '';
-    document.getElementById('status-filesize').textContent = '';
+    let thumbImg = document.getElementById('thumbnail-img');
+    if (thumbImg) thumbImg.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+    let statusFilename = document.getElementById('status-filename');
+    if (statusFilename) statusFilename.textContent = '';
+    let statusFilesize = document.getElementById('status-filesize');
+    if (statusFilesize) statusFilesize.textContent = '';
     
     document.getElementById('chart-info-tag').textContent = 'No active chart';
     updateLegend();
@@ -4383,12 +4766,7 @@ function toggleConditionalFields() {
   let customPaletteBox = document.getElementById('custom-palette-container');
   let paletteSizeContainer = document.getElementById('palette-size-container');
   let colorDistanceMetricContainer = document.getElementById('color-distance-metric-container');
-  let flowSensitivityBox = document.getElementById('flow-sensitivity-container');
   let bayerMatrixBox = document.getElementById('bayer-matrix-container');
-
-  if (flowSensitivityBox) {
-    flowSensitivityBox.style.display = (mode === APP_STRINGS.MODE_EDGE) ? 'block' : 'none';
-  }
 
   if (bayerMatrixBox) {
     bayerMatrixBox.style.display = (mode === APP_STRINGS.MODE_BAYER) ? 'block' : 'none';
@@ -4405,15 +4783,13 @@ function toggleConditionalFields() {
     mode === APP_STRINGS.MODE_BURKES ||
     mode === APP_STRINGS.MODE_SIERRA ||
     mode === APP_STRINGS.MODE_JJN ||
-    mode === APP_STRINGS.MODE_EDGE || 
     mode === APP_STRINGS.MODE_PALETTE_MAPPING ||
     mode === APP_STRINGS.MODE_BAYER ||
     mode === APP_STRINGS.MODE_HALFTONE ||
     mode === APP_STRINGS.MODE_RIPPLE ||
     mode === APP_STRINGS.MODE_HATCH ||
     mode === APP_STRINGS.MODE_STENCIL ||
-    mode === APP_STRINGS.MODE_RELIEF ||
-
+ 
     mode === APP_STRINGS.MODE_SHADOW ||
     mode === APP_STRINGS.MODE_BARGELLO ||
     mode === APP_STRINGS.MODE_STAINED_GLASS ||
@@ -4443,9 +4819,7 @@ function toggleConditionalFields() {
       if (colorDistanceMetricContainer) colorDistanceMetricContainer.style.display = 'none';
       // Configure visible color pickers based on the specific mode
       let maxVisible = 2; // Default for 2-color modes
-      if (mode === APP_STRINGS.MODE_RELIEF) {
-        maxVisible = 1;
-      } else if (mode === APP_STRINGS.MODE_STENCIL) {
+      if (mode === APP_STRINGS.MODE_STENCIL) {
         maxVisible = 3;
       } else if (mode === APP_STRINGS.MODE_BARGELLO) {
         maxVisible = 4;
@@ -4464,13 +4838,77 @@ function toggleConditionalFields() {
     if (colorDistanceMetricContainer) colorDistanceMetricContainer.style.display = 'none';
   }
   
+  // Handle dynamic algorithm parameters visibility & settings
+  if (ALGO_PARAMS[mode]) {
+    let params = ALGO_PARAMS[mode];
+    if (params.param1) {
+      if (algoParamContainer1) {
+        algoParamContainer1.style.display = 'block';
+        
+        let label1 = params.param1.label;
+        let help1 = params.param1.help;
+        if (typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS[currentLanguage] && TRANSLATIONS[currentLanguage].algoParams) {
+          label1 = TRANSLATIONS[currentLanguage].algoParams[label1] || label1;
+          help1 = TRANSLATIONS[currentLanguage].algoParams[help1] || help1;
+        }
+        algoParamLabel1.textContent = label1;
+        
+        algoParamVal1.min = params.param1.min;
+        algoParamVal1.max = params.param1.max;
+        algoParamVal1.step = params.param1.step;
+        algoParamVal1.value = params.param1.value;
+
+        algoParamSlider1.min = params.param1.min;
+        algoParamSlider1.max = params.param1.max;
+        algoParamSlider1.step = params.param1.step;
+        algoParamSlider1.value = params.param1.value;
+
+        if (algoParamHelp1) algoParamHelp1.textContent = help1;
+      }
+    } else {
+      if (algoParamContainer1) algoParamContainer1.style.display = 'none';
+    }
+
+    if (params.param2) {
+      if (algoParamContainer2) {
+        algoParamContainer2.style.display = 'block';
+        
+        let label2 = params.param2.label;
+        let help2 = params.param2.help;
+        if (typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS[currentLanguage] && TRANSLATIONS[currentLanguage].algoParams) {
+          label2 = TRANSLATIONS[currentLanguage].algoParams[label2] || label2;
+          help2 = TRANSLATIONS[currentLanguage].algoParams[help2] || help2;
+        }
+        algoParamLabel2.textContent = label2;
+        
+        algoParamVal2.min = params.param2.min;
+        algoParamVal2.max = params.param2.max;
+        algoParamVal2.step = params.param2.step;
+        algoParamVal2.value = params.param2.value;
+
+        algoParamSlider2.min = params.param2.min;
+        algoParamSlider2.max = params.param2.max;
+        algoParamSlider2.step = params.param2.step;
+        algoParamSlider2.value = params.param2.value;
+
+        if (algoParamHelp2) algoParamHelp2.textContent = help2;
+      }
+    } else {
+      if (algoParamContainer2) algoParamContainer2.style.display = 'none';
+    }
+  } else {
+    if (algoParamContainer1) algoParamContainer1.style.display = 'none';
+    if (algoParamContainer2) algoParamContainer2.style.display = 'none';
+  }
+
   let wrapper = document.getElementById('mode-settings-wrapper');
   if (wrapper) {
     let hasVisibleSetting = 
-      (flowSensitivityBox && flowSensitivityBox.style.display !== 'none') ||
       (bayerMatrixBox && bayerMatrixBox.style.display !== 'none') ||
       (levelsBox && levelsBox.style.display !== 'none') ||
-      (customPaletteBox && customPaletteBox.style.display !== 'none');
+      (customPaletteBox && customPaletteBox.style.display !== 'none') ||
+      (algoParamContainer1 && algoParamContainer1.style.display !== 'none') ||
+      (algoParamContainer2 && algoParamContainer2.style.display !== 'none');
     wrapper.style.display = hasVisibleSetting ? 'flex' : 'none';
   }
 
@@ -4509,7 +4947,7 @@ function updateLegend() {
     container.innerHTML = `
       <div class="empty-legend-message">
         <div class="empty-wool-icon">🧶</div>
-        <p>Upload an image and click <strong>Generate Chart</strong> to calculate stitch colors.</p>
+        <p>${currentLanguage === 'pl' ? "Załaduj obraz, aby obliczyć kolory oczek." : "Upload an image to calculate stitch colors."}</p>
       </div>
     `;
     return;
@@ -4564,16 +5002,16 @@ function updateLegend() {
         <span class="legend-color-box" style="background-color: ${sw.hex}"></span>
         <div class="legend-info">
           <span class="legend-hex">${sw.hex}</span>
-          <span class="legend-count">${sw.count.toLocaleString()} sts (${sw.percent}%)</span>
-          <span class="legend-yards">~${totalMeters.toFixed(1)} m (${skeins} ${skeins === 1 ? 'skein' : 'skeins'})</span>
+          <span class="legend-count">${sw.count.toLocaleString()} ${currentLanguage === 'pl' ? 'o.' : 'sts'} (${sw.percent}%)</span>
+          <span class="legend-yards">~${totalMeters.toFixed(1)} m (${skeins} ${currentLanguage === 'pl' ? 'mot.' : (skeins === 1 ? 'skein' : 'skeins')})</span>
         </div>
-        <div class="legend-symbol-wrapper" title="Map stitch symbol to this color">
+        <div class="legend-symbol-wrapper" title="${currentLanguage === 'pl' ? 'Przypisz symbol ściegu do tego koloru' : 'Map stitch symbol to this color'}">
           <select class="legend-symbol-select" data-hex="${sw.hex}">
-            <option value="none" ${sNone}>Knit (Blank)</option>
-            <option value="purl" ${sPurl}>Purl (•)</option>
-            <option value="yo" ${sYo}>YO (○)</option>
-            <option value="k2tog" ${sK2tog}>K2Tog (/)</option>
-            <option value="ssk" ${sSsk}>SSK (\\)</option>
+            <option value="none" ${sNone}>${currentLanguage === 'pl' ? 'Prawe (Puste)' : 'Knit (Blank)'}</option>
+            <option value="purl" ${sPurl}>${currentLanguage === 'pl' ? 'Lewe (•)' : 'Purl (•)'}</option>
+            <option value="yo" ${sYo}>${currentLanguage === 'pl' ? 'Narzut (○)' : 'YO (○)'}</option>
+            <option value="k2tog" ${sK2tog}>${currentLanguage === 'pl' ? '2razP (/)' : 'K2Tog (/)'}</option>
+            <option value="ssk" ${sSsk}>${currentLanguage === 'pl' ? '2razPl (\\)' : 'SSK (\\)'}</option>
           </select>
         </div>
       </div>
@@ -4606,80 +5044,6 @@ function generateWrittenInstructions() {
     }
     if (btnCopyInstructions) {
       btnCopyInstructions.setAttribute('disabled', 'true');
-    }
-    return;
-  }
-
-  // AYAB Machine Lace Mode Written Instructions
-  if (ayabLaceCheckbox && ayabLaceCheckbox.checked && ayabLaceRowMapping && designSymbolsGrid) {
-    let textLines = [];
-    let totalDesignRows = designSymbolsGrid.length;
-    
-    textLines.push("==================================================");
-    textLines.push("AYAB MACHINE LACE MODE - WRITTEN PATTERN SUMMARY");
-    textLines.push("==================================================");
-    textLines.push("");
-    textLines.push("SECTION 1: DESIGN ROW SUMMARY (LACE TRANSFER LAYOUT)");
-    textLines.push("--------------------------------------------------");
-    
-    for (let designIdx = 0; designIdx < totalDesignRows; designIdx++) {
-      let designY = totalDesignRows - 1 - designIdx;
-      let designRowNum = designIdx + 1;
-      let rowSymbols = designSymbolsGrid[designY] || [];
-      let transfers = [];
-      
-      for (let x = 0; x < rowSymbols.length; x++) {
-        let sym = rowSymbols[x];
-        if (sym === 'yo' || sym === 'ssk' || sym === 'k2tog') {
-          let stitchNum = rowSymbols.length - x;
-          transfers.push(`St ${stitchNum} (${sym.toUpperCase()})`);
-        }
-      }
-      
-      if (transfers.length > 0) {
-        textLines.push(`Row ${designRowNum}: Lace Transfers at ${transfers.join(', ')}`);
-      } else {
-        textLines.push(`Row ${designRowNum}: Plain Knit Row`);
-      }
-    }
-    
-    textLines.push("");
-    textLines.push("SECTION 2: AYAB CARRIAGE ROW PASS SEQUENCE");
-    textLines.push("--------------------------------------------------");
-    textLines.push("Follow this step-by-step pass sequence on the machine:");
-    textLines.push("");
-    
-    let expandedHeight = ayabLaceRowMapping.length;
-    
-    for (let stepIdx = 0; stepIdx < expandedHeight; stepIdx++) {
-      let y = expandedHeight - 1 - stepIdx;
-      let stepNum = stepIdx + 1;
-      let mapping = ayabLaceRowMapping[y];
-      
-      let passLabel = `${mapping.type}${mapping.passIndex}`;
-      let carriageName = mapping.type === 'L' ? "Lace Carriage (L)" : "Knit Carriage (K)";
-      
-      if (mapping.type === 'L') {
-        let selections = [];
-        let rowSymbols = designSymbolsGrid[mapping.designRow] || [];
-        for (let x = 0; x < rowSymbols.length; x++) {
-          let sym = rowSymbols[x];
-          if (sym === 'yo' || sym === 'ssk' || sym === 'k2tog') {
-            selections.push(rowSymbols.length - x);
-          }
-        }
-        textLines.push(`Pass ${stepNum} [${passLabel} - ${carriageName}]: Select needles/transfer at stitches [${selections.join(', ')}]`);
-      } else {
-        textLines.push(`Pass ${stepNum} [${passLabel} - ${carriageName}]: Knit plain row`);
-      }
-    }
-    
-    let instructionsText = textLines.join('\n');
-    if (writtenInstructionsTextarea) {
-      writtenInstructionsTextarea.value = instructionsText;
-    }
-    if (btnCopyInstructions) {
-      btnCopyInstructions.removeAttribute('disabled');
     }
     return;
   }
@@ -4717,19 +5081,28 @@ function generateWrittenInstructions() {
   }
 
   let textLines = [];
-  textLines.push("YARN COLOR KEYS:");
+  textLines.push(currentLanguage === 'pl' ? "LEGENDA KOLORÓW WŁÓCZKI:" : "YARN COLOR KEYS:");
   for (let hex in colorToLetter) {
-    textLines.push(`  Color ${colorToLetter[hex]}: ${hex}`);
+    textLines.push(currentLanguage === 'pl' ? `  Kolor ${colorToLetter[hex]}: ${hex}` : `  Color ${colorToLetter[hex]}: ${hex}`);
   }
   textLines.push("");
-  textLines.push(`METHOD: ${isFlat ? 'Flat (Back & Forth)' : 'Circular (In the Round)'}`);
+  textLines.push(currentLanguage === 'pl' 
+    ? `METODA: ${isFlat ? 'Płasko (tam i z powrotem)' : 'Okrągło (w koło)'}` 
+    : `METHOD: ${isFlat ? 'Flat (Back & Forth)' : 'Circular (In the Round)'}`);
   textLines.push("");
 
   for (let rowIdx = 0; rowIdx < h; rowIdx++) {
     let y = h - 1 - rowIdx;
     let rowNum = rowIdx + 1;
     let isRS = !isFlat || (rowNum % 2 !== 0);
-    let rowLabel = isFlat ? (isRS ? "RS" : "WS") : "Round";
+    let rowLabel = "";
+    if (isFlat) {
+      rowLabel = isRS 
+        ? (currentLanguage === 'pl' ? "PS" : "RS") 
+        : (currentLanguage === 'pl' ? "LS" : "WS");
+    } else {
+      rowLabel = currentLanguage === 'pl' ? "Okrążenie" : "Round";
+    }
     
     let stitches = [];
     let startX = isRS ? (w - 1) : 0;
@@ -4781,10 +5154,22 @@ function generateWrittenInstructions() {
     }
     
     let rowStrs = compressed.map(c => {
-      return `${c.stitchName}${c.count} in ${c.letter}`;
+      let mappedStitch = c.stitchName;
+      if (currentLanguage === 'pl') {
+        if (c.stitchName === 'K') mappedStitch = 'P';
+        else if (c.stitchName === 'P') mappedStitch = 'L';
+        else if (c.stitchName === 'YO') mappedStitch = 'N';
+        else if (c.stitchName === 'K2Tog') mappedStitch = '2razP';
+        else if (c.stitchName === 'SSK') mappedStitch = '2razPl';
+      }
+      return currentLanguage === 'pl' 
+        ? `${mappedStitch}${c.count} w ${c.letter}`
+        : `${mappedStitch}${c.count} in ${c.letter}`;
     });
     
-    let prefix = isFlat ? `Row ${rowNum} (${rowLabel}):` : `Round ${rowNum}:`;
+    let prefix = isFlat 
+      ? (currentLanguage === 'pl' ? `Rząd ${rowNum} (${rowLabel}):` : `Row ${rowNum} (${rowLabel}):`) 
+      : (currentLanguage === 'pl' ? `Okrążenie ${rowNum}:` : `Round ${rowNum}:`);
     textLines.push(`${prefix} ${rowStrs.join(', ')}`);
   }
 
@@ -5173,4 +5558,97 @@ function showLoader() {
 function hideLoader() {
   let loader = document.getElementById('loading-overlay');
   if (loader) loader.style.display = 'none';
+}
+
+function setLanguage(lang) {
+  currentLanguage = lang;
+  
+  // Update APP_STRINGS dynamic alerts
+  let dict = TRANSLATIONS[lang];
+  if (dict) {
+    if (dict.alerts) {
+      for (let k in dict.alerts) {
+        APP_STRINGS[k] = dict.alerts[k];
+      }
+    }
+    
+    // Translate standard DOM elements by ID
+    for (let id in dict) {
+      if (id === 'selects' || id === 'algoParams' || id === 'alerts' || id === 'placeholders') continue;
+      let el = document.getElementById(id);
+      if (el) {
+        // If it's a button or contains HTML we use innerHTML, otherwise textContent
+        if (id.startsWith('btn-') || id === 'btn-generate') {
+          el.innerHTML = dict[id];
+        } else {
+          el.textContent = dict[id];
+        }
+      }
+    }
+    
+    // Translate placeholders
+    if (dict.placeholders) {
+      for (let id in dict.placeholders) {
+        let el = document.getElementById(id);
+        if (el) {
+          el.setAttribute('placeholder', dict.placeholders[id]);
+        }
+      }
+    }
+    
+    // Translate Select elements (options and optgroups)
+    if (dict.selects) {
+      for (let selectId in dict.selects) {
+        let selectEl = document.getElementById(selectId);
+        if (selectEl) {
+          let selectDict = dict.selects[selectId];
+          
+          // Translate options
+          let options = selectEl.querySelectorAll('option');
+          options.forEach(opt => {
+            let val = opt.value;
+            if (selectDict[val]) {
+              opt.textContent = selectDict[val];
+            }
+          });
+          
+          // Translate optgroups if any
+          let optgroups = selectEl.querySelectorAll('optgroup');
+          optgroups.forEach(og => {
+            let label = og.getAttribute('label');
+            if (selectDict[label]) {
+              og.setAttribute('label', selectDict[label]);
+            }
+          });
+        }
+      }
+    }
+  }
+  
+  // Re-trigger dynamic configurations, legends, written instructions if image is processed
+  toggleConditionalFields();
+  if (processedImg) {
+    updateLegend();
+    generateWrittenInstructions();
+    
+    // Also update the active chart info tag text
+    let filename = document.getElementById('status-filename') ? document.getElementById('status-filename').textContent : '';
+    let infoText = lang === 'pl' ? `${processedImg.width} × ${processedImg.height} oczek` : `${processedImg.width} × ${processedImg.height} stitches`;
+    if (filename) {
+      infoText = `${filename} (${infoText})`;
+    }
+    document.getElementById('chart-info-tag').textContent = infoText;
+  } else {
+    // Redraw empty legend message
+    updateLegend();
+    
+    // Reset chart info tag to localized "No active chart"
+    let infoTag = document.getElementById('chart-info-tag');
+    if (infoTag) {
+      infoTag.textContent = lang === 'pl' ? 'Brak aktywnego schematu' : 'No active chart';
+    }
+  }
+  
+  // Redraw canvas
+  redraw();
 }

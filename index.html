@@ -67,13 +67,13 @@
         <p class="subtitle" id="app-subtitle">Convert any photo into a stitch-by-stitch knitting pattern with dynamic
           yarn calculators</p>
       </div>
-      <!-- <div class="lang-selector-container">
+      <div class="lang-selector-container">
         <span style="font-size: 1.1rem; line-height: 1;">🌐</span>
         <select id="lang-select-desktop" class="lang-select">
           <option value="en" selected>English</option>
           <option value="pl">Polski</option>
         </select>
-      </div> -->
+      </div>
     </header>
 
     <!-- Main Workspace Area -->
@@ -88,43 +88,22 @@
           <button type="button" class="btn-close-drawer" id="btn-close-drawer">✕</button>
         </div>
 
-        <!-- Step 1: Upload Image -->
-        <div class="step-card" id="step-card-upload">
-          <div class="step-header">
-            <span class="step-badge">1</span>
-            <h3 id="step-upload-title">Upload Image</h3>
-            <span class="step-chevron">▼</span>
-          </div>
-          <div class="step-body">
-            <div class="upload-dropzone" id="dropzone">
-              <div class="dropzone-icon">📷</div>
-              <div class="dropzone-text">
-                <span class="primary-text" id="upload-primary-text">Drag & drop image here</span>
-                <span class="secondary-text" id="upload-secondary-text">or click to browse files</span>
-                <span class="file-limits" id="upload-file-limits">Supports JPG, PNG, WEBP, HEIC</span>
-              </div>
-            </div>
-            <input type="file" id="image-upload" accept="image/*,.heic,.HEIC">
-            <!-- Uploaded Preview Thumb -->
-            <div class="upload-status" id="upload-status-box" style="display: none;">
-              <div class="status-details">
-                <div class="status-thumbnail-wrapper">
-                  <img id="thumbnail-img" src="" alt="preview">
-                </div>
-                <div class="status-meta">
-                  <span class="status-filename" id="status-filename">filename.png</span>
-                  <span class="status-size" id="status-filesize">0 KB</span>
-                </div>
-              </div>
-              <button type="button" class="btn-remove-file" id="btn-remove-file" title="Remove image">✕</button>
-            </div>
+        <!-- Hidden upload elements to maintain JS compatibility and PDF generation -->
+        <div style="display: none;">
+          <input type="file" id="image-upload" accept="image/*,.heic,.HEIC">
+          <div id="dropzone"></div>
+          <div id="upload-status-box">
+            <img id="thumbnail-img" src="" alt="preview">
+            <span id="status-filename"></span>
+            <span id="status-filesize"></span>
+            <button type="button" id="btn-remove-file"></button>
           </div>
         </div>
 
-        <!-- Step 2: Dimensions -->
+        <!-- Step 1: Dimensions -->
         <div class="step-card disabled collapsed" id="step-card-dimensions">
           <div class="step-header">
-            <span class="step-badge">2</span>
+            <span class="step-badge">1</span>
             <h3 id="step-stitch-title">Stitch Settings</h3>
             <span class="step-chevron">▼</span>
           </div>
@@ -266,7 +245,7 @@
         <!-- Step 3: Colors -->
         <div class="step-card disabled collapsed" id="step-card-colors">
           <div class="step-header">
-            <span class="step-badge">3</span>
+            <span class="step-badge">2</span>
             <h3 id="step-colors-title">Filter & Color Modes</h3>
             <span class="step-chevron">▼</span>
           </div>
@@ -275,71 +254,57 @@
               <label for="color-mode-select" id="color-mode-label">Color Algorithm</label>
               <div class="select-wrapper">
                 <select id="color-mode-select">
-                  <option value="Original Colors">Original Colors</option>
-                  <option value="Black & White (Threshold)">Black & White (Threshold)</option>
-                  <option value="Edge Outline">Edge Outline</option>
-                  <option value="Color Reduction (Posterize)">Color Reduction (Posterize)</option>
-                  <option value="K-Means Color Reduction">K-Means Color Reduction</option>
-                  <option value="Floyd-Steinberg Dithering">Floyd-Steinberg Dithering</option>
-                  <option value="Atkinson Dithering">Atkinson Dithering</option>
-                  <option value="Stucki Dithering">Stucki Dithering</option>
-                  <option value="Burkes Dithering">Burkes Dithering</option>
-                  <option value="Sierra Dithering">Sierra Dithering</option>
-                  <option value="Jarvis-Judice-Ninke Dithering">Jarvis-Judice-Ninke Dithering</option>
-                  <option value="Custom Palette Mapping">Custom Palette Mapping</option>
-                  <option value="Bayer Ordered Dithering">Bayer Ordered Dithering</option>
-                  <option value="Octree Color Reduction">Octree Color Reduction</option>
-                  <option value="Halftone Dot Pattern">Halftone Dot Pattern</option>
-                  <option value="Glitch Art Effect">Glitch Art Effect</option>
-                  <option value="Ripple Halftone (2 Colors)">Ripple Halftone (2 Colors)</option>
-                  <option value="Cross-Hatch Sketch (2 Colors)">Cross-Hatch Sketch (2 Colors)</option>
-                  <option value="Offset Stencil Pop Art (3 Colors)">Offset Stencil Pop Art (3 Colors)</option>
-                  <option value="Relief Texture (1 Color)">Relief Texture (1 Color)</option>
+                  <optgroup label="Standard & Multi-Color Modes">
+                    <option value="Original Colors">Original Colors</option>
+                    <option value="Custom Palette Mapping">Custom Palette Mapping</option>
+                    <option value="K-Means Color Reduction">K-Means Color Reduction</option>
+                    <option value="Octree Color Reduction">Octree Color Reduction</option>
+                    <option value="Color Reduction (Posterize)">Color Reduction (Posterize)</option>
+                  </optgroup>
+                  
+                  <optgroup label="Dithering & Texturing">
+                    <option value="Bayer Ordered Dithering" selected>Bayer Ordered Dithering</option>
+                    <option value="Floyd-Steinberg Dithering">Floyd-Steinberg Dithering</option>
+                    <option value="Atkinson Dithering">Atkinson Dithering</option>
+                    <option value="Stucki Dithering">Stucki Dithering</option>
+                    <option value="Burkes Dithering">Burkes Dithering</option>
+                    <option value="Sierra Dithering">Sierra Dithering</option>
+                    <option value="Jarvis-Judice-Ninke Dithering">Jarvis-Judice-Ninke Dithering</option>
+                    <option value="Black & White (Threshold)">Black & White (Threshold)</option>
+                  </optgroup>
+                  
+                  <optgroup label="Artistic & Halftones">
+                    <option value="Halftone Dot Pattern">Halftone Dot Pattern</option>
+                    <option value="Comic Halftone (2 Colors)">Comic Halftone (2 Colors)</option>
+                    <option value="Ripple Halftone (2 Colors)">Ripple Halftone (2 Colors)</option>
+                    <option value="Spiral Halftone (2 Colors)">Spiral Halftone (2 Colors)</option>
+                    <option value="Cross-Hatch Sketch (2 Colors)">Cross-Hatch Sketch (2 Colors)</option>
+                    <option value="Ink Stippling (2 Colors)">Ink Stippling (2 Colors)</option>
+                    <option value="Offset Stencil Pop Art (3 Colors)">Offset Stencil Pop Art (3 Colors)</option>
+                    <option value="Glitch Art Effect">Glitch Art Effect</option>
+                  </optgroup>
+                  
+                  <optgroup label="Geometric & Algorithmic Patterns">
 
-                  <option value="Shadow Illusion (2 Colors)">Shadow Illusion (2 Colors)</option>
-                  <option value="Bargello Wave (4 Colors)">Bargello Wave (4 Colors)</option>
-                  <option value="Stained Glass Intarsia (5 Colors)">Stained Glass Intarsia (5 Colors)</option>
-                  <option value="Comic Halftone (2 Colors)">Comic Halftone (2 Colors)</option>
-
-                  <option value="Contour Waves (2 Colors)">Contour Waves (2 Colors)</option>
-                  <option value="Truchet Maze (2 Colors)">Truchet Maze (2 Colors)</option>
-                  <option value="Ink Stippling (2 Colors)">Ink Stippling (2 Colors)</option>
-                  <option value="Cable-Rib Illusion (2 Colors)">Cable-Rib Illusion (2 Colors)</option>
-                  <option value="Herringbone Hatch (2 Colors)">Herringbone Hatch (2 Colors)</option>
-                  <option value="Voronoi Mosaic (2 Colors)">Voronoi Mosaic (2 Colors)</option>
-
-                  <option value="Moiré Op-Art (2 Colors)">Moiré Op-Art (2 Colors)</option>
-                  <option value="Spiral Halftone (2 Colors)">Spiral Halftone (2 Colors)</option>
-                  <option value="Houndstooth Check (2 Colors)">Houndstooth Check (2 Colors)</option>
-                  <option value="Turing Pattern (2 Colors)">Turing Pattern (2 Colors)</option>
-                  <option value="Cellular Automata (2 Colors)">Cellular Automata (2 Colors)</option>
-
+                    <option value="Shadow Illusion (2 Colors)">Shadow Illusion (2 Colors)</option>
+                    <option value="Bargello Wave (4 Colors)">Bargello Wave (4 Colors)</option>
+                    <option value="Stained Glass Intarsia (5 Colors)">Stained Glass Intarsia (5 Colors)</option>
+                    <option value="Contour Waves (2 Colors)">Contour Waves (2 Colors)</option>
+                    <option value="Truchet Maze (2 Colors)">Truchet Maze (2 Colors)</option>
+                    <option value="Cable-Rib Illusion (2 Colors)">Cable-Rib Illusion (2 Colors)</option>
+                    <option value="Herringbone Hatch (2 Colors)">Herringbone Hatch (2 Colors)</option>
+                    <option value="Voronoi Mosaic (2 Colors)">Voronoi Mosaic (2 Colors)</option>
+                    <option value="Moiré Op-Art (2 Colors)">Moiré Op-Art (2 Colors)</option>
+                    <option value="Houndstooth Check (2 Colors)">Houndstooth Check (2 Colors)</option>
+                    <option value="Turing Pattern (2 Colors)">Turing Pattern (2 Colors)</option>
+                    <option value="Cellular Automata (2 Colors)">Cellular Automata (2 Colors)</option>
+                  </optgroup>
                 </select>
               </div>
             </div>
 
             <!-- Filter Mode Specific Settings Wrapper -->
             <div class="mode-settings-wrapper" id="mode-settings-wrapper" style="display: none;">
-              <!-- Flow Sensitivity Option (Conditional for Edge Outline) -->
-              <div class="control-group" id="flow-sensitivity-container" style="display: none;">
-                <div class="label-row">
-                  <label for="flow-sensitivity-slider" id="flow-sensitivity-label">Stitch Flow Sensitivity</label>
-                  <input type="text" id="flow-sensitivity-val" value="50%" readonly
-                    style="width: 50px; border: none; background: none; font-weight: bold; text-align: right; color: var(--color-text);">
-                </div>
-                <div class="slider-wrapper">
-                  <input type="range" id="flow-sensitivity-slider" min="10" max="90" value="50" step="5">
-                </div>
-                <p class="control-help" id="flow-sensitivity-help">Controls the intensity threshold for converting
-                  contour lines to directional decrease stitches (ssk/k2tog).</p>
-                <div style="margin-top: 10px; display: flex; align-items: center;">
-                  <label class="grid-checkbox-switch">
-                    <input type="checkbox" id="flow-invert-checkbox">
-                    <span class="switch-slider"></span>
-                    <span class="switch-label" id="flow-invert-label">Swap SSK & K2Tog Directions</span>
-                  </label>
-                </div>
-              </div>
 
               <!-- Bayer Matrix Size Option (Conditional) -->
               <div class="control-group" id="bayer-matrix-container" style="display: none;">
@@ -497,6 +462,30 @@
                   </div>
                 </div>
               </div>
+
+              <!-- Generic Algorithm Parameter 1 (Conditional) -->
+              <div class="control-group" id="algo-parameter-container-1" style="display: none;">
+                <div class="label-row">
+                  <label for="algo-parameter-val-1" id="algo-parameter-label-1">Parameter 1</label>
+                  <input type="number" id="algo-parameter-val-1" value="4">
+                </div>
+                <div class="slider-wrapper">
+                  <input type="range" id="algo-parameter-slider-1" min="1" max="100" value="4">
+                </div>
+                <p class="control-help" id="algo-parameter-help-1"></p>
+              </div>
+
+              <!-- Generic Algorithm Parameter 2 (Conditional) -->
+              <div class="control-group" id="algo-parameter-container-2" style="display: none;">
+                <div class="label-row">
+                  <label for="algo-parameter-val-2" id="algo-parameter-label-2">Parameter 2</label>
+                  <input type="number" id="algo-parameter-val-2" value="2">
+                </div>
+                <div class="slider-wrapper">
+                  <input type="range" id="algo-parameter-slider-2" min="1" max="100" value="2">
+                </div>
+                <p class="control-help" id="algo-parameter-help-2"></p>
+              </div>
             </div>
 
             <!-- Stray Stitch Cleaner Option (Global) -->
@@ -532,67 +521,6 @@
                 colors for stranded/Fair Isle knitting compatibility.</p>
             </div>
 
-            <!-- AYAB Machine Lace Mode -->
-            <div class="control-group" id="ayab-lace-container">
-              <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-                <label class="grid-checkbox-switch">
-                  <input type="checkbox" id="ayab-lace-checkbox">
-                  <span class="switch-slider"></span>
-                  <span class="switch-label" id="ayab-lace-label">AYAB Machine Lace Mode</span>
-                </label>
-              </div>
-              <div style="display: flex; align-items: center; gap: 15px; margin-top: 4px;">
-                <div style="display: flex; align-items: center; gap: 6px;">
-                  <label for="ayab-lace-l-passes" id="ayab-lace-l-passes-label"
-                    style="font-size: 0.8rem; font-weight: 500; color: var(--color-text-muted); margin: 0;">L-Passes:</label>
-                  <input type="number" id="ayab-lace-l-passes" min="1" max="10" value="2"
-                    style="width: 45px; padding: 4px 6px; font-size: 0.85rem; border: 1px solid var(--color-border); border-radius: 4px;">
-                </div>
-                <div style="display: flex; align-items: center; gap: 6px;">
-                  <label for="ayab-lace-k-passes" id="ayab-lace-k-passes-label"
-                    style="font-size: 0.8rem; font-weight: 500; color: var(--color-text-muted); margin: 0;">K-Passes:</label>
-                  <input type="number" id="ayab-lace-k-passes" min="1" max="10" value="2"
-                    style="width: 45px; padding: 4px 6px; font-size: 0.85rem; border: 1px solid var(--color-border); border-radius: 4px;">
-                </div>
-              </div>
-              <p class="control-help" id="ayab-lace-help">Expands the chart for Brother electronic machines running
-                AYAB, inserting L-carriage transfer passes and K-carriage knitting passes.</p>
-            </div>
-
-
-          </div>
-        </div>
-
-        <!-- Step 4: Actions -->
-        <div class="step-card disabled collapsed" id="step-card-actions">
-          <div class="step-header">
-            <span class="step-badge">4</span>
-            <h3 id="step-actions-title">Generate & Export</h3>
-            <span class="step-chevron">▼</span>
-          </div>
-          <div class="step-body">
-            <div class="control-group" style="margin-bottom: 6px;">
-              <label for="pdf-pattern-title" id="pdf-pattern-title-label">Pattern PDF Title</label>
-              <input type="text" id="pdf-pattern-title" value="My Knitting Project"
-                placeholder="Enter title for PDF...">
-            </div>
-            <div class="action-buttons-group">
-              <button id="btn-generate" class="btn btn-primary" disabled>
-                <span class="btn-icon">⚡</span> Generate Chart
-              </button>
-              <button id="btn-download" class="btn btn-secondary" disabled>
-                <span class="btn-icon">💾</span> Export Chart (PNG)
-              </button>
-              <button id="btn-export-pdf" class="btn btn-outline-sage" disabled>
-                <span class="btn-icon">📄</span> Export Pattern (PDF)
-              </button>
-              <button id="btn-export-xls" class="btn btn-outline-sage" disabled>
-                <span class="btn-icon">📊</span> Export Spreadsheet (XLS)
-              </button>
-              <button id="btn-reset" class="btn btn-tertiary">
-                <span class="btn-icon">🔄</span> Reset App
-              </button>
-            </div>
           </div>
         </div>
 
@@ -605,21 +533,27 @@
         <div class="preview-card">
           <div class="preview-header">
             <div class="preview-title">
-              <h2>Stitch Preview Grid</h2>
+              <h2 id="preview-grid-title">Stitch Preview Grid</h2>
               <div class="chart-info-tag" id="chart-info-tag">No active chart</div>
             </div>
 
             <!-- View Controls -->
             <div class="preview-toolbar">
+              <button id="btn-change-image-canvas" class="btn btn-outline-sage" style="display: none;">
+                <span class="btn-icon">🔄</span> Change Image
+              </button>
+              <button id="btn-remove-image-canvas" class="btn btn-tertiary" style="display: none;">
+                <span class="btn-icon">🗑️</span> Remove Image
+              </button>
               <label class="grid-checkbox-switch">
                 <input type="checkbox" id="grid-checkbox">
                 <span class="switch-slider"></span>
-                <span class="switch-label">Show Outlines</span>
+                <span class="switch-label" id="show-outlines-label">Show Outlines</span>
               </label>
               <label class="grid-checkbox-switch" style="margin-left: 15px;">
                 <input type="checkbox" id="symbols-checkbox">
                 <span class="switch-slider"></span>
-                <span class="switch-label">Show Symbols</span>
+                <span class="switch-label" id="show-symbols-label">Show Symbols</span>
               </label>
             </div>
           </div>
@@ -629,10 +563,44 @@
           <!-- Canvas Drawing Board -->
           <div class="canvas-viewport" id="viewport-frame">
             <div id="canvas-container"></div>
+            <!-- Upload Prompt (shown when no image is loaded) -->
+            <div id="viewport-upload-prompt" class="viewport-upload-prompt">
+              <div class="viewport-upload-icon">📷</div>
+              <div class="viewport-upload-text">
+                <span class="viewport-upload-primary" id="viewport-upload-primary">Drag & drop image here</span>
+                <span class="viewport-upload-secondary" id="viewport-upload-secondary">or click to browse files</span>
+                <span class="viewport-upload-limits" id="viewport-upload-limits">Supports JPG, PNG, WEBP, HEIC</span>
+              </div>
+            </div>
             <!-- Loading Overlay -->
             <div id="loading-overlay" class="loading-overlay" style="display: none;">
               <div class="spinner"></div>
-              <p>Processing Image...</p>
+              <p id="loading-text">Processing Image...</p>
+            </div>
+          </div>
+
+          <!-- Actions Panel (Moved close to Preview) -->
+          <div class="preview-actions-section" id="step-card-actions">
+            <div class="preview-actions-wrapper">
+              <div class="preview-actions-title-group">
+                <label for="pdf-pattern-title" id="pdf-pattern-title-label">Pattern PDF Title</label>
+                <input type="text" id="pdf-pattern-title" value="My Knitting Project"
+                  placeholder="Enter title for PDF...">
+              </div>
+              <div class="action-buttons-group-horizontal">
+                <button id="btn-download" class="btn btn-secondary" disabled>
+                  <span class="btn-icon">💾</span> Export Chart (PNG)
+                </button>
+                <button id="btn-export-pdf" class="btn btn-outline-sage" disabled>
+                  <span class="btn-icon">📄</span> Export Pattern (PDF)
+                </button>
+                <button id="btn-export-xls" class="btn btn-outline-sage" disabled>
+                  <span class="btn-icon">📊</span> Export Spreadsheet (XLS)
+                </button>
+                <button id="btn-reset" class="btn btn-tertiary">
+                  <span class="btn-icon">🔄</span> Reset App
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -641,8 +609,8 @@
         <div class="legend-card collapsed" id="legend-card-yarn">
           <div class="legend-header">
             <div style="text-align: left;">
-              <h2>Yarn Consumption Calculator</h2>
-              <p class="legend-description">This list displays the estimated stitches and yarn color blocks needed.</p>
+              <h2 id="yarn-calculator-title">Yarn Consumption Calculator</h2>
+              <p class="legend-description" id="yarn-calculator-desc">This list displays the estimated stitches and yarn color blocks needed.</p>
             </div>
             <span class="step-chevron">▼</span>
           </div>
@@ -650,18 +618,18 @@
             <!-- Yarn Gauge Calculator Inputs -->
             <div class="calculator-config">
               <div class="calc-field">
-                <label for="calc-stitch-length">Yarn/Stitch (cm)</label>
+                <label for="calc-stitch-length" id="yarn-stitch-length-label">Yarn/Stitch (cm)</label>
                 <input type="number" id="calc-stitch-length" value="3.0" min="0.1" max="25.0" step="0.1">
               </div>
               <div class="calc-field">
-                <label for="calc-skein-length">Meters/Skein</label>
+                <label for="calc-skein-length" id="yarn-skein-length-label">Meters/Skein</label>
                 <input type="number" id="calc-skein-length" value="200" min="10" max="2000" step="10">
               </div>
             </div>
             <div class="legend-body" id="legend-container">
               <div class="empty-legend-message">
                 <div class="empty-wool-icon">🧶</div>
-                <p>Upload an image and click <strong>Generate Chart</strong> to calculate stitch colors.</p>
+                <p>Upload an image to calculate stitch colors.</p>
               </div>
             </div>
           </div>
@@ -672,11 +640,12 @@
           style="margin-top: 24px; opacity: 0.5; pointer-events: none;">
           <div class="legend-header">
             <div style="text-align: left; flex: 1;">
-              <h2>Written Instructions</h2>
-              <p class="legend-description" style="margin: 4px 0 0 0;">Follow these sequential row-by-row instructions
-                to knit this pattern.</p>
+              <h2 id="written-instructions-title">Written Instructions</h2>
+              <p class="legend-description" id="written-instructions-desc" style="margin: 4px 0 0 0;">Follow these sequential row-by-row instructions to knit this pattern.</p>
             </div>
-            <span class="step-chevron">▼</span>
+            <div style="margin-left: 10px; display: flex; align-items: center;">
+              <span class="step-chevron">▼</span>
+            </div>
           </div>
           <div class="instructions-body-wrapper">
             <div class="instructions-actions" style="display: flex; justify-content: flex-end; margin-bottom: 8px;">
