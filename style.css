@@ -74,6 +74,7 @@ body {
 }
 
 .lang-select {
+  width: auto;
   padding: 6px 12px;
   font-size: 0.85rem;
   font-weight: 600;
@@ -84,6 +85,8 @@ body {
   cursor: pointer;
   outline: none;
   transition: var(--transition);
+  -webkit-appearance: revert;
+  appearance: revert;
 }
 
 .lang-select:hover {
@@ -1305,8 +1308,30 @@ select option {
 
 @media (max-width: 768px) {
   .mobile-top-bar {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
     margin: -20px -16px 20px -16px; /* Offset the 768px padding */
+  }
+
+  .mobile-top-bar .btn-hamburger {
+    justify-self: start;
+  }
+
+  .mobile-app-title {
+    justify-self: center;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text);
+    line-height: 1.2;
+    white-space: normal;
+    word-wrap: break-word;
+  }
+
+  .mobile-top-bar .lang-selector-container {
+    justify-self: end;
+    margin-left: 0;
   }
 
   .app-container {
