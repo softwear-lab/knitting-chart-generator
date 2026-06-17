@@ -41,6 +41,10 @@
   <script src="https://cdn.jsdelivr.net/npm/heic-to@1.5.2/dist/iife/heic-to.js"></script>
  
   <!-- App Logic -->
+  <script src="constants.js" defer></script>
+  <script src="color-utils.js" defer></script>
+  <script src="filters.js" defer></script>
+  <script src="exporters.js" defer></script>
   <script src="sketch.js?v=1.0.4" defer></script>
 </head>
 
@@ -260,6 +264,8 @@
                     <option value="K-Means Color Reduction">K-Means Color Reduction</option>
                     <option value="Octree Color Reduction">Octree Color Reduction</option>
                     <option value="Color Reduction (Posterize)">Color Reduction (Posterize)</option>
+                    <option value="Vector Quantization">Vector Quantization</option>
+                    <option value="Bilateral Filter">Bilateral Filter</option>
                   </optgroup>
                   
                   <optgroup label="Dithering & Texturing">
@@ -271,6 +277,7 @@
                     <option value="Sierra Dithering">Sierra Dithering</option>
                     <option value="Jarvis-Judice-Ninke Dithering">Jarvis-Judice-Ninke Dithering</option>
                     <option value="Black & White (Threshold)">Black & White (Threshold)</option>
+                    <option value="Blue Noise Dithering (2 Colors)">Blue Noise Dithering (2 Colors)</option>
                   </optgroup>
                   
                   <optgroup label="Artistic & Halftones">
@@ -298,6 +305,20 @@
                     <option value="Houndstooth Check (2 Colors)">Houndstooth Check (2 Colors)</option>
                     <option value="Turing Pattern (2 Colors)">Turing Pattern (2 Colors)</option>
                     <option value="Cellular Automata (2 Colors)">Cellular Automata (2 Colors)</option>
+                    <option value="Laplacian Edge (2 Colors)">Laplacian Edge (2 Colors)</option>
+                    <option value="Canny Edge Detector (2 Colors)">Canny Edge Detector (2 Colors)</option>
+                    <option value="Laplacian of Gaussian (LoG) (2 Colors)">Laplacian of Gaussian (LoG) (2 Colors)</option>
+                    <option value="Median Blur + Otsu (2 Colors)">Median Blur + Otsu (2 Colors)</option>
+                    <option value="Contour Tracing / Topography (2 Colors)">Contour Tracing / Topography (2 Colors)</option>
+                    <option value="Difference of Gaussians - DoG (2 Colors)">Difference of Gaussians - DoG (2 Colors)</option>
+                    <option value="Sobel Operator (2 Colors)">Sobel Operator (2 Colors)</option>
+                    <option value="Adaptive Thresholding (2 Colors)">Adaptive Thresholding (2 Colors)</option>
+                    <option value="High-Pass Filter (2 Colors)">High-Pass Filter (2 Colors)</option>
+                    <option value="Prewitt Filter (2 Colors)">Prewitt Filter (2 Colors)</option>
+                    <option value="Superpixels">Superpixels</option>
+                    <option value="Anisotropic Diffusion">Anisotropic Diffusion</option>
+                    <option value="Difference of Medians (2 Colors)">Difference of Medians (2 Colors)</option>
+                    <option value="Binarization Ridge Detection (2 Colors)">Binarization Ridge Detection (2 Colors)</option>
                   </optgroup>
                 </select>
               </div>
@@ -314,6 +335,7 @@
                     <option value="2">2x2 (Coarse / Large Pattern)</option>
                     <option value="4" selected>4x4 (Medium / Standard Pattern)</option>
                     <option value="8">8x8 (Fine / Small Pattern)</option>
+                    <option value="12">12x12 (Ultra Fine / Very Small Pattern)</option>
                   </select>
                 </div>
                 <p class="control-help" id="bayer-matrix-help">Controls the grid size of the dithering texture pattern
