@@ -66,6 +66,7 @@ let algoParamContainer2, algoParamLabel2, algoParamVal2, algoParamSlider2, algoP
 // Settings cache
 let currentSettings = {};
 let currentLanguage = 'en';
+let ALGO_DEFAULTS = {};
 
 // Workspace layout & zoom additions
 let viewMode = 'chart';
@@ -260,6 +261,7 @@ function setup() {
           mode === APP_STRINGS.MODE_VECTOR_QUANTIZATION) {
         handleSettingChange(paletteSizeInput, activeColorsCount, 'paletteSize');
       } else {
+        updateURLParams();
         generateChart();
       }
     });
@@ -317,8 +319,12 @@ function setup() {
     handleSettingChange(smoothingSlider, parseInt(e.target.value), 'smoothing');
   });
 
-  gridCheckbox.addEventListener('change', () => loop());
+  gridCheckbox.addEventListener('change', () => {
+    updateURLParams();
+    loop();
+  });
   symbolsCheckbox.addEventListener('change', () => {
+    updateURLParams();
     if (processedImg) {
       generateWrittenInstructions();
     }
@@ -327,9 +333,11 @@ function setup() {
 
   // Yarn Gauge Calculator input listeners
   calcStitchLengthInput.addEventListener('input', () => {
+    updateURLParams();
     updateLegend();
   });
   calcSkeinLengthInput.addEventListener('input', () => {
+    updateURLParams();
     updateLegend();
   });
 
@@ -378,10 +386,12 @@ function setup() {
   });
 
   stitchAspectSelect.addEventListener('change', () => {
+    updateURLParams();
     loop();
   });
 
   knittingMethodSelect.addEventListener('change', () => {
+    updateURLParams();
     if (processedImg) {
       generateWrittenInstructions();
     }
@@ -472,6 +482,20 @@ function setup() {
       // Reset select to placeholder
       exportSelect.value = '';
     });
+  }
+
+  // URL sync event listeners for PDF toggles
+  let patternTitleEl = document.getElementById('pdf-pattern-title');
+  if (patternTitleEl) {
+    patternTitleEl.addEventListener('input', updateURLParams);
+  }
+  let includeYarnEl = document.getElementById('pdf-include-yarn');
+  if (includeYarnEl) {
+    includeYarnEl.addEventListener('change', updateURLParams);
+  }
+  let includeInstructionsEl = document.getElementById('pdf-include-instructions');
+  if (includeInstructionsEl) {
+    includeInstructionsEl.addEventListener('change', updateURLParams);
   }
 
 
@@ -730,6 +754,18 @@ function setup() {
   baseCanvasHeight = canvasHeight;
   updateZoom();
 
+  // Initialize algorithm defaults copy
+  for (let mode in ALGO_PARAMS) {
+    ALGO_DEFAULTS[mode] = {};
+    if (ALGO_PARAMS[mode].param1) {
+      ALGO_DEFAULTS[mode].param1 = ALGO_PARAMS[mode].param1.value;
+    }
+    if (ALGO_PARAMS[mode].param2) {
+      ALGO_DEFAULTS[mode].param2 = ALGO_PARAMS[mode].param2.value;
+    }
+  }
+
+  loadSettingsFromURL();
   toggleConditionalFields();
 
   // Try to load any saved image from IndexedDB on page load
@@ -1033,7 +1069,260 @@ function cacheCurrentSettings() {
 
 function handleSettingChange(inputEl, value, propertyName) {
   applySettingValue(propertyName, value);
+  updateURLParams();
   generateChart();
+}
+
+function updateURLParams() {
+  let params = new URLSearchParams();
+
+  // Basic settings
+  if (widthInputVal) {
+    let val = parseInt(widthInputVal.value);
+    if (val !== DEFAULTS.OUTPUT_WIDTH) params.set('width', val);
+  }
+  if (colorModeSelect) {
+    let val = colorModeSelect.value;
+    if (val !== 'original') params.set('mode', val);
+  }
+  if (colorLevelsInput) {
+    let val = parseInt(colorLevelsInput.value);
+    if (val !== 4) params.set('levels', val);
+  }
+  if (brightnessInputVal) {
+    let val = parseInt(brightnessInputVal.value);
+    if (val !== 0) params.set('brightness', val);
+  }
+  if (contrastInputVal) {
+    let val = parseInt(contrastInputVal.value);
+    if (val !== 0) params.set('contrast', val);
+  }
+  if (smoothingInputVal) {
+    let val = parseInt(smoothingInputVal.value);
+    if (val !== 0) params.set('smoothing', val);
+  }
+  if (paletteSizeInput) {
+    let val = parseInt(paletteSizeInput.value);
+    if (val !== DEFAULTS.PALETTE_SIZE) params.set('paletteSize', val);
+  }
+  if (yarnColor1) {
+    let val = yarnColor1.value;
+    if (val.toLowerCase() !== '#ffffff') params.set('color1', val.replace('#', ''));
+  }
+  if (yarnColor2) {
+    let val = yarnColor2.value;
+    if (val.toLowerCase() !== '#000000') params.set('color2', val.replace('#', ''));
+  }
+  if (kuwaharaSlider) {
+    let val = parseInt(kuwaharaSlider.value);
+    if (val !== 0) params.set('kuwahara', val);
+  }
+  if (colorDistanceSelect) {
+    let val = colorDistanceSelect.value;
+    if (val !== 'CIEDE2000') params.set('colorDistance', val);
+  }
+  if (bayerMatrixSelect) {
+    let val = parseInt(bayerMatrixSelect.value);
+    if (val !== 4) params.set('bayerSize', val);
+  }
+
+  // Checkboxes (advanced options)
+  if (strayStitchCheckbox) {
+    let val = strayStitchCheckbox.checked;
+    if (val !== false) params.set('cleanStrays', '1');
+  }
+  if (histEqCheckbox) {
+    let val = histEqCheckbox.checked;
+    if (val !== false) params.set('histEq', '1');
+  }
+  if (bilateralSlider) {
+    let val = parseInt(bilateralSlider.value);
+    if (val !== 0) params.set('bilateral', val);
+  }
+  if (morphCleanupSelect) {
+    let val = morphCleanupSelect.value;
+    if (val !== 'none') params.set('morphCleanup', val);
+  }
+  if (rowColorLimitCheckbox) {
+    let val = rowColorLimitCheckbox.checked;
+    if (val !== false) params.set('rowColorLimit', '1');
+  }
+  if (rowColorLimitInput) {
+    let val = parseInt(rowColorLimitInput.value);
+    if (val !== 2) params.set('rowColorMax', val);
+  }
+
+  // Algo parameters
+  let mode = colorModeSelect ? colorModeSelect.value : '';
+  if (algoParamVal1 && ALGO_PARAMS[mode] && ALGO_PARAMS[mode].param1) {
+    let val = parseFloat(algoParamVal1.value);
+    let def = ALGO_DEFAULTS[mode] ? ALGO_DEFAULTS[mode].param1 : undefined;
+    if (val !== def) params.set('algoParam1', val);
+  }
+  if (algoParamVal2 && ALGO_PARAMS[mode] && ALGO_PARAMS[mode].param2) {
+    let val = parseFloat(algoParamVal2.value);
+    let def = ALGO_DEFAULTS[mode] ? ALGO_DEFAULTS[mode].param2 : undefined;
+    if (val !== def) params.set('algoParam2', val);
+  }
+
+  // Yarn Colors
+  if (yarnPickers && yarnPickers.length > 0) {
+    let activeColorsCount = paletteSizeInput ? parseInt(paletteSizeInput.value) : yarnPickers.length;
+    for (let i = 0; i < activeColorsCount; i++) {
+      if (yarnPickers[i]) {
+        let val = yarnPickers[i].value;
+        let def = DEFAULTS.YARN_COLORS[i];
+        if (val.toLowerCase() !== def.toLowerCase()) {
+          params.set(`yarnColor${i}`, val.replace('#', ''));
+        }
+      }
+    }
+  }
+
+  // Yarn Gauge Calculator
+  if (calcStitchLengthInput) {
+    let val = parseFloat(calcStitchLengthInput.value);
+    if (val !== 3.0) params.set('stitchLength', val);
+  }
+  if (calcSkeinLengthInput) {
+    let val = parseFloat(calcSkeinLengthInput.value);
+    if (val !== 200.0) params.set('skeinLength', val);
+  }
+
+  // Display Settings
+  if (gridCheckbox) {
+    let val = gridCheckbox.checked;
+    if (val !== DEFAULTS.GRID_ENABLED) params.set('showOutlines', val ? '1' : '0');
+  }
+  if (symbolsCheckbox) {
+    let val = symbolsCheckbox.checked;
+    if (val !== false) params.set('showSymbols', '1');
+  }
+  if (stitchAspectSelect) {
+    let val = parseFloat(stitchAspectSelect.value);
+    if (val !== 1.0) params.set('aspect', val);
+  }
+  if (knittingMethodSelect) {
+    let val = knittingMethodSelect.value;
+    if (val !== 'flat') params.set('knittingMethod', val);
+  }
+
+  // PDF Export Toggles
+  let patternTitleEl = document.getElementById('pdf-pattern-title');
+  if (patternTitleEl) {
+    let val = patternTitleEl.value;
+    if (val !== 'My Knitting Project') params.set('pdfTitle', val);
+  }
+
+  let includeYarnEl = document.getElementById('pdf-include-yarn');
+  if (includeYarnEl) {
+    let val = includeYarnEl.checked;
+    if (val !== true) params.set('pdfYarn', '0');
+  }
+
+  let includeInstructionsEl = document.getElementById('pdf-include-instructions');
+  if (includeInstructionsEl) {
+    let val = includeInstructionsEl.checked;
+    if (val !== false) params.set('pdfInstructions', '1');
+  }
+
+  // Replace URL
+  let paramStr = params.toString();
+  let newUrl = window.location.pathname + (paramStr ? '?' + paramStr : '');
+  window.history.replaceState({ path: newUrl }, '', newUrl);
+}
+
+function loadSettingsFromURL() {
+  let params = new URLSearchParams(window.location.search);
+  if (params.toString() === '') return; // No params to load
+
+  // Load basic parameters
+  if (params.has('width')) applySettingValue('width', parseInt(params.get('width')));
+  if (params.has('mode')) {
+    applySettingValue('mode', params.get('mode'));
+  }
+  if (params.has('levels')) applySettingValue('levels', parseInt(params.get('levels')));
+  if (params.has('brightness')) applySettingValue('brightness', parseInt(params.get('brightness')));
+  if (params.has('contrast')) applySettingValue('contrast', parseInt(params.get('contrast')));
+  if (params.has('smoothing')) applySettingValue('smoothing', parseInt(params.get('smoothing')));
+  if (params.has('paletteSize')) {
+    applySettingValue('paletteSize', parseInt(params.get('paletteSize')));
+  }
+  if (params.has('kuwahara')) applySettingValue('kuwahara', parseInt(params.get('kuwahara')));
+  if (params.has('colorDistance')) applySettingValue('colorDistance', params.get('colorDistance'));
+  if (params.has('bayerSize')) applySettingValue('bayerSize', parseInt(params.get('bayerSize')));
+
+  // Checkboxes
+  if (params.has('cleanStrays')) applySettingValue('cleanStrays', params.get('cleanStrays') === '1');
+  if (params.has('histEq')) applySettingValue('histEq', params.get('histEq') === '1');
+  if (params.has('bilateral')) applySettingValue('bilateral', parseInt(params.get('bilateral')));
+  if (params.has('morphCleanup')) applySettingValue('morphCleanup', params.get('morphCleanup'));
+  if (params.has('rowColorLimit')) applySettingValue('rowColorLimit', params.get('rowColorLimit') === '1');
+  if (params.has('rowColorMax')) applySettingValue('rowColorMax', parseInt(params.get('rowColorMax')));
+
+  // Run toggleConditionalFields so mode layouts are configured before setting parameter inputs
+  toggleConditionalFields();
+
+  // Algo parameters
+  if (params.has('algoParam1')) applySettingValue('algoParam1', parseFloat(params.get('algoParam1')));
+  if (params.has('algoParam2')) applySettingValue('algoParam2', parseFloat(params.get('algoParam2')));
+
+  // Yarn Colors
+  for (let i = 0; i < 8; i++) {
+    let paramKey = `yarnColor${i}`;
+    if (params.has(paramKey)) {
+      let hexValue = params.get(paramKey);
+      if (!hexValue.startsWith('#')) hexValue = '#' + hexValue;
+      applySettingValue(paramKey, hexValue);
+    }
+  }
+  
+  if (params.has('color1')) {
+    let hexValue = params.get('color1');
+    if (!hexValue.startsWith('#')) hexValue = '#' + hexValue;
+    applySettingValue('color1', hexValue);
+  }
+  if (params.has('color2')) {
+    let hexValue = params.get('color2');
+    if (!hexValue.startsWith('#')) hexValue = '#' + hexValue;
+    applySettingValue('color2', hexValue);
+  }
+
+  // Yarn Gauge Calculator
+  if (params.has('stitchLength') && calcStitchLengthInput) {
+    calcStitchLengthInput.value = parseFloat(params.get('stitchLength'));
+  }
+  if (params.has('skeinLength') && calcSkeinLengthInput) {
+    calcSkeinLengthInput.value = parseFloat(params.get('skeinLength'));
+  }
+
+  // Display Settings
+  if (params.has('showOutlines') && gridCheckbox) {
+    gridCheckbox.checked = params.get('showOutlines') === '1';
+  }
+  if (params.has('showSymbols') && symbolsCheckbox) {
+    symbolsCheckbox.checked = params.get('showSymbols') === '1';
+  }
+  if (params.has('aspect') && stitchAspectSelect) {
+    stitchAspectSelect.value = params.get('aspect');
+  }
+  if (params.has('knittingMethod') && knittingMethodSelect) {
+    knittingMethodSelect.value = params.get('knittingMethod');
+  }
+
+  // PDF Export Toggles
+  let patternTitleEl = document.getElementById('pdf-pattern-title');
+  if (params.has('pdfTitle') && patternTitleEl) {
+    patternTitleEl.value = params.get('pdfTitle');
+  }
+  let includeYarnEl = document.getElementById('pdf-include-yarn');
+  if (params.has('pdfYarn') && includeYarnEl) {
+    includeYarnEl.checked = params.get('pdfYarn') === '1';
+  }
+  let includeInstructionsEl = document.getElementById('pdf-include-instructions');
+  if (params.has('pdfInstructions') && includeInstructionsEl) {
+    includeInstructionsEl.checked = params.get('pdfInstructions') === '1';
+  }
 }
 
 function applySettingValue(propertyName, value) {
@@ -1667,6 +1956,15 @@ function resetApp() {
     patternTitleInput.value = "My Knitting Project";
   }
 
+  let includeYarnEl = document.getElementById('pdf-include-yarn');
+  if (includeYarnEl) {
+    includeYarnEl.checked = true;
+  }
+  let includeInstructionsEl = document.getElementById('pdf-include-instructions');
+  if (includeInstructionsEl) {
+    includeInstructionsEl.checked = false;
+  }
+
   // Re-sync cache
   cacheCurrentSettings();
   
@@ -1674,6 +1972,10 @@ function resetApp() {
   deleteImageFromDB((err) => {
     if (err) console.error("Error deleting image from IndexedDB:", err);
   });
+  
+  // Clear URL query parameters
+  let cleanUrl = window.location.pathname;
+  window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
   
   toggleConditionalFields();
   updateStepCardsState(false);

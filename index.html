@@ -32,7 +32,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
 
   <!-- App Stylesheet -->
-  <link rel="stylesheet" href="style.css?v=1.0.5">
+  <link rel="stylesheet" href="style.css?v=1.0.6">
  
   <!-- jsPDF Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -41,11 +41,11 @@
   <script src="https://cdn.jsdelivr.net/npm/heic-to@1.5.2/dist/iife/heic-to.js"></script>
  
   <!-- App Logic -->
-  <script src="constants.js" defer></script>
+  <script src="constants.js?v=1.0.6" defer></script>
   <script src="color-utils.js" defer></script>
   <script src="filters.js" defer></script>
-  <script src="exporters.js" defer></script>
-  <script src="sketch.js?v=1.0.5" defer></script>
+  <script src="exporters.js?v=1.0.6" defer></script>
+  <script src="sketch.js?v=1.0.6" defer></script>
 </head>
 
 <body>
@@ -571,6 +571,23 @@
             <div class="control-group">
               <label for="pdf-pattern-title" id="pdf-pattern-title-label" style="font-size: 0.8rem; font-weight: 500; color: var(--color-text-muted); display: block; margin-bottom: 6px;">Pattern PDF Title</label>
               <input type="text" id="pdf-pattern-title" value="My Knitting Project" placeholder="Enter title for PDF..." style="width: 100%; height: 38px; padding: 6px 12px; font-size: 0.85rem; border: 1px solid var(--color-border); border-radius: var(--border-radius-sm); outline: none; background-color: var(--color-input-bg); color: var(--color-text); box-sizing: border-box; transition: var(--transition);">
+            </div>
+
+            <!-- PDF Export Config Toggles -->
+            <div class="control-group">
+              <label style="font-size: 0.8rem; font-weight: 600; color: var(--color-text); display: block; margin-bottom: 4px;" id="pdf-options-label">PDF Export Options</label>
+              <div class="toggle-group-vertical" style="display: flex; flex-direction: column; gap: 8px;">
+                <label class="grid-checkbox-switch" style="display: inline-flex; align-items: center; gap: 8px; cursor: pointer; user-select: none;">
+                  <input type="checkbox" id="pdf-include-yarn" checked>
+                  <span class="switch-slider"></span>
+                  <span class="switch-label" id="pdf-include-yarn-label">Include Yarn Usage</span>
+                </label>
+                <label class="grid-checkbox-switch" style="display: inline-flex; align-items: center; gap: 8px; cursor: pointer; user-select: none;">
+                  <input type="checkbox" id="pdf-include-instructions">
+                  <span class="switch-slider"></span>
+                  <span class="switch-label" id="pdf-include-instructions-label">Include Written Instructions</span>
+                </label>
+              </div>
             </div>
             
             <!-- Export dropdown and Reset buttons -->

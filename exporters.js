@@ -161,56 +161,65 @@ async function exportPDF() {
   // 4. Yarn Consumption Legend Card (positioned dynamically)
   let startY = hasImage ? (imgY + imgH + 10) : 65;
   
-  let numCols = 3;
-  let rowsOfSwatches = Math.ceil(numSwatches / numCols);
-  if (rowsOfSwatches < 3) rowsOfSwatches = 3; // safe minimum
-  let cardH = 20 + rowsOfSwatches * 10;
+  let includeYarnEl = document.getElementById('pdf-include-yarn');
+  let isYarnIncluded = includeYarnEl ? includeYarnEl.checked : true;
   
-  doc.setFillColor(249, 247, 243); // warm light sand bg
-  doc.setDrawColor(232, 226, 214); // sand border
-  doc.rect(20, startY, 170, cardH, "FD"); // draw card wrapper dynamically
-  
-  doc.setFont(activeFont, "bold");
-  doc.setFontSize(12);
-  doc.setTextColor(44, 53, 49);
-  doc.text(currentLanguage === 'pl' ? "KALKULATOR ZUŻYCIA WŁÓCZKI" : "YARN CONSUMPTION CALCULATOR", 30, startY + 12);
-  
-  let stitchLengthEl = document.getElementById('calc-stitch-length');
-  let skeinLengthEl = document.getElementById('calc-skein-length');
-  let stitchLength = (stitchLengthEl && parseFloat(stitchLengthEl.value)) || 3.0;
-  let skeinLength = (skeinLengthEl && parseFloat(skeinLengthEl.value)) || 200;
-  
-  swatches.forEach((sw, idx) => {
-    if (idx >= 32) return; // support up to 32 colors (3 columns of 11)
+  let cardH = 0;
+  if (isYarnIncluded) {
+    let numCols = 3;
+    let rowsOfSwatches = Math.ceil(numSwatches / numCols);
+    if (rowsOfSwatches < 3) rowsOfSwatches = 3; // safe minimum
+    cardH = 20 + rowsOfSwatches * 10;
     
-    let colIdx = Math.floor(idx / rowsOfSwatches);
-    let rowIdx = idx % rowsOfSwatches;
+    doc.setFillColor(249, 247, 243); // warm light sand bg
+    doc.setDrawColor(232, 226, 214); // sand border
+    doc.rect(20, startY, 170, cardH, "FD"); // draw card wrapper dynamically
     
-    let colX = 24 + colIdx * 55;
-    let colY = startY + 24 + rowIdx * 10;
-    
-    let rgb = hexToRgb(sw.hex);
-    doc.setFillColor(rgb[0], rgb[1], rgb[2]);
-    doc.rect(colX, colY - 5, 8, 8, "F");
-    
-    // Swatch outline
-    doc.setDrawColor(200, 200, 200);
-    doc.setLineWidth(0.15);
-    doc.rect(colX, colY - 5, 8, 8, "S");
-    
-    doc.setFont(activeFont, "normal");
-    doc.setFontSize(8);
+    doc.setFont(activeFont, "bold");
+    doc.setFontSize(12);
     doc.setTextColor(44, 53, 49);
-    doc.text(`${sw.hex}`, colX + 10, colY + 1);
+    doc.text(currentLanguage === 'pl' ? "KALKULATOR ZUŻYCIA WŁÓCZKI" : "YARN CONSUMPTION CALCULATOR", 30, startY + 12);
     
-    doc.setFontSize(7);
-    doc.setTextColor(100, 117, 109);
-    let totalMeters = (sw.count * stitchLength) / 100;
-    let skeins = Math.ceil(totalMeters / skeinLength);
-    let stsLabel = currentLanguage === 'pl' ? "o." : "sts";
-    let skLabel = currentLanguage === 'pl' ? "mot." : (skeins === 1 ? "skein" : "skeins");
-    doc.text(`${sw.count.toLocaleString()} ${stsLabel} (~${totalMeters.toFixed(1)} m, ${skeins} ${skLabel})`, colX + 21, colY + 1);
-  });
+    let stitchLengthEl = document.getElementById('calc-stitch-length');
+    let skeinLengthEl = document.getElementById('calc-skein-length');
+    let stitchLength = (stitchLengthEl && parseFloat(stitchLengthEl.value)) || 3.0;
+    let skeinLength = (skeinLengthEl && parseFloat(skeinLengthEl.value)) || 200;
+    
+    swatches.forEach((sw, idx) => {
+      if (idx >= 32) return; // support up to 32 colors (3 columns of 11)
+      
+      let colIdx = Math.floor(idx / rowsOfSwatches);
+      let rowIdx = idx % rowsOfSwatches;
+      
+      let colX = 24 + colIdx * 55;
+      let colY = startY + 24 + rowIdx * 10;
+      
+      let rgb = hexToRgb(sw.hex);
+      doc.setFillColor(rgb[0], rgb[1], rgb[2]);
+      doc.rect(colX, colY - 5, 8, 8, "F");
+      
+      // Swatch outline
+      doc.setDrawColor(200, 200, 200);
+      doc.setLineWidth(0.15);
+      doc.rect(colX, colY - 5, 8, 8, "S");
+      
+      doc.setFont(activeFont, "normal");
+      doc.setFontSize(8);
+      doc.setTextColor(44, 53, 49);
+      doc.text(`${sw.hex}`, colX + 10, colY + 1);
+      
+      doc.setFontSize(7);
+      doc.setTextColor(100, 117, 109);
+      let totalMeters = (sw.count * stitchLength) / 100;
+      let skeins = Math.ceil(totalMeters / skeinLength);
+      let stsLabel = currentLanguage === 'pl' ? "o." : "sts";
+      let skLabel = currentLanguage === 'pl' ? "mot." : (skeins === 1 ? "skein" : "skeins");
+      doc.text(`${sw.count.toLocaleString()} ${stsLabel} (~${totalMeters.toFixed(1)} m, ${skeins} ${skLabel})`, colX + 21, colY + 1);
+    });
+  } else {
+    // If yarn consumption calculation is excluded, set cardH so subsequent key cards shift up
+    cardH = -6;
+  }
 
   // 5. Draw Stitch Glossary Key Card (if symbols are mapped and enabled)
   let activeSymbols = [];
@@ -446,38 +455,42 @@ async function exportPDF() {
   }
   
   // PAGE 3+: WRITTEN INSTRUCTIONS
-  doc.addPage();
-  
-  doc.setFont(activeFont, "bold");
-  doc.setFontSize(14);
-  doc.setTextColor(44, 53, 49);
-  doc.text(currentLanguage === 'pl' ? "PISEMNA INSTRUKCJA" : "WRITTEN INSTRUCTIONS", 105, 25, { align: "center" });
-  
-  doc.setFont(activeFont, "normal");
-  doc.setFontSize(9);
-  doc.setTextColor(50, 50, 50);
-  
-  let writtenInstructionsTextareaEl = document.getElementById('written-instructions-textarea');
-  let instructionsText = writtenInstructionsTextareaEl ? writtenInstructionsTextareaEl.value : "";
-  if (instructionsText) {
-    let lines = doc.splitTextToSize(instructionsText, 170); // 170 mm print width
-    let startY = 35;
-    let pageHeight = 297;
-    let margin = 20;
+  let includeInstructionsEl = document.getElementById('pdf-include-instructions');
+  let isInstructionsIncluded = includeInstructionsEl ? includeInstructionsEl.checked : false;
+  if (isInstructionsIncluded) {
+    doc.addPage();
     
-    lines.forEach(line => {
-      if (startY > pageHeight - margin) {
-        doc.addPage();
-        doc.setFont(activeFont, "normal");
-        doc.setFontSize(9);
-        doc.setTextColor(50, 50, 50);
-        startY = 25; // Reset Y on new page
-      }
-      doc.text(line, 20, startY);
-      startY += 5.5; // Line height 5.5 mm
-    });
-  } else {
-    doc.text(currentLanguage === 'pl' ? "Brak wygenerowanej instrukcji." : "No instructions generated.", 20, 35);
+    doc.setFont(activeFont, "bold");
+    doc.setFontSize(14);
+    doc.setTextColor(44, 53, 49);
+    doc.text(currentLanguage === 'pl' ? "PISEMNA INSTRUKCJA" : "WRITTEN INSTRUCTIONS", 105, 25, { align: "center" });
+    
+    doc.setFont(activeFont, "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(50, 50, 50);
+    
+    let writtenInstructionsTextareaEl = document.getElementById('written-instructions-textarea');
+    let instructionsText = writtenInstructionsTextareaEl ? writtenInstructionsTextareaEl.value : "";
+    if (instructionsText) {
+      let lines = doc.splitTextToSize(instructionsText, 170); // 170 mm print width
+      let startY = 35;
+      let pageHeight = 297;
+      let margin = 20;
+      
+      lines.forEach(line => {
+        if (startY > pageHeight - margin) {
+          doc.addPage();
+          doc.setFont(activeFont, "normal");
+          doc.setFontSize(9);
+          doc.setTextColor(50, 50, 50);
+          startY = 25; // Reset Y on new page
+        }
+        doc.text(line, 20, startY);
+        startY += 5.5; // Line height 5.5 mm
+      });
+    } else {
+      doc.text(currentLanguage === 'pl' ? "Brak wygenerowanej instrukcji." : "No instructions generated.", 20, 35);
+    }
   }
   
   // Save PDF pattern document
