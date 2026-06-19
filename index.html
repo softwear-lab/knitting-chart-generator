@@ -5,11 +5,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Knitting Chart Generator</title>
-  <!-- Google Fonts: Playfair Display (headings) & Outfit (body & UI) -->
+  <!-- Google Fonts: Inter (main body/UI) & Outfit/Playfair (headings) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
     rel="stylesheet">
 
   <!-- Optimize canvas 2D contexts for multiple readback operations (getImageData) -->
@@ -32,7 +32,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
 
   <!-- App Stylesheet -->
-  <link rel="stylesheet" href="style.css?v=1.0.4">
+  <link rel="stylesheet" href="style.css?v=1.0.5">
  
   <!-- jsPDF Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -45,7 +45,7 @@
   <script src="color-utils.js" defer></script>
   <script src="filters.js" defer></script>
   <script src="exporters.js" defer></script>
-  <script src="sketch.js?v=1.0.4" defer></script>
+  <script src="sketch.js?v=1.0.5" defer></script>
 </head>
 
 <body>
@@ -63,14 +63,19 @@
       </div>
     </div>
 
-    <!-- Top Brand Header -->
+    <!-- Top Navbar (Desktop view only, styled as header) -->
     <header class="app-header">
-      <div class="header-logo">🧶</div>
-      <div class="header-text">
-        <h1 id="app-title">Knitting Chart Generator</h1>
-        <p class="subtitle" id="app-subtitle">Convert any photo into a stitch-by-stitch knitting pattern with dynamic
-          yarn calculators</p>
+      <div class="header-logo-container">
+        <div class="header-logo">🧶</div>
+        <div class="header-text">
+          <h1 id="app-title">Knitting Chart Generator</h1>
+          <p class="subtitle" id="app-subtitle" style="display: none;">Convert any photo into a stitch-by-stitch knitting pattern with dynamic yarn calculators</p>
+        </div>
       </div>
+      
+      <!-- (Navbar project actions moved to sidebar) -->
+
+      <!-- Right: Language Selector -->
       <div class="lang-selector-container">
         <span style="font-size: 1.1rem; line-height: 1;">🌐</span>
         <select id="lang-select-desktop" class="lang-select">
@@ -94,9 +99,9 @@
 
         <!-- Hidden upload elements to maintain JS compatibility and PDF generation -->
         <div style="display: none;">
-          <input type="file" id="image-upload" accept="image/*,.heic,.HEIC">
+          <input type="file" id="image-upload" accept="image/*,.heic,.HEIC" style="display: none;">
           <div id="dropzone"></div>
-          <div id="upload-status-box">
+          <div id="upload-status-box" style="display: none;">
             <img id="thumbnail-img" src="" alt="preview">
             <span id="status-filename"></span>
             <span id="status-filesize"></span>
@@ -104,7 +109,7 @@
           </div>
         </div>
 
-        <!-- Step 1: Dimensions -->
+        <!-- Step 1: Stitch Settings -->
         <div class="step-card disabled collapsed" id="step-card-dimensions">
           <div class="step-header">
             <span class="step-badge">1</span>
@@ -120,8 +125,7 @@
               <div class="slider-wrapper">
                 <input type="range" id="chart-width-slider" min="10" max="300" value="200">
               </div>
-              <p class="control-help" id="chart-width-help">Fewer stitches create a more grid-like, abstract design.
-                Height will scale proportionally.</p>
+              <p class="control-help" id="chart-width-help">Fewer stitches create a more grid-like, abstract design. Height will scale proportionally.</p>
             </div>
 
             <!-- Brightness Slider -->
@@ -155,8 +159,7 @@
                   <span class="switch-label" id="hist-eq-label">Auto Enhance Contrast</span>
                 </label>
               </div>
-              <p class="control-help" id="hist-eq-help">Applies histogram equalization to improve tonal range of
-                washed-out images before processing.</p>
+              <p class="control-help" id="hist-eq-help">Applies histogram equalization to improve tonal range of washed-out images before processing.</p>
             </div>
 
             <!-- Anti-Confetti Smoothing Slider -->
@@ -168,8 +171,7 @@
               <div class="slider-wrapper">
                 <input type="range" id="chart-smoothing-slider" min="0" max="3" value="0" step="1">
               </div>
-              <p class="control-help" id="chart-smoothing-help">Removes stray single stitches. 0 is off, 1-3 increases
-                edge-preserving smoothing.</p>
+              <p class="control-help" id="chart-smoothing-help">Removes stray single stitches. 0 is off, 1-3 increases edge-preserving smoothing.</p>
             </div>
 
             <!-- Bilateral Filter -->
@@ -182,8 +184,7 @@
               <div class="slider-wrapper">
                 <input type="range" id="bilateral-slider" min="0" max="5" value="0" step="1">
               </div>
-              <p class="control-help" id="bilateral-help">Smooths noise while keeping sharp color boundaries intact (0 =
-                off, 1-5 = intensity).</p>
+              <p class="control-help" id="bilateral-help">Smooths noise while keeping sharp color boundaries intact (0 = off, 1-5 = intensity).</p>
             </div>
 
             <!-- Block Painting (Kuwahara Filter) -->
@@ -196,8 +197,7 @@
               <div class="slider-wrapper">
                 <input type="range" id="kuwahara-slider" min="0" max="5" value="0" step="1">
               </div>
-              <p class="control-help" id="kuwahara-help">Simplifies shapes into flat painterly blocks while keeping
-                edges sharp (0 = off, 1-5 = intensity).</p>
+              <p class="control-help" id="kuwahara-help">Simplifies shapes into flat painterly blocks while keeping edges sharp (0 = off, 1-5 = intensity).</p>
             </div>
 
             <!-- Morphological Cleanup -->
@@ -212,8 +212,7 @@
                   <option value="close">Close (Fill Small Gaps)</option>
                 </select>
               </div>
-              <p class="control-help" id="morph-cleanup-help">Refines shape boundaries using mathematical morphology.
-                Open removes noise; Close fills holes.</p>
+              <p class="control-help" id="morph-cleanup-help">Refines shape boundaries using mathematical morphology. Open removes noise; Close fills holes.</p>
             </div>
 
             <!-- Stitch Aspect Ratio Select -->
@@ -227,8 +226,7 @@
                   <option value="1.2">Fine Knit (6:5)</option>
                 </select>
               </div>
-              <p class="control-help" id="stitch-aspect-help">Real knit stitches are wider than tall. Adjusts display,
-                PDF, and XLS to match physical proportions.</p>
+              <p class="control-help" id="stitch-aspect-help">Real knit stitches are wider than tall. Adjusts display, PDF, and XLS to match physical proportions.</p>
             </div>
 
             <!-- Knitting Method (Flat vs Circular) -->
@@ -240,13 +238,12 @@
                   <option value="circular">Circular (In the Round)</option>
                 </select>
               </div>
-              <p class="control-help" id="knitting-method-help">Determines row reading direction and stitch conversion
-                for wrong-side rows in written instructions.</p>
+              <p class="control-help" id="knitting-method-help">Determines row reading direction and stitch conversion for wrong-side rows in written instructions.</p>
             </div>
           </div>
         </div>
 
-        <!-- Step 3: Colors -->
+        <!-- Step 2: Colors -->
         <div class="step-card disabled collapsed" id="step-card-colors">
           <div class="step-header">
             <span class="step-badge">2</span>
@@ -292,7 +289,6 @@
                   </optgroup>
                   
                   <optgroup label="Geometric & Algorithmic Patterns">
-
                     <option value="Shadow Illusion (2 Colors)">Shadow Illusion (2 Colors)</option>
                     <option value="Bargello Wave (4 Colors)">Bargello Wave (4 Colors)</option>
                     <option value="Stained Glass Intarsia (5 Colors)">Stained Glass Intarsia (5 Colors)</option>
@@ -338,22 +334,26 @@
                     <option value="12">12x12 (Ultra Fine / Very Small Pattern)</option>
                   </select>
                 </div>
-                <p class="control-help" id="bayer-matrix-help">Controls the grid size of the dithering texture pattern
-                  relative to the stitches.</p>
+                <p class="control-help" id="bayer-matrix-help">Controls the grid size of the dithering texture pattern relative to the stitches.</p>
               </div>
 
               <!-- Posterize Option (Conditional) -->
               <div class="control-group" id="levels-container" style="display: none;">
                 <label for="color-levels-input" id="color-levels-label">Color Count (Levels)</label>
                 <input type="number" id="color-levels-input" min="2" max="32" value="4">
-                <p class="control-help" id="color-levels-help">Reduces the image to a specific number of color tones.
-                </p>
+                <p class="control-help" id="color-levels-help">Reduces the image to a specific number of color tones.</p>
               </div>
 
               <!-- Custom Palette Pickers (Conditional) -->
               <div class="control-group" id="custom-palette-container" style="display: none;">
-                <div class="label-row">
-                  <label id="yarn-palette-label">Yarn Color Palette</label>
+                <div class="label-row" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <label id="yarn-palette-label" style="margin: 0;">Yarn Color Palette</label>
+                    <button type="button" id="btn-rotate-colors" class="btn-rotate-colors"
+                      style="font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; border: 1px solid var(--color-border); background: #ffffff; cursor: pointer; font-weight: 600; color: var(--color-text-muted); display: inline-flex; align-items: center; gap: 4px; transition: var(--transition);">
+                      ⟳ Rotate
+                    </button>
+                  </div>
                   <div class="palette-size-wrapper" id="palette-size-container"
                     style="display: flex; align-items: center; gap: 6px;">
                     <label for="palette-size-input" id="yarn-palette-size-label"
@@ -473,8 +473,7 @@
                 <div class="control-group" id="color-distance-metric-container"
                   style="display: none; margin-top: 12px; margin-bottom: 0;">
                   <label for="color-distance-select" id="color-distance-label"
-                    style="font-size: 0.8rem; font-weight: 600; color: var(--color-text-muted); display: block; margin-bottom: 4px;">Color
-                    Matching Metric</label>
+                    style="font-size: 0.8rem; font-weight: 600; color: var(--color-text-muted); display: block; margin-bottom: 4px;">Color Matching Metric</label>
                   <div class="select-wrapper">
                     <select id="color-distance-select"
                       style="font-size: 0.8rem; padding: 6px 8px; width: 100%; border: 1px solid var(--color-border); border-radius: 4px; background: #ffffff;">
@@ -519,8 +518,7 @@
                   <span class="switch-label" id="stray-stitch-label">Clean Stray Stitches</span>
                 </label>
               </div>
-              <p class="control-help" id="stray-stitch-help">Automatically merges isolated single-pixel stitches into
-                their most prominent surrounding color block to make knitting easier.</p>
+              <p class="control-help" id="stray-stitch-help">Automatically merges isolated single-pixel stitches into their most prominent surrounding color block to make knitting easier.</p>
             </div>
 
 
@@ -539,14 +537,63 @@
                     style="width: 45px; padding: 4px 6px; font-size: 0.85rem; border: 1px solid var(--color-border); border-radius: 4px;">
                 </div>
               </div>
-              <p class="control-help" id="row-color-limit-help">Constrains each row to a maximum number of active yarn
-                colors for stranded/Fair Isle knitting compatibility.</p>
+              <p class="control-help" id="row-color-limit-help">Constrains each row to a maximum number of active yarn colors for stranded/Fair Isle knitting compatibility.</p>
             </div>
 
           </div>
         </div>
 
+        <!-- Step 3: Export Settings -->
+        <div class="step-card disabled collapsed" id="step-card-actions">
+          <div class="step-header">
+            <span class="step-badge">3</span>
+            <h3 id="step-actions-title">Export</h3>
+            <span class="step-chevron">▼</span>
+          </div>
+          <div class="step-body">
+            <!-- Display Toggles -->
+            <div class="control-group">
+              <div class="toggle-group-inline" style="display: flex; gap: 16px; flex-wrap: wrap; padding: 4px 0;">
+                <label class="grid-checkbox-switch" style="display: inline-flex; align-items: center; gap: 8px; cursor: pointer; user-select: none;">
+                  <input type="checkbox" id="grid-checkbox">
+                  <span class="switch-slider"></span>
+                  <span class="switch-label" id="show-outlines-label">Show Outlines</span>
+                </label>
+                <label class="grid-checkbox-switch" style="display: inline-flex; align-items: center; gap: 8px; cursor: pointer; user-select: none;">
+                  <input type="checkbox" id="symbols-checkbox">
+                  <span class="switch-slider"></span>
+                  <span class="switch-label" id="show-symbols-label">Show Symbols</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Project Title (Pattern PDF Title) -->
+            <div class="control-group">
+              <label for="pdf-pattern-title" id="pdf-pattern-title-label" style="font-size: 0.8rem; font-weight: 500; color: var(--color-text-muted); display: block; margin-bottom: 6px;">Pattern PDF Title</label>
+              <input type="text" id="pdf-pattern-title" value="My Knitting Project" placeholder="Enter title for PDF..." style="width: 100%; height: 38px; padding: 6px 12px; font-size: 0.85rem; border: 1px solid var(--color-border); border-radius: var(--border-radius-sm); outline: none; background-color: var(--color-input-bg); color: var(--color-text); box-sizing: border-box; transition: var(--transition);">
+            </div>
+            
+            <!-- Export dropdown and Reset buttons -->
+            <div class="action-buttons-group-horizontal" style="margin-top: 16px;">
+              <button id="btn-reset" class="btn" title="Reset App">
+                <span class="btn-icon">🔄</span> Reset
+              </button>
+              <div class="select-export-wrapper" id="export-select-wrapper" style="flex: 1.5 1 auto;">
+                <select id="export-select" class="select-export" disabled>
+                  <option value="" disabled selected id="opt-export-placeholder">📥 Export...</option>
+                  <option value="png" id="opt-export-png">💾 Export PNG</option>
+                  <option value="pdf" id="opt-export-pdf">📄 Export PDF</option>
+                  <option value="xls" id="opt-export-xls">📊 Export XLS</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </aside>
+
+      <!-- Sidebar Toggle Button (Desktop view only, styled as absolute pull-tab) -->
+      <button id="btn-toggle-sidebar-desktop" class="btn-toggle-sidebar" title="Collapse Settings Sidebar">◀</button>
 
       <!-- Right Column: Interactive Workspace -->
       <main class="workspace-panel">
@@ -559,28 +606,32 @@
               <div class="chart-info-tag" id="chart-info-tag">No active chart</div>
             </div>
 
-            <!-- View Controls -->
+            <!-- View Controls & Toolbar -->
             <div class="preview-toolbar">
+              <!-- View mode tab switch -->
+              <div class="view-tabs">
+                <button id="btn-tab-original" class="tab-btn">Original Image</button>
+                <button id="btn-tab-chart" class="tab-btn active">Knitting Chart</button>
+              </div>
+              
+              <!-- (Outlines and symbols toggles moved to sidebar) -->
+
+              <!-- Zoom Controls -->
+              <div class="zoom-controls">
+                <button id="btn-zoom-out" class="zoom-btn" title="Zoom Out">-</button>
+                <span id="zoom-val" class="zoom-val">100%</span>
+                <button id="btn-zoom-in" class="zoom-btn" title="Zoom In">+</button>
+              </div>
+
+              <!-- Canvas actions (change / remove) -->
               <button id="btn-change-image-canvas" class="btn btn-outline-sage" style="display: none;">
                 <span class="btn-icon">🔄</span> Change Image
               </button>
               <button id="btn-remove-image-canvas" class="btn btn-tertiary" style="display: none;">
                 <span class="btn-icon">🗑️</span> Remove Image
               </button>
-              <label class="grid-checkbox-switch">
-                <input type="checkbox" id="grid-checkbox">
-                <span class="switch-slider"></span>
-                <span class="switch-label" id="show-outlines-label">Show Outlines</span>
-              </label>
-              <label class="grid-checkbox-switch" style="margin-left: 15px;">
-                <input type="checkbox" id="symbols-checkbox">
-                <span class="switch-slider"></span>
-                <span class="switch-label" id="show-symbols-label">Show Symbols</span>
-              </label>
             </div>
           </div>
-
-
 
           <!-- Canvas Drawing Board -->
           <div class="canvas-viewport" id="viewport-frame">
@@ -598,31 +649,6 @@
             <div id="loading-overlay" class="loading-overlay" style="display: none;">
               <div class="spinner"></div>
               <p id="loading-text">Processing Image...</p>
-            </div>
-          </div>
-
-          <!-- Actions Panel (Moved close to Preview) -->
-          <div class="preview-actions-section" id="step-card-actions">
-            <div class="preview-actions-wrapper">
-              <div class="preview-actions-title-group">
-                <label for="pdf-pattern-title" id="pdf-pattern-title-label">Pattern PDF Title</label>
-                <input type="text" id="pdf-pattern-title" value="My Knitting Project"
-                  placeholder="Enter title for PDF...">
-              </div>
-              <div class="action-buttons-group-horizontal">
-                <button id="btn-download" class="btn btn-secondary" disabled>
-                  <span class="btn-icon">💾</span> Export Chart (PNG)
-                </button>
-                <button id="btn-export-pdf" class="btn btn-outline-sage" disabled>
-                  <span class="btn-icon">📄</span> Export Pattern (PDF)
-                </button>
-                <button id="btn-export-xls" class="btn btn-outline-sage" disabled>
-                  <span class="btn-icon">📊</span> Export Spreadsheet (XLS)
-                </button>
-                <button id="btn-reset" class="btn btn-tertiary">
-                  <span class="btn-icon">🔄</span> Reset App
-                </button>
-              </div>
             </div>
           </div>
         </div>
@@ -659,7 +685,7 @@
 
         <!-- Written Instructions Step Card -->
         <div class="legend-card disabled collapsed" id="step-card-written-instructions"
-          style="margin-top: 24px; opacity: 0.5; pointer-events: none;">
+          style="opacity: 0.5; pointer-events: none;">
           <div class="legend-header">
             <div style="text-align: left; flex: 1;">
               <h2 id="written-instructions-title">Written Instructions</h2>
@@ -672,8 +698,7 @@
           <div class="instructions-body-wrapper">
             <div class="instructions-actions" style="display: flex; justify-content: flex-end; margin-bottom: 8px;">
               <button id="btn-copy-instructions" class="btn btn-secondary btn-sm" disabled
-                style="background-color: var(--color-input-bg); color: var(--color-text); border: 1px solid var(--color-border); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">Copy
-                Text</button>
+                style="background-color: var(--color-input-bg); color: var(--color-text); border: 1px solid var(--color-border); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">Copy Text</button>
             </div>
             <div class="instructions-body" style="padding: 4px 0;">
               <textarea id="written-instructions-textarea" readonly
@@ -687,8 +712,6 @@
 
     </div>
   </div>
-
-
 
   <!-- Drawer Backdrop Overlay -->
   <div class="drawer-backdrop" id="drawer-backdrop"></div>

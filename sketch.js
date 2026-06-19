@@ -1,6 +1,9 @@
 // Knitting Chart Generator - Main Application Script
 // Modularized components are split into: constants.js, color-utils.js, filters.js, exporters.js
 
+// Disable p5.js Friendly Error System (FES) to silence false positive warnings and optimize rendering performance
+p5.disableFriendlyErrors = true;
+
 // p5.Image variables
 let img;
 let processedImg;
@@ -30,6 +33,7 @@ let btnDownload;
 let btnReset;
 let btnExportPDF;
 let btnExportXLS;
+let exportSelect;
 let symbolsCheckbox;
 let symbolMap = {};
 
@@ -62,6 +66,13 @@ let algoParamContainer2, algoParamLabel2, algoParamVal2, algoParamSlider2, algoP
 // Settings cache
 let currentSettings = {};
 let currentLanguage = 'en';
+
+// Workspace layout & zoom additions
+let viewMode = 'chart';
+let baseCanvasWidth = 800;
+let baseCanvasHeight = 600;
+let zoomLevel = 1.0;
+let updateZoom = function() {};
 
 function setup() {
   // Canvas creation
@@ -141,6 +152,7 @@ function setup() {
   btnReset = document.getElementById('btn-reset');
   btnExportPDF = document.getElementById('btn-export-pdf');
   btnExportXLS = document.getElementById('btn-export-xls');
+  exportSelect = document.getElementById('export-select');
   symbolsCheckbox = document.getElementById('symbols-checkbox');
 
   // Set Default states
@@ -211,6 +223,47 @@ function setup() {
     paletteSizeInput.value = val;
     handleSettingChange(paletteSizeInput, val, 'paletteSize');
   });
+
+  // Rotate Colors button sync
+  let btnRotateColors = document.getElementById('btn-rotate-colors');
+  if (btnRotateColors) {
+    btnRotateColors.addEventListener('click', () => {
+      // Find how many color pickers are currently visible in the DOM
+      let activeColorsCount = 2;
+      for (let i = 1; i <= 8; i++) {
+        let box = document.getElementById(`picker-box-${i}`);
+        if (box && box.style.display !== 'none') {
+          activeColorsCount = i;
+        }
+      }
+      
+      let colors = [];
+      for (let i = 0; i < activeColorsCount; i++) {
+        colors.push(yarnPickers[i].value);
+      }
+      
+      // Rotate colors (circular shift to the right)
+      let lastColor = colors.pop();
+      colors.unshift(lastColor);
+      
+      for (let i = 0; i < activeColorsCount; i++) {
+        yarnPickers[i].value = colors[i];
+        yarnPickerHexes[i].textContent = colors[i].toUpperCase();
+      }
+      
+      // Re-trigger update and generate chart
+      let mode = colorModeSelect.value;
+      if (mode === APP_STRINGS.MODE_PALETTE_MAPPING ||
+          mode === APP_STRINGS.MODE_SUPERPIXELS ||
+          mode === APP_STRINGS.MODE_BILATERAL_MODE ||
+          mode === APP_STRINGS.MODE_ANISOTROPIC ||
+          mode === APP_STRINGS.MODE_VECTOR_QUANTIZATION) {
+        handleSettingChange(paletteSizeInput, activeColorsCount, 'paletteSize');
+      } else {
+        generateChart();
+      }
+    });
+  }
 
   // Algorithm select dropdown sync
   colorModeSelect.addEventListener('change', (e) => {
@@ -401,10 +454,25 @@ function setup() {
       handleSettingChange(btnGenerate, null, 'regenerate');
     });
   }
-  btnDownload.addEventListener('click', saveChart);
-  btnExportPDF.addEventListener('click', exportPDF);
-  btnExportXLS.addEventListener('click', exportXLS);
-  btnReset.addEventListener('click', handleResetClick);
+  if (btnDownload) btnDownload.addEventListener('click', saveChart);
+  if (btnExportPDF) btnExportPDF.addEventListener('click', exportPDF);
+  if (btnExportXLS) btnExportXLS.addEventListener('click', exportXLS);
+  if (btnReset) btnReset.addEventListener('click', handleResetClick);
+
+  if (exportSelect) {
+    exportSelect.addEventListener('change', (e) => {
+      let val = e.target.value;
+      if (val === 'png') {
+        saveChart();
+      } else if (val === 'pdf') {
+        exportPDF();
+      } else if (val === 'xls') {
+        exportXLS();
+      }
+      // Reset select to placeholder
+      exportSelect.value = '';
+    });
+  }
 
 
 
@@ -555,6 +623,32 @@ function setup() {
     drawerBackdrop.addEventListener('click', closeDrawer);
   }
 
+  // Desktop Sidebar Collapse toggle logic
+  let btnToggleSidebarDesktop = document.getElementById('btn-toggle-sidebar-desktop');
+  if (btnToggleSidebarDesktop && sidebarPanel) {
+    // Listen to transitionend on sidebarPanel to trigger canvas resize
+    sidebarPanel.addEventListener('transitionend', (e) => {
+      if (e.propertyName === 'width') {
+        windowResized();
+      }
+    });
+
+    btnToggleSidebarDesktop.addEventListener('click', () => {
+      sidebarPanel.classList.toggle('collapsed');
+      let isCollapsed = sidebarPanel.classList.contains('collapsed');
+      
+      // Update button text icon
+      btnToggleSidebarDesktop.textContent = isCollapsed ? '▶' : '◀';
+      
+      // Update button title
+      if (currentLanguage === 'pl') {
+        btnToggleSidebarDesktop.title = isCollapsed ? 'Rozwiń panel ustawień' : 'Zwiń panel ustawień';
+      } else {
+        btnToggleSidebarDesktop.title = isCollapsed ? 'Expand Settings Sidebar' : 'Collapse Settings Sidebar';
+      }
+    });
+  }
+
   // Canvas Font and alignments
   textFont('Outfit');
   textAlign(CENTER, CENTER);
@@ -585,12 +679,74 @@ function setup() {
   let savedLang = localStorage.getItem('knitting-chart-lang') || 'en';
   syncAndSetLanguage(savedLang);
 
+  // Original vs Chart Tabs
+  let btnTabOriginal = document.getElementById('btn-tab-original');
+  let btnTabChart = document.getElementById('btn-tab-chart');
+  if (btnTabOriginal && btnTabChart) {
+    btnTabOriginal.addEventListener('click', () => {
+      viewMode = 'original';
+      btnTabOriginal.classList.add('active');
+      btnTabChart.classList.remove('active');
+      redraw();
+    });
+    btnTabChart.addEventListener('click', () => {
+      viewMode = 'chart';
+      btnTabChart.classList.add('active');
+      btnTabOriginal.classList.remove('active');
+      redraw();
+    });
+  }
+
+  // Canvas Zoom Controls
+  let zoomInBtn = document.getElementById('btn-zoom-in');
+  let zoomOutBtn = document.getElementById('btn-zoom-out');
+  let zoomVal = document.getElementById('zoom-val');
+
+  updateZoom = function() {
+    let canvasElement = document.querySelector('#canvas-container canvas');
+    if (canvasElement) {
+      canvasElement.style.width = `${baseCanvasWidth * zoomLevel}px`;
+      canvasElement.style.height = `${baseCanvasHeight * zoomLevel}px`;
+      canvasElement.style.maxWidth = 'none';
+    }
+    if (zoomVal) {
+      zoomVal.textContent = `${Math.round(zoomLevel * 100)}%`;
+    }
+  };
+
+  if (zoomInBtn && zoomOutBtn) {
+    zoomInBtn.addEventListener('click', () => {
+      zoomLevel = Math.min(2.5, zoomLevel + 0.25);
+      updateZoom();
+    });
+    zoomOutBtn.addEventListener('click', () => {
+      zoomLevel = Math.max(0.5, zoomLevel - 0.25);
+      updateZoom();
+    });
+  }
+
+  // Set canvas scale baseline
+  baseCanvasWidth = canvasWidth;
+  baseCanvasHeight = canvasHeight;
+  updateZoom();
+
   toggleConditionalFields();
+
+  // Try to load any saved image from IndexedDB on page load
+  getSavedImageFromDB((err, savedBlob) => {
+    if (err) {
+      console.error("Error reading from IndexedDB:", err);
+      return;
+    }
+    if (savedBlob) {
+      executeUpload(savedBlob);
+    }
+  });
 }
 
 function draw() {
-  // Clear background with soft warm tint matching CSS bg
-  background(247, 244, 238); 
+  // Clear background with white to match the workspace canvas board
+  background(255); 
 
   if (processedImg) {
     let params = getGridParams();
@@ -602,12 +758,16 @@ function draw() {
 
     // Render the stitches as a single scaled image (extremely fast!)
     push();
-    noSmooth();
-    image(processedImg, params.offsetX, params.offsetY, processedImg.width * params.cellSizeX, processedImg.height * params.cellSizeY);
+    if (viewMode === 'original' && img) {
+      image(img, params.offsetX, params.offsetY, processedImg.width * params.cellSizeX, processedImg.height * params.cellSizeY);
+    } else {
+      noSmooth();
+      image(processedImg, params.offsetX, params.offsetY, processedImg.width * params.cellSizeX, processedImg.height * params.cellSizeY);
+    }
     pop();
 
     // Render grid lines if enabled (much faster than individual cell borders)
-    if (gridCheckbox.checked) {
+    if (viewMode !== 'original' && gridCheckbox.checked) {
       stroke(185, 178, 168); // Soft warm grey stitch outlines
       strokeWeight(0.5);
       
@@ -625,7 +785,7 @@ function draw() {
     }
 
     // Render symbols if enabled and cell size is readable
-    if (symbolsCheckbox.checked && adjustedGrid && params.cellSizeY >= 3 && params.cellSizeX >= 3) {
+    if (viewMode !== 'original' && symbolsCheckbox.checked && adjustedGrid && params.cellSizeY >= 3 && params.cellSizeX >= 3) {
       processedImg.loadPixels();
       for (let y = 0; y < processedImg.height; y++) {
         if (!adjustedGrid[y]) continue;
@@ -646,7 +806,7 @@ function draw() {
 
 
   } else {
-    fill(100, 117, 109); // slate-muted text
+    fill(113, 113, 122); // zinc-500 muted text
     noStroke();
     text(APP_STRINGS.CANVAS_EMPTY, width / 2, height / 2);
   }
@@ -806,10 +966,19 @@ function getAdjustedSymbols() {
 
 function windowResized() {
   let viewportFrameEl = document.getElementById('viewport-frame');
+  if (!viewportFrameEl) return;
   let containerWidth = viewportFrameEl.clientWidth - 40;
   let canvasWidth = min(containerWidth, 800);
   let canvasHeight = canvasWidth * 0.75;
   resizeCanvas(canvasWidth, canvasHeight);
+  
+  // Update zoom baselines and scale
+  baseCanvasWidth = canvasWidth;
+  baseCanvasHeight = canvasHeight;
+  if (typeof updateZoom === 'function') {
+    updateZoom();
+  }
+  
   loop();
 }
 
@@ -1054,6 +1223,11 @@ function convertHeicAndUpload(file) {
 }
 
 function executeUpload(file) {
+  // Save image to IndexedDB to persist it across refreshes
+  saveImageToDB(file, (err) => {
+    if (err) console.error("Error saving image to IndexedDB:", err);
+  });
+
   let reader = new FileReader();
   reader.onload = (e) => {
     loadImage(e.target.result, (loadedImg) => {
@@ -1074,7 +1248,7 @@ function executeUpload(file) {
       
       // Populate Thumbnail details
       document.getElementById('thumbnail-img').src = e.target.result;
-      document.getElementById('status-filename').textContent = file.name;
+      document.getElementById('status-filename').textContent = file.name || (currentLanguage === 'pl' ? 'zapisany_obraz.png' : 'saved_image.png');
       document.getElementById('status-filesize').textContent = formatBytes(file.size);
       
       updateStepCardsState(true);
@@ -1399,9 +1573,14 @@ function generateChart() {
     cacheCurrentSettings();
 
     // Enable download button and update chart stats info
-    btnDownload.removeAttribute('disabled');
-    btnExportPDF.removeAttribute('disabled');
-    btnExportXLS.removeAttribute('disabled');
+    if (btnDownload) btnDownload.removeAttribute('disabled');
+    if (btnExportPDF) btnExportPDF.removeAttribute('disabled');
+    if (btnExportXLS) btnExportXLS.removeAttribute('disabled');
+    if (exportSelect) {
+      exportSelect.removeAttribute('disabled');
+      let wrapper = document.getElementById('export-select-wrapper');
+      if (wrapper) wrapper.classList.remove('disabled');
+    }
     let filename = document.getElementById('status-filename') ? document.getElementById('status-filename').textContent : '';
     let infoText = `${processedImg.width} × ${processedImg.height} stitches`;
     if (filename) {
@@ -1491,6 +1670,11 @@ function resetApp() {
   // Re-sync cache
   cacheCurrentSettings();
   
+  // Clear persistent image from database
+  deleteImageFromDB((err) => {
+    if (err) console.error("Error deleting image from IndexedDB:", err);
+  });
+  
   toggleConditionalFields();
   updateStepCardsState(false);
 }
@@ -1537,9 +1721,14 @@ function updateStepCardsState(hasImage) {
     if (cardColors) cardColors.classList.add('disabled');
     if (cardActions) cardActions.classList.add('disabled');
     if (btnGenerate) btnGenerate.setAttribute('disabled', 'true');
-    btnDownload.setAttribute('disabled', 'true');
-    btnExportPDF.setAttribute('disabled', 'true');
-    btnExportXLS.setAttribute('disabled', 'true');
+    if (btnDownload) btnDownload.setAttribute('disabled', 'true');
+    if (btnExportPDF) btnExportPDF.setAttribute('disabled', 'true');
+    if (btnExportXLS) btnExportXLS.setAttribute('disabled', 'true');
+    if (exportSelect) {
+      exportSelect.setAttribute('disabled', 'true');
+      let wrapper = document.getElementById('export-select-wrapper');
+      if (wrapper) wrapper.classList.add('disabled');
+    }
     
     // Reset collapse states: collapse disabled steps
     if (cardDimensions) cardDimensions.classList.add('collapsed');
@@ -1758,11 +1947,11 @@ function toggleConditionalFields() {
 
 function updateVisiblePalettePickers() {
   if (!paletteSizeInput) return;
-  let size = parseInt(paletteSizeInput.value) || 4;
+  let numColors = parseInt(paletteSizeInput.value) || 4;
   for (let i = 0; i < 8; i++) {
     let box = document.getElementById(`picker-box-${i + 1}`);
     if (box) {
-      if (i < size) {
+      if (i < numColors) {
         box.style.display = 'flex';
       } else {
         box.style.display = 'none';
@@ -1773,9 +1962,9 @@ function updateVisiblePalettePickers() {
 
 function getActiveCustomColors() {
   if (!paletteSizeInput) return [];
-  let size = parseInt(paletteSizeInput.value) || 4;
+  let numColors = parseInt(paletteSizeInput.value) || 4;
   let colors = [];
-  for (let i = 0; i < size; i++) {
+  for (let i = 0; i < numColors; i++) {
     colors.push(yarnPickers[i].value);
   }
   return colors;
@@ -2126,6 +2315,96 @@ function setLanguage(lang) {
     }
   }
   
+  // Update desktop toggle sidebar button title translation
+  let btnToggleSidebarDesktop = document.getElementById('btn-toggle-sidebar-desktop');
+  let sidebarPanelElement = document.querySelector('.sidebar-panel');
+  if (btnToggleSidebarDesktop && sidebarPanelElement) {
+    let isCollapsed = sidebarPanelElement.classList.contains('collapsed');
+    if (lang === 'pl') {
+      btnToggleSidebarDesktop.title = isCollapsed ? 'Rozwiń panel ustawień' : 'Zwiń panel ustawień';
+    } else {
+      btnToggleSidebarDesktop.title = isCollapsed ? 'Expand Settings Sidebar' : 'Collapse Settings Sidebar';
+    }
+  }
+  
   // Redraw canvas
   redraw();
+}
+
+// ==========================================================================
+// INDEXEDDB FILE SAVING UTILITIES
+// ==========================================================================
+const DB_NAME = 'KnittingChartGeneratorDB';
+const DB_VERSION = 1;
+const STORE_NAME = 'images';
+const KEY_NAME = 'uploadedImage';
+
+function initIndexedDB(callback) {
+  let request = indexedDB.open(DB_NAME, DB_VERSION);
+  request.onupgradeneeded = (e) => {
+    let db = e.target.result;
+    if (!db.objectStoreNames.contains(STORE_NAME)) {
+      db.createObjectStore(STORE_NAME);
+    }
+  };
+  request.onsuccess = (e) => {
+    callback(null, e.target.result);
+  };
+  request.onerror = (e) => {
+    callback(e.target.error, null);
+  };
+}
+
+function saveImageToDB(fileBlob, callback) {
+  initIndexedDB((err, db) => {
+    if (err) {
+      if (callback) callback(err);
+      return;
+    }
+    let tx = db.transaction(STORE_NAME, 'readwrite');
+    let store = tx.objectStore(STORE_NAME);
+    let request = store.put(fileBlob, KEY_NAME);
+    request.onsuccess = () => {
+      if (callback) callback(null);
+    };
+    request.onerror = (e) => {
+      if (callback) callback(e.target.error);
+    };
+  });
+}
+
+function getSavedImageFromDB(callback) {
+  initIndexedDB((err, db) => {
+    if (err) {
+      callback(err, null);
+      return;
+    }
+    let tx = db.transaction(STORE_NAME, 'readonly');
+    let store = tx.objectStore(STORE_NAME);
+    let request = store.get(KEY_NAME);
+    request.onsuccess = (e) => {
+      callback(null, e.target.result || null);
+    };
+    request.onerror = (e) => {
+      callback(e.target.error, null);
+    };
+  });
+}
+
+function deleteImageFromDB(callback) {
+  initIndexedDB((err, db) => {
+    if (err) {
+      if (callback) callback(err);
+      return;
+    }
+    let tx = db.transaction(STORE_NAME, 'readwrite');
+    let store = tx.objectStore(STORE_NAME);
+    let request = store.delete(KEY_NAME);
+    request.onsuccess = () => {
+      if (callback) callback(null);
+    };
+    request.onerror = (e) => {
+      if (callback) callback(e.target.error);
+    };
+  });
 }

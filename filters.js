@@ -2669,15 +2669,15 @@ function applyLaplacianOfGaussian(imageObj, bgHex, edgeHex, sigma, threshold) {
   }
   
   let radius = Math.ceil(sigma * 3);
-  let size = radius * 2 + 1;
-  let kernel = new Float32Array(size);
+  let kernelSize = radius * 2 + 1;
+  let kernel = new Float32Array(kernelSize);
   let sum = 0;
   for (let i = -radius; i <= radius; i++) {
     let v = Math.exp(-(i * i) / (2 * sigma * sigma));
     kernel[i + radius] = v;
     sum += v;
   }
-  for (let i = 0; i < size; i++) kernel[i] /= sum;
+  for (let i = 0; i < kernelSize; i++) kernel[i] /= sum;
   
   let temp = new Float32Array(w * h);
   for (let y = 0; y < h; y++) {
@@ -2887,15 +2887,15 @@ function applyDifferenceOfGaussians(imageObj, bgHex, edgeHex, sigma1, sigma2) {
   // Split Gaussian blur implementation
   let blur = (pixels, sigma) => {
     let radius = Math.ceil(sigma * 3);
-    let size = radius * 2 + 1;
-    let kernel = new Float32Array(size);
+    let kernelSize = radius * 2 + 1;
+    let kernel = new Float32Array(kernelSize);
     let sum = 0;
     for (let i = -radius; i <= radius; i++) {
       let v = Math.exp(-(i * i) / (2 * sigma * sigma));
       kernel[i + radius] = v;
       sum += v;
     }
-    for (let i = 0; i < size; i++) kernel[i] /= sum;
+    for (let i = 0; i < kernelSize; i++) kernel[i] /= sum;
     
     let temp = new Float32Array(w * h);
     for (let y = 0; y < h; y++) {
@@ -3062,7 +3062,7 @@ function applyHighPassFilter(imageObj, bgHex, edgeHex, radius, threshold) {
     lums[i] = 0.299 * srcPixels[idx] + 0.587 * srcPixels[idx + 1] + 0.114 * srcPixels[idx + 2];
   }
   
-  let size = radius * 2 + 1;
+  let kernelSize = radius * 2 + 1;
   let blurred = new Float32Array(w * h);
   let temp = new Float32Array(w * h);
   
@@ -3073,7 +3073,7 @@ function applyHighPassFilter(imageObj, bgHex, edgeHex, radius, threshold) {
         let kx = Math.max(0, Math.min(w - 1, x + k));
         sum += lums[kx + y * w];
       }
-      temp[x + y * w] = sum / size;
+      temp[x + y * w] = sum / kernelSize;
     }
   }
   
@@ -3084,7 +3084,7 @@ function applyHighPassFilter(imageObj, bgHex, edgeHex, radius, threshold) {
         let ky = Math.max(0, Math.min(h - 1, y + k));
         sum += temp[x + ky * w];
       }
-      blurred[x + y * w] = sum / size;
+      blurred[x + y * w] = sum / kernelSize;
     }
   }
   
@@ -3165,7 +3165,7 @@ function applyBlueNoiseDithering(imageObj, bgHex, edgeHex, ditherIntensity, nois
   }
   
   let radius = 2;
-  let size = radius * 2 + 1;
+  let kernelSize = radius * 2 + 1;
   let blurred = new Float32Array(noiseW * noiseH);
   let temp = new Float32Array(noiseW * noiseH);
   
@@ -3176,7 +3176,7 @@ function applyBlueNoiseDithering(imageObj, bgHex, edgeHex, ditherIntensity, nois
         let kx = Math.max(0, Math.min(noiseW - 1, x + k));
         sum += whiteNoise[kx + y * noiseW];
       }
-      temp[x + y * noiseW] = sum / size;
+      temp[x + y * noiseW] = sum / kernelSize;
     }
   }
   for (let y = 0; y < noiseH; y++) {
@@ -3186,7 +3186,7 @@ function applyBlueNoiseDithering(imageObj, bgHex, edgeHex, ditherIntensity, nois
         let ky = Math.max(0, Math.min(noiseH - 1, y + k));
         sum += temp[x + ky * noiseW];
       }
-      blurred[x + y * noiseW] = sum / size;
+      blurred[x + y * noiseW] = sum / kernelSize;
     }
   }
   

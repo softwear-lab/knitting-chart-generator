@@ -1,33 +1,33 @@
 /* ==========================================================================
-   DESIGN SYSTEM - WARM COZY CRAFT THEME
+   DESIGN SYSTEM - MODERN APP WORKSPACE THEME
    ========================================================================== */
 html {
-  --font-heading: 'Playfair Display', Georgia, serif;
-  --font-body: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   
-  /* Color Palette */
-  --color-bg: #F7F4EE;            /* Warm oatmeal cream background */
+  /* Color Palette (Zinc & Terracotta Mockup Theme) */
+  --color-bg: #f4f4f5;            /* Zinc-100 */
   --color-card: #FFFFFF;          /* Pure white card backgrounds */
-  --color-text: #2C3531;          /* Deep forest charcoal for high readability */
-  --color-text-muted: #64756D;    /* Slate-tinted grey for subtitles and labels */
-  --color-primary: #D37467;       /* Soft terracotta clay */
-  --color-primary-hover: #C06154; /* Deepened terracotta */
-  --color-primary-light: #FBF0EE; /* Terracotta tint for focus states */
-  --color-secondary: #7FA695;     /* Sage green */
+  --color-text: #27272a;          /* Zinc-800 */
+  --color-text-muted: #71717a;    /* Zinc-500 */
+  --color-primary: #cb997e;       /* Terracotta */
+  --color-primary-hover: #b5856b; /* Darker terracotta */
+  --color-primary-light: #fcf8f6; /* Soft terracotta tint */
+  --color-secondary: #7FA695;     /* Sage green (kept for specific accents) */
   --color-secondary-hover: #6C9281;
-  --color-border: #E8E2D6;        /* Warm sand border */
-  --color-border-light: #F2ECE1;  /* Subtle sand divider */
-  --color-input-bg: #F9F7F3;      /* Muted light sand input background */
-  --color-disabled-text: #A4B2AB; /* Muted text in disabled steps */
+  --color-border: #e4e4e7;        /* Zinc-200 */
+  --color-border-light: #f4f4f5;  /* Zinc-100 */
+  --color-input-bg: #fafafa;      /* Zinc-50 */
+  --color-disabled-text: #a1a1aa; /* Zinc-400 */
   
   /* Layout Constants */
   --border-radius-sm: 8px;
-  --border-radius-md: 16px;
-  --border-radius-lg: 24px;
-  --shadow-sm: 0 2px 8px rgba(44, 53, 49, 0.04);
-  --shadow-md: 0 10px 30px rgba(44, 53, 49, 0.06);
-  --shadow-lg: 0 20px 40px rgba(44, 53, 49, 0.1);
-  --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  --border-radius-md: 12px;
+  --border-radius-lg: 16px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.02);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+  --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 
@@ -1285,6 +1285,89 @@ select option {
   pointer-events: auto;
 }
 
+/* Export Select in Sidebar Panel */
+.select-export-wrapper {
+  position: relative;
+  display: block;
+}
+
+.select-export-wrapper::after {
+  content: '▼';
+  font-size: 0.65rem;
+  color: var(--color-primary);
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.select-export-wrapper.disabled::after {
+  color: var(--color-disabled-text);
+}
+
+.select-export {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 38px;
+  padding: 8px 32px 8px 12px;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  background-color: #FFFFFF;
+  border: 1.5px solid var(--color-primary);
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: var(--transition);
+  outline: none;
+  box-sizing: border-box;
+}
+
+.select-export:hover:not(:disabled) {
+  background-color: var(--color-primary-light);
+  transform: translateY(-1px);
+}
+
+.select-export:focus {
+  border-color: var(--color-primary-hover);
+}
+
+.select-export:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: var(--color-input-bg);
+  border-color: var(--color-border);
+  color: var(--color-disabled-text);
+}
+
+/* Reset Button Styling inside Sidebar Panel */
+#btn-reset {
+  background-color: #FFFFFF;
+  color: var(--color-text-muted);
+  border: 1.5px solid var(--color-border);
+  height: 38px;
+  box-sizing: border-box;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: var(--border-radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+#btn-reset:hover {
+  background-color: var(--color-input-bg);
+  border-color: var(--color-text-muted);
+  color: var(--color-text);
+  text-decoration: none;
+}
+
 /* ==========================================================================
    RESPONSIVE DESIGN (MEDIA QUERIES)
    ========================================================================== */
@@ -1293,20 +1376,6 @@ select option {
     flex-direction: column;
     align-items: stretch;
   }
-  
-  .sidebar-panel {
-    width: 100%;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-  }
-  
-  .step-card {
-    height: auto;
-  }
-}
-
-@media (max-width: 768px) {
   .mobile-top-bar {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
@@ -1642,4 +1711,407 @@ select option {
 .action-buttons-group-horizontal .btn {
   width: auto;
   flex: 1 1 auto;
+}
+/* Sidebar Collapse Toggle Button (Hidden on Mobile) */
+.btn-toggle-sidebar {
+  display: none;
+}
+
+/* ==========================================================================
+   DESKTOP APP-LIKE LAYOUT OVERRIDES (min-width: 1025px)
+   ========================================================================== */
+@media (min-width: 1025px) {
+  body {
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    background-color: var(--color-bg);
+  }
+
+  .app-container {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .mobile-top-bar {
+    display: none !important;
+  }
+
+  /* Slim top navbar layout */
+  .app-header {
+    display: flex !important;
+    height: 56px;
+    padding: 0 20px;
+    box-sizing: border-box;
+    background-color: #ffffff;
+    border-bottom: 1px solid var(--color-border);
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    z-index: 100;
+    gap: 24px;
+  }
+
+  .header-logo-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .header-logo {
+    font-size: 1.8rem;
+    animation: none;
+  }
+
+  .header-text h1 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+
+  /* Middle project info & actions block in navbar */
+  .navbar-project-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+    max-width: 800px;
+    justify-content: flex-end;
+  }
+  
+  .navbar-project-actions.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  .project-title-wrapper {
+    width: 180px;
+  }
+
+  .project-title-wrapper input[type="text"] {
+    width: 100%;
+    height: 32px;
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-sm);
+    background-color: var(--color-input-bg);
+    color: var(--color-text);
+    outline: none;
+    transition: var(--transition);
+    box-sizing: border-box;
+  }
+
+  .project-title-wrapper input[type="text"]:focus {
+    border-color: var(--color-primary);
+    background-color: #fff;
+  }
+
+  .navbar-buttons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-navbar {
+    width: auto;
+    padding: 6px 12px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    height: 32px;
+    box-sizing: border-box;
+    border-radius: var(--border-radius-sm);
+    box-shadow: none !important;
+    margin: 0;
+  }
+  
+  /* (Removed navbar specific exports & reset) */
+
+  /* Right language selection block in navbar */
+  .app-header .lang-selector-container {
+    margin-left: 0;
+    flex-shrink: 0;
+  }
+
+  /* Main Workspace pane split */
+  .main-content {
+    display: flex;
+    flex-direction: row;
+    height: calc(100vh - 56px);
+    width: 100%;
+    gap: 0;
+    align-items: stretch;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Scrollable left sidebar settings panel */
+  .sidebar-panel {
+    width: 380px;
+    height: 100%;
+    overflow-y: auto;
+    border-right: 1px solid var(--color-border);
+    background-color: #ffffff;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex-shrink: 0;
+    box-shadow: 4px 0 24px rgba(0,0,0,0.01);
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease;
+  }
+
+  /* Collapsed state for desktop sidebar */
+  .sidebar-panel.collapsed {
+    width: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    border-right-width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  /* Sidebar Toggle Button (Desktop Only) */
+  .btn-toggle-sidebar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 24px;
+    left: 366px; /* Centered on the 380px border (380 - 14) */
+    width: 28px;
+    height: 28px;
+    background-color: #ffffff;
+    border: 1px solid var(--color-border);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    z-index: 100;
+    transition: background-color 0.2s, border-color 0.2s, left 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s;
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+    font-weight: bold;
+    user-select: none;
+    outline: none;
+  }
+
+  .btn-toggle-sidebar:hover {
+    background-color: var(--color-bg-hover);
+    color: var(--color-secondary);
+    border-color: var(--color-secondary);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  }
+
+  .sidebar-panel.collapsed + .btn-toggle-sidebar {
+    left: 14px; /* Pull it slightly into view inside the workspace panel edge */
+    transform: rotate(180deg);
+  }
+
+  .sidebar-panel::after {
+    display: none;
+  }
+
+  .step-card {
+    padding: 16px;
+    border-radius: var(--border-radius-md);
+  }
+
+  /* Sticky sidebar actions area */
+  .sidebar-action-area {
+    position: sticky;
+    bottom: -20px;
+    margin: 10px -20px -20px -20px;
+    padding: 16px 20px;
+    background-color: #fafafa;
+    border-top: 1px solid var(--color-border);
+    z-index: 10;
+  }
+  
+  .sidebar-action-area .btn {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 12px rgba(203, 153, 126, 0.15);
+  }
+
+  /* Workspace canvas panel */
+  .workspace-panel {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background-color: #f4f4f5; /* zinc-100 */
+    overflow-y: auto;
+    padding: 24px;
+    box-sizing: border-box;
+    gap: 24px;
+  }
+
+  .preview-card {
+    padding: 20px;
+    border-radius: var(--border-radius-lg);
+    background-color: #ffffff;
+  }
+
+  .preview-header {
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    gap: 16px;
+  }
+
+  /* Grid details info overlay style */
+  .chart-info-tag {
+    font-size: 0.75rem;
+    padding: 3px 8px;
+  }
+
+  /* Centered Canvas viewport settings */
+  .canvas-viewport {
+    background-color: #ffffff;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    background-image: 
+        linear-gradient(45deg, #f4f4f5 25%, transparent 25%), 
+        linear-gradient(-45deg, #f4f4f5 25%, transparent 25%), 
+        linear-gradient(45deg, transparent 75%, #f4f4f5 75%), 
+        linear-gradient(-45deg, transparent 75%, #f4f4f5 75%);
+    background-size: 16px 16px;
+    background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+    min-height: 480px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: auto;
+    position: relative;
+    padding: 20px;
+  }
+
+  #canvas-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform var(--transition);
+    transform-origin: center center;
+  }
+
+  #canvas-container canvas {
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.03);
+    border: none;
+    border-radius: 4px;
+  }
+}
+
+/* ==========================================================================
+   WORKSPACE WIDGETS & CONTROLS (TABS, ZOOM, TOGGLES)
+   ========================================================================== */
+.preview-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.view-tabs {
+  display: flex;
+  background-color: #f4f4f5; /* zinc-100 */
+  padding: 3px;
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--color-border);
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  padding: 5px 12px;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.tab-btn:hover {
+  color: var(--color-text);
+}
+
+.tab-btn.active {
+  background-color: #ffffff;
+  color: var(--color-primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.toggle-group-inline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.zoom-controls {
+  display: flex;
+  align-items: center;
+  background-color: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  padding: 2px;
+  gap: 4px;
+}
+
+.zoom-btn {
+  background: none;
+  border: none;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.zoom-btn:hover {
+  background-color: #f4f4f5;
+  color: var(--color-text);
+}
+
+.zoom-val {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text);
+  width: 44px;
+  text-align: center;
+}
+
+/* Custom Scrollbar Styles for app-like panels */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d4d4d8; /* zinc-300 */
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1aa; /* zinc-400 */
+}
+
+.btn-rotate-colors:hover {
+  background-color: var(--color-primary-light) !important;
+  color: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
 }
