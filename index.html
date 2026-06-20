@@ -113,7 +113,7 @@
         <div class="step-card disabled collapsed" id="step-card-dimensions">
           <div class="step-header">
             <span class="step-badge">1</span>
-            <h3 id="step-stitch-title">Stitch Settings</h3>
+            <h3 id="step-stitch-title">Image Prep & Grid</h3>
             <span class="step-chevron">▼</span>
           </div>
           <div class="step-body">
@@ -215,31 +215,9 @@
               <p class="control-help" id="morph-cleanup-help">Refines shape boundaries using mathematical morphology. Open removes noise; Close fills holes.</p>
             </div>
 
-            <!-- Stitch Aspect Ratio Select -->
-            <div class="control-group">
-              <label for="stitch-aspect-select" id="stitch-aspect-label">Stitch Aspect Ratio</label>
-              <div class="select-wrapper">
-                <select id="stitch-aspect-select">
-                  <option value="1.0" selected>Square (1:1)</option>
-                  <option value="1.333">Standard Knit (4:3)</option>
-                  <option value="1.25">Sock Knit (5:4)</option>
-                  <option value="1.2">Fine Knit (6:5)</option>
-                </select>
-              </div>
-              <p class="control-help" id="stitch-aspect-help">Real knit stitches are wider than tall. Adjusts display, PDF, and XLS to match physical proportions.</p>
-            </div>
 
-            <!-- Knitting Method (Flat vs Circular) -->
-            <div class="control-group" id="knitting-method-container">
-              <label for="knitting-method-select" id="knitting-method-label">Knitting Method</label>
-              <div class="select-wrapper">
-                <select id="knitting-method-select">
-                  <option value="flat" selected>Flat (Back & Forth)</option>
-                  <option value="circular">Circular (In the Round)</option>
-                </select>
-              </div>
-              <p class="control-help" id="knitting-method-help">Determines row reading direction and stitch conversion for wrong-side rows in written instructions.</p>
-            </div>
+
+
           </div>
         </div>
 
@@ -565,6 +543,32 @@
                   <span class="switch-label" id="show-symbols-label">Show Symbols</span>
                 </label>
               </div>
+            </div>
+
+            <!-- Stitch Aspect Ratio Select -->
+            <div class="control-group">
+              <label for="stitch-aspect-select" id="stitch-aspect-label">Stitch Aspect Ratio</label>
+              <div class="select-wrapper">
+                <select id="stitch-aspect-select">
+                  <option value="1.0" selected>Square (1:1)</option>
+                  <option value="1.333">Standard Knit (4:3)</option>
+                  <option value="1.25">Sock Knit (5:4)</option>
+                  <option value="1.2">Fine Knit (6:5)</option>
+                </select>
+              </div>
+              <p class="control-help" id="stitch-aspect-help">Real knit stitches are wider than tall. Adjusts display, PDF, and XLS to match physical proportions.</p>
+            </div>
+
+            <!-- Knitting Method (Flat vs Circular) -->
+            <div class="control-group" id="knitting-method-container">
+              <label for="knitting-method-select" id="knitting-method-label">Knitting Method</label>
+              <div class="select-wrapper">
+                <select id="knitting-method-select">
+                  <option value="flat" selected>Flat (Back & Forth)</option>
+                  <option value="circular">Circular (In the Round)</option>
+                </select>
+              </div>
+              <p class="control-help" id="knitting-method-help">Determines row reading direction and stitch conversion for wrong-side rows in written instructions.</p>
             </div>
 
             <!-- Project Title (Pattern PDF Title) -->
