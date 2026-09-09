@@ -528,40 +528,11 @@ function setup() {
     }
   });
 
-  // Viewport Upload Prompt (primary upload zone on the canvas preview area)
-  let viewportPrompt = document.getElementById('viewport-upload-prompt');
+  // Drag-and-drop support directly on the viewport frame (over blank or active canvas)
   let viewportFrame = document.getElementById('viewport-frame');
-
-  if (viewportPrompt) {
-    // Click on the prompt opens file picker
-    viewportPrompt.addEventListener('click', () => {
-      fileInput.click();
-    });
-
-    // Drag-over on the prompt
-    viewportPrompt.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      viewportPrompt.classList.add('dragover');
-    });
-
-    viewportPrompt.addEventListener('dragleave', () => {
-      viewportPrompt.classList.remove('dragover');
-    });
-
-    viewportPrompt.addEventListener('drop', (e) => {
-      e.preventDefault();
-      viewportPrompt.classList.remove('dragover');
-      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-        processUploadedFile(e.dataTransfer.files[0]);
-      }
-    });
-  }
-
-  // Also allow drag-and-drop on the viewport frame itself (even after an image is loaded)
   if (viewportFrame) {
     viewportFrame.addEventListener('dragover', (e) => {
       e.preventDefault();
-      if (viewportPrompt && !viewportPrompt.classList.contains('hidden')) return; // prompt handles it
       viewportFrame.classList.add('dragover');
     });
 
@@ -578,6 +549,13 @@ function setup() {
       if (e.dataTransfer.files && e.dataTransfer.files[0]) {
         processUploadedFile(e.dataTransfer.files[0]);
       }
+    });
+  }
+
+  let btnChangeFile = document.getElementById('btn-change-file');
+  if (btnChangeFile) {
+    btnChangeFile.addEventListener('click', () => {
+      fileInput.click();
     });
   }
 
@@ -781,6 +759,11 @@ function setup() {
 }
 
 function draw() {
+  if (!processedImg) {
+    clear();
+    return;
+  }
+
   // Clear background with white to match the workspace canvas board
   background(255); 
 
@@ -1982,6 +1965,7 @@ function resetApp() {
 }
 
 function updateStepCardsState(hasImage) {
+  let cardUpload = document.getElementById('step-card-upload');
   let cardDimensions = document.getElementById('step-card-dimensions');
   let cardColors = document.getElementById('step-card-colors');
   let cardActions = document.getElementById('step-card-actions');
@@ -1990,8 +1974,18 @@ function updateStepCardsState(hasImage) {
   let uploadStatusBox = document.getElementById('upload-status-box');
   let btnChange = document.getElementById('btn-change-image-canvas');
   let btnRemove = document.getElementById('btn-remove-image-canvas');
+  let canvasContainer = document.getElementById('canvas-container');
+  let canvasPlaceholder = document.getElementById('canvas-placeholder');
+  let btnZoomIn = document.getElementById('btn-zoom-in');
+  let btnZoomOut = document.getElementById('btn-zoom-out');
 
   if (hasImage) {
+    if (canvasContainer) canvasContainer.classList.remove('hidden');
+    if (canvasPlaceholder) canvasPlaceholder.classList.add('hidden');
+    if (btnZoomIn) btnZoomIn.removeAttribute('disabled');
+    if (btnZoomOut) btnZoomOut.removeAttribute('disabled');
+
+    if (cardUpload) cardUpload.classList.add('has-image');
     if (cardDimensions) cardDimensions.classList.remove('disabled');
     if (cardColors) cardColors.classList.remove('disabled');
     if (cardActions) cardActions.classList.remove('disabled');
@@ -2011,14 +2005,16 @@ function updateStepCardsState(hasImage) {
     if (dropzoneEl) dropzoneEl.style.display = 'none';
     if (uploadStatusBox) uploadStatusBox.style.display = 'flex';
 
-    // Hide viewport upload prompt since image is loaded
-    let vpPrompt = document.getElementById('viewport-upload-prompt');
-    if (vpPrompt) vpPrompt.classList.add('hidden');
-
     // Show change/remove buttons on preview toolbar
     if (btnChange) btnChange.style.display = 'inline-flex';
     if (btnRemove) btnRemove.style.display = 'inline-flex';
   } else {
+    if (canvasContainer) canvasContainer.classList.add('hidden');
+    if (canvasPlaceholder) canvasPlaceholder.classList.remove('hidden');
+    if (btnZoomIn) btnZoomIn.setAttribute('disabled', 'true');
+    if (btnZoomOut) btnZoomOut.setAttribute('disabled', 'true');
+
+    if (cardUpload) cardUpload.classList.remove('has-image');
     if (cardDimensions) cardDimensions.classList.add('disabled');
     if (cardColors) cardColors.classList.add('disabled');
     if (cardActions) cardActions.classList.add('disabled');
@@ -2048,10 +2044,6 @@ function updateStepCardsState(hasImage) {
     if (dropzoneEl) dropzoneEl.style.display = 'block';
     if (uploadStatusBox) uploadStatusBox.style.display = 'none';
     if (fileInput) fileInput.value = '';
-
-    // Show viewport upload prompt
-    let vpPrompt = document.getElementById('viewport-upload-prompt');
-    if (vpPrompt) vpPrompt.classList.remove('hidden');
 
     // Hide change/remove buttons on preview toolbar
     if (btnChange) btnChange.style.display = 'none';

@@ -47,7 +47,7 @@
   <link rel="icon" type="image/x-icon" href="favicon.ico">
 
   <!-- App Stylesheet -->
-  <link rel="stylesheet" href="style.css?v=1.0.8">
+  <link rel="stylesheet" href="style.css?v=1.0.12">
  
   <!-- jsPDF Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -56,12 +56,12 @@
   <script src="https://cdn.jsdelivr.net/npm/heic-to@1.5.2/dist/iife/heic-to.js"></script>
  
   <!-- App Logic -->
-  <script src="constants.js?v=1.0.8" defer></script>
+  <script src="constants.js?v=1.0.12" defer></script>
   <script src="color-utils.js" defer></script>
   <script src="filters.js" defer></script>
-  <script src="exporters.js?v=1.0.8" defer></script>
-  <script src="sketch.js?v=1.0.8" defer></script>
-  <script src="app.js?v=1.0.8"></script>
+  <script src="exporters.js?v=1.0.12" defer></script>
+  <script src="sketch.js?v=1.0.12" defer></script>
+  <script src="app.js?v=1.0.12"></script>
 </head>
 
 <body>
@@ -70,7 +70,7 @@
     <!-- Mobile Navigation Top Bar -->
     <div class="mobile-top-bar">
       <button id="btn-toggle-drawer" class="btn-hamburger">☰ Settings</button>
-      <span class="mobile-app-title" id="mobile-app-title">Knitting Chart Generator</span>
+      <span class="mobile-app-title" id="mobile-app-title">knitting-chart-generator</span>
       <div class="mobile-top-actions" style="display: flex; align-items: center; gap: 8px;">
         <div class="lang-selector-container">
           <select id="lang-select-mobile" class="lang-select">
@@ -82,29 +82,24 @@
       </div>
     </div>
 
-    <!-- Top Navbar (Desktop view only, styled as header) -->
+    <!-- Header -->
     <header class="app-header">
-      <div class="header-logo-container">
-        <div class="header-logo">🧶</div>
-        <div class="header-text">
-          <h1 id="app-title">Knitting Chart Generator</h1>
-          <p class="subtitle" id="app-subtitle" style="display: none;">Convert any photo into a stitch-by-stitch knitting pattern with dynamic yarn calculators</p>
+      <div class="logo-container">
+        <span class="logo-icon">🧶</span>
+        <h1 id="app-title">knitting-chart-generator</h1>
+        <span class="badge">v1.0</span>
+        <div class="header-right-controls">
+          <div class="lang-selector-container">
+            <span class="lang-globe-icon">🌐</span>
+            <select id="lang-select-desktop" class="lang-select">
+              <option value="en" selected>English</option>
+              <option value="pl">Polski</option>
+            </select>
+          </div>
+          <button type="button" class="theme-toggle-btn" id="theme-toggle-btn" onclick="toggleTheme()" aria-label="Switch to Light Theme" title="Switch to Light Theme" data-umami-event="toggle-theme">☀️</button>
         </div>
       </div>
-      
-      <!-- (Navbar project actions moved to sidebar) -->
-
-      <!-- Right: Language Selector & Theme Toggle -->
-      <div class="header-right-controls" style="margin-left: auto; display: flex; align-items: center; gap: 12px;">
-        <div class="lang-selector-container">
-          <span style="font-size: 1.1rem; line-height: 1;">🌐</span>
-          <select id="lang-select-desktop" class="lang-select">
-            <option value="en" selected>English</option>
-            <option value="pl">Polski</option>
-          </select>
-        </div>
-        <button type="button" class="theme-toggle-btn" id="theme-toggle-btn" onclick="toggleTheme()" aria-label="Switch to Light Theme" title="Switch to Light Theme" data-umami-event="toggle-theme">☀️</button>
-      </div>
+      <p class="subtitle" id="app-subtitle">Convert any photo into a stitch-by-stitch knitting pattern with dynamic yarn calculators</p>
     </header>
 
     <!-- Main Workspace Area -->
@@ -119,22 +114,47 @@
           <button type="button" class="btn-close-drawer" id="btn-close-drawer">✕</button>
         </div>
 
-        <!-- Hidden upload elements to maintain JS compatibility and PDF generation -->
-        <div style="display: none;">
-          <input type="file" id="image-upload" accept="image/*,.heic,.HEIC" style="display: none;">
-          <div id="dropzone"></div>
-          <div id="upload-status-box" style="display: none;">
-            <img id="thumbnail-img" src="" alt="preview">
-            <span id="status-filename"></span>
-            <span id="status-filesize"></span>
-            <button type="button" id="btn-remove-file"></button>
+        <!-- Step 1: Import Photo -->
+        <div class="step-card" id="step-card-upload">
+          <div class="step-header">
+            <span class="step-badge">1</span>
+            <h3 id="step-upload-title">Import Photo</h3>
+            <span class="step-chevron">▼</span>
+          </div>
+          <div class="step-body">
+            <input type="file" id="image-upload" accept="image/*,.heic,.HEIC" style="display: none;">
+            
+            <div class="upload-dropzone" id="dropzone">
+              <span class="dropzone-icon">📥</span>
+              <div class="dropzone-text">
+                <span class="primary-text" id="dropzone-primary-text">Upload Photo</span>
+                <span class="secondary-text" id="dropzone-secondary-text">Drag & Drop or click to browse</span>
+                <span class="file-limits">JPG, PNG, WEBP, HEIC</span>
+              </div>
+            </div>
+
+            <div class="upload-status" id="upload-status-box" style="display: none;">
+              <div class="status-details">
+                <div class="status-thumbnail-wrapper">
+                  <img id="thumbnail-img" src="" alt="preview">
+                </div>
+                <div class="status-meta">
+                  <span class="status-filename" id="status-filename"></span>
+                  <span class="status-filesize" id="status-filesize"></span>
+                </div>
+              </div>
+              <div class="status-actions">
+                <button type="button" class="btn btn-secondary btn-xs" id="btn-change-file" title="Change photo">Change</button>
+                <button type="button" class="btn-remove-file" id="btn-remove-file" title="Remove photo" aria-label="Remove photo">✕</button>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- Step 1: Stitch Settings -->
+        <!-- Step 2: Stitch Settings -->
         <div class="step-card disabled collapsed" id="step-card-dimensions">
           <div class="step-header">
-            <span class="step-badge">1</span>
+            <span class="step-badge">2</span>
             <h3 id="step-stitch-title">Image Prep & Grid</h3>
             <span class="step-chevron">▼</span>
           </div>
@@ -243,10 +263,10 @@
           </div>
         </div>
 
-        <!-- Step 2: Colors -->
+        <!-- Step 3: Colors -->
         <div class="step-card disabled collapsed" id="step-card-colors">
           <div class="step-header">
-            <span class="step-badge">2</span>
+            <span class="step-badge">3</span>
             <h3 id="step-colors-title">Filter & Color Modes</h3>
             <span class="step-chevron">▼</span>
           </div>
@@ -495,10 +515,10 @@
           </div>
         </div>
 
-        <!-- Step 3: Export Settings -->
+        <!-- Step 4: Export Settings -->
         <div class="step-card disabled collapsed" id="step-card-actions">
           <div class="step-header">
-            <span class="step-badge">3</span>
+            <span class="step-badge">4</span>
             <h3 id="step-actions-title">Export</h3>
             <span class="step-chevron">▼</span>
           </div>
@@ -630,16 +650,8 @@
 
           <!-- Canvas Drawing Board -->
           <div class="canvas-viewport" id="viewport-frame">
-            <div id="canvas-container"></div>
-            <!-- Upload Prompt (shown when no image is loaded) -->
-            <div id="viewport-upload-prompt" class="viewport-upload-prompt">
-              <div class="viewport-upload-icon">📷</div>
-              <div class="viewport-upload-text">
-                <span class="viewport-upload-primary" id="viewport-upload-primary">Drag & drop image here</span>
-                <span class="viewport-upload-secondary" id="viewport-upload-secondary">or click to browse files</span>
-                <span class="viewport-upload-limits" id="viewport-upload-limits">Supports JPG, PNG, WEBP, HEIC</span>
-              </div>
-            </div>
+            <div id="canvas-container" class="hidden"></div>
+            <div class="canvas-placeholder" id="canvas-placeholder">Knitting chart preview</div>
             <!-- Loading Overlay -->
             <div id="loading-overlay" class="loading-overlay" style="display: none;">
               <div class="spinner"></div>
