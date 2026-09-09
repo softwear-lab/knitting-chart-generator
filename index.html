@@ -1,16 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Knitting Chart Generator</title>
-  <!-- Google Fonts: Inter (main body/UI) & Outfit/Playfair (headings) -->
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=VT323&display=swap" rel="stylesheet">
+
+  <!-- Early Theme Initialization -->
+  <script>
+    (function () {
+      let theme = 'dark';
+      try {
+        theme = localStorage.getItem('theme') || sessionStorage.getItem('theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+      } catch (e) {}
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+
+  <!-- Umami Analytics -->
+  <script defer src="https://cloud.umami.is/script.js" data-website-id="26bbc811-1931-4583-ba8a-31b474a0b76c" data-domains="softwear-lab.github.io"></script>
 
   <!-- Optimize canvas 2D contexts for multiple readback operations (getImageData) -->
   <script>
@@ -31,6 +43,9 @@
   <!-- p5.js Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
 
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+
   <!-- App Stylesheet -->
   <link rel="stylesheet" href="style.css?v=1.0.6">
  
@@ -46,6 +61,7 @@
   <script src="filters.js" defer></script>
   <script src="exporters.js?v=1.0.6" defer></script>
   <script src="sketch.js?v=1.0.6" defer></script>
+  <script src="app.js?v=1.0.7"></script>
 </head>
 
 <body>
@@ -55,11 +71,14 @@
     <div class="mobile-top-bar">
       <button id="btn-toggle-drawer" class="btn-hamburger">☰ Settings</button>
       <span class="mobile-app-title" id="mobile-app-title">Knitting Chart Generator</span>
-      <div class="lang-selector-container">
-        <select id="lang-select-mobile" class="lang-select">
-          <option value="en" selected>EN</option>
-          <option value="pl">PL</option>
-        </select>
+      <div class="mobile-top-actions" style="display: flex; align-items: center; gap: 8px;">
+        <div class="lang-selector-container">
+          <select id="lang-select-mobile" class="lang-select">
+            <option value="en" selected>EN</option>
+            <option value="pl">PL</option>
+          </select>
+        </div>
+        <button type="button" class="theme-toggle-btn" id="theme-toggle-btn-mobile" onclick="toggleTheme()" aria-label="Switch to Light Theme" title="Switch to Light Theme" data-umami-event="toggle-theme">☀️</button>
       </div>
     </div>
 
@@ -75,13 +94,16 @@
       
       <!-- (Navbar project actions moved to sidebar) -->
 
-      <!-- Right: Language Selector -->
-      <div class="lang-selector-container">
-        <span style="font-size: 1.1rem; line-height: 1;">🌐</span>
-        <select id="lang-select-desktop" class="lang-select">
-          <option value="en" selected>English</option>
-          <option value="pl">Polski</option>
-        </select>
+      <!-- Right: Language Selector & Theme Toggle -->
+      <div class="header-right-controls" style="margin-left: auto; display: flex; align-items: center; gap: 12px;">
+        <div class="lang-selector-container">
+          <span style="font-size: 1.1rem; line-height: 1;">🌐</span>
+          <select id="lang-select-desktop" class="lang-select">
+            <option value="en" selected>English</option>
+            <option value="pl">Polski</option>
+          </select>
+        </div>
+        <button type="button" class="theme-toggle-btn" id="theme-toggle-btn" onclick="toggleTheme()" aria-label="Switch to Light Theme" title="Switch to Light Theme" data-umami-event="toggle-theme">☀️</button>
       </div>
     </header>
 
@@ -326,135 +348,87 @@
               <div class="control-group" id="custom-palette-container" style="display: none;">
                 <div class="label-row" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                   <div style="display: flex; align-items: center; gap: 10px;">
-                    <label id="yarn-palette-label" style="margin: 0;">Yarn Color Palette</label>
-                    <button type="button" id="btn-rotate-colors" class="btn-rotate-colors"
-                      style="font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; border: 1px solid var(--color-border); background: #ffffff; cursor: pointer; font-weight: 600; color: var(--color-text-muted); display: inline-flex; align-items: center; gap: 4px; transition: var(--transition);">
+                    <label id="yarn-palette-label">Yarn Color Palette</label>
+                    <button type="button" id="btn-rotate-colors" class="btn-rotate-colors">
                       ⟳ Rotate
                     </button>
                   </div>
-                  <div class="palette-size-wrapper" id="palette-size-container"
-                    style="display: flex; align-items: center; gap: 6px;">
-                    <label for="palette-size-input" id="yarn-palette-size-label"
-                      style="font-size: 0.8rem; margin: 0; font-weight: 500;">Colors:</label>
-                    <input type="number" id="palette-size-input" min="2" max="8" value="4"
-                      style="width: 50px; padding: 4px 6px; font-size: 0.85rem; border: 1px solid var(--color-border); border-radius: 4px;">
+                  <div class="palette-size-wrapper" id="palette-size-container">
+                    <label for="palette-size-input" id="yarn-palette-size-label">Colors:</label>
+                    <input type="number" id="palette-size-input" min="2" max="8" value="4">
                   </div>
                 </div>
-                <div class="palette-grid"
-                  style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 4px;">
+                <div class="palette-grid">
                   <!-- Color 1 -->
-                  <div class="color-picker-box" id="picker-box-1"
-                    style="display: flex; flex-direction: column; gap: 4px;">
-                    <span class="picker-label" id="yarn-color-1-label"
-                      style="font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted);">Color 1</span>
-                    <div class="picker-inner"
-                      style="display: flex; align-items: center; gap: 8px; background: #ffffff; border: 1px solid var(--color-border); padding: 4px 8px; border-radius: 6px;">
-                      <input type="color" id="yarn-color-1" value="#ffffff"
-                        style="border: none; background: none; padding: 0; width: 24px; height: 24px; cursor: pointer;">
-                      <span class="color-hex-label" id="yarn-color-1-hex"
-                        style="font-size: 0.8rem; font-family: monospace; font-weight: 600; color: var(--color-text);">#FFFFFF</span>
+                  <div class="color-picker-box" id="picker-box-1">
+                    <span class="picker-label" id="yarn-color-1-label">Color 1</span>
+                    <div class="picker-inner">
+                      <input type="color" id="yarn-color-1" value="#ffffff">
+                      <span class="color-hex-label" id="yarn-color-1-hex">#FFFFFF</span>
                     </div>
                   </div>
                   <!-- Color 2 -->
-                  <div class="color-picker-box" id="picker-box-2"
-                    style="display: flex; flex-direction: column; gap: 4px;">
-                    <span class="picker-label" id="yarn-color-2-label"
-                      style="font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted);">Color 2</span>
-                    <div class="picker-inner"
-                      style="display: flex; align-items: center; gap: 8px; background: #ffffff; border: 1px solid var(--color-border); padding: 4px 8px; border-radius: 6px;">
-                      <input type="color" id="yarn-color-2" value="#000000"
-                        style="border: none; background: none; padding: 0; width: 24px; height: 24px; cursor: pointer;">
-                      <span class="color-hex-label" id="yarn-color-2-hex"
-                        style="font-size: 0.8rem; font-family: monospace; font-weight: 600; color: var(--color-text);">#000000</span>
+                  <div class="color-picker-box" id="picker-box-2">
+                    <span class="picker-label" id="yarn-color-2-label">Color 2</span>
+                    <div class="picker-inner">
+                      <input type="color" id="yarn-color-2" value="#000000">
+                      <span class="color-hex-label" id="yarn-color-2-hex">#000000</span>
                     </div>
                   </div>
                   <!-- Color 3 -->
-                  <div class="color-picker-box" id="picker-box-3"
-                    style="display: flex; flex-direction: column; gap: 4px;">
-                    <span class="picker-label" id="yarn-color-3-label"
-                      style="font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted);">Color 3</span>
-                    <div class="picker-inner"
-                      style="display: flex; align-items: center; gap: 8px; background: #ffffff; border: 1px solid var(--color-border); padding: 4px 8px; border-radius: 6px;">
-                      <input type="color" id="yarn-color-3" value="#dca1a1"
-                        style="border: none; background: none; padding: 0; width: 24px; height: 24px; cursor: pointer;">
-                      <span class="color-hex-label" id="yarn-color-3-hex"
-                        style="font-size: 0.8rem; font-family: monospace; font-weight: 600; color: var(--color-text);">#DCA1A1</span>
+                  <div class="color-picker-box" id="picker-box-3">
+                    <span class="picker-label" id="yarn-color-3-label">Color 3</span>
+                    <div class="picker-inner">
+                      <input type="color" id="yarn-color-3" value="#dca1a1">
+                      <span class="color-hex-label" id="yarn-color-3-hex">#DCA1A1</span>
                     </div>
                   </div>
                   <!-- Color 4 -->
-                  <div class="color-picker-box" id="picker-box-4"
-                    style="display: flex; flex-direction: column; gap: 4px;">
-                    <span class="picker-label" id="yarn-color-4-label"
-                      style="font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted);">Color 4</span>
-                    <div class="picker-inner"
-                      style="display: flex; align-items: center; gap: 8px; background: #ffffff; border: 1px solid var(--color-border); padding: 4px 8px; border-radius: 6px;">
-                      <input type="color" id="yarn-color-4" value="#a2a1dc"
-                        style="border: none; background: none; padding: 0; width: 24px; height: 24px; cursor: pointer;">
-                      <span class="color-hex-label" id="yarn-color-4-hex"
-                        style="font-size: 0.8rem; font-family: monospace; font-weight: 600; color: var(--color-text);">#A2A1DC</span>
+                  <div class="color-picker-box" id="picker-box-4">
+                    <span class="picker-label" id="yarn-color-4-label">Color 4</span>
+                    <div class="picker-inner">
+                      <input type="color" id="yarn-color-4" value="#a2a1dc">
+                      <span class="color-hex-label" id="yarn-color-4-hex">#A2A1DC</span>
                     </div>
                   </div>
                   <!-- Color 5 -->
-                  <div class="color-picker-box" id="picker-box-5"
-                    style="display: flex; flex-direction: column; gap: 4px;">
-                    <span class="picker-label" id="yarn-color-5-label"
-                      style="font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted);">Color 5</span>
-                    <div class="picker-inner"
-                      style="display: flex; align-items: center; gap: 8px; background: #ffffff; border: 1px solid var(--color-border); padding: 4px 8px; border-radius: 6px;">
-                      <input type="color" id="yarn-color-5" value="#f3dfb6"
-                        style="border: none; background: none; padding: 0; width: 24px; height: 24px; cursor: pointer;">
-                      <span class="color-hex-label" id="yarn-color-5-hex"
-                        style="font-size: 0.8rem; font-family: monospace; font-weight: 600; color: var(--color-text);">#F3DFB6</span>
+                  <div class="color-picker-box" id="picker-box-5">
+                    <span class="picker-label" id="yarn-color-5-label">Color 5</span>
+                    <div class="picker-inner">
+                      <input type="color" id="yarn-color-5" value="#f3dfb6">
+                      <span class="color-hex-label" id="yarn-color-5-hex">#F3DFB6</span>
                     </div>
                   </div>
                   <!-- Color 6 -->
-                  <div class="color-picker-box" id="picker-box-6"
-                    style="display: flex; flex-direction: column; gap: 4px;">
-                    <span class="picker-label" id="yarn-color-6-label"
-                      style="font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted);">Color 6</span>
-                    <div class="picker-inner"
-                      style="display: flex; align-items: center; gap: 8px; background: #ffffff; border: 1px solid var(--color-border); padding: 4px 8px; border-radius: 6px;">
-                      <input type="color" id="yarn-color-6" value="#bcf2f5"
-                        style="border: none; background: none; padding: 0; width: 24px; height: 24px; cursor: pointer;">
-                      <span class="color-hex-label" id="yarn-color-6-hex"
-                        style="font-size: 0.8rem; font-family: monospace; font-weight: 600; color: var(--color-text);">#BCF2F5</span>
+                  <div class="color-picker-box" id="picker-box-6">
+                    <span class="picker-label" id="yarn-color-6-label">Color 6</span>
+                    <div class="picker-inner">
+                      <input type="color" id="yarn-color-6" value="#bcf2f5">
+                      <span class="color-hex-label" id="yarn-color-6-hex">#BCF2F5</span>
                     </div>
                   </div>
                   <!-- Color 7 -->
-                  <div class="color-picker-box" id="picker-box-7"
-                    style="display: flex; flex-direction: column; gap: 4px;">
-                    <span class="picker-label" id="yarn-color-7-label"
-                      style="font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted);">Color 7</span>
-                    <div class="picker-inner"
-                      style="display: flex; align-items: center; gap: 8px; background: #ffffff; border: 1px solid var(--color-border); padding: 4px 8px; border-radius: 6px;">
-                      <input type="color" id="yarn-color-7" value="#e3bcf5"
-                        style="border: none; background: none; padding: 0; width: 24px; height: 24px; cursor: pointer;">
-                      <span class="color-hex-label" id="yarn-color-7-hex"
-                        style="font-size: 0.8rem; font-family: monospace; font-weight: 600; color: var(--color-text);">#E3BCF5</span>
+                  <div class="color-picker-box" id="picker-box-7">
+                    <span class="picker-label" id="yarn-color-7-label">Color 7</span>
+                    <div class="picker-inner">
+                      <input type="color" id="yarn-color-7" value="#e3bcf5">
+                      <span class="color-hex-label" id="yarn-color-7-hex">#E3BCF5</span>
                     </div>
                   </div>
                   <!-- Color 8 -->
-                  <div class="color-picker-box" id="picker-box-8"
-                    style="display: flex; flex-direction: column; gap: 4px;">
-                    <span class="picker-label" id="yarn-color-8-label"
-                      style="font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted);">Color 8</span>
-                    <div class="picker-inner"
-                      style="display: flex; align-items: center; gap: 8px; background: #ffffff; border: 1px solid var(--color-border); padding: 4px 8px; border-radius: 6px;">
-                      <input type="color" id="yarn-color-8" value="#d4d4d4"
-                        style="border: none; background: none; padding: 0; width: 24px; height: 24px; cursor: pointer;">
-                      <span class="color-hex-label" id="yarn-color-8-hex"
-                        style="font-size: 0.8rem; font-family: monospace; font-weight: 600; color: var(--color-text);">#D4D4D4</span>
+                  <div class="color-picker-box" id="picker-box-8">
+                    <span class="picker-label" id="yarn-color-8-label">Color 8</span>
+                    <div class="picker-inner">
+                      <input type="color" id="yarn-color-8" value="#d4d4d4">
+                      <span class="color-hex-label" id="yarn-color-8-hex">#D4D4D4</span>
                     </div>
                   </div>
                 </div>
                 <!-- Color Distance Metric Selector -->
-                <div class="control-group" id="color-distance-metric-container"
-                  style="display: none; margin-top: 12px; margin-bottom: 0;">
-                  <label for="color-distance-select" id="color-distance-label"
-                    style="font-size: 0.8rem; font-weight: 600; color: var(--color-text-muted); display: block; margin-bottom: 4px;">Color Matching Metric</label>
+                <div class="control-group" id="color-distance-metric-container" style="display: none; margin-top: 12px; margin-bottom: 0;">
+                  <label for="color-distance-select" id="color-distance-label">Color Matching Metric</label>
                   <div class="select-wrapper">
-                    <select id="color-distance-select"
-                      style="font-size: 0.8rem; padding: 6px 8px; width: 100%; border: 1px solid var(--color-border); border-radius: 4px; background: #ffffff;">
+                    <select id="color-distance-select">
                       <option value="CIEDE2000" selected>CIEDE2000 (Perceptual LAB)</option>
                       <option value="RGB">Euclidean RGB (Fast)</option>
                     </select>
@@ -717,14 +691,11 @@
             </div>
           </div>
           <div class="instructions-body-wrapper">
-            <div class="instructions-actions" style="display: flex; justify-content: flex-end; margin-bottom: 8px;">
-              <button id="btn-copy-instructions" class="btn btn-secondary btn-sm" disabled
-                style="background-color: var(--color-input-bg); color: var(--color-text); border: 1px solid var(--color-border); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">Copy Text</button>
+            <div class="instructions-actions">
+              <button id="btn-copy-instructions" class="btn btn-secondary btn-sm" disabled>Copy Text</button>
             </div>
-            <div class="instructions-body" style="padding: 4px 0;">
-              <textarea id="written-instructions-textarea" readonly
-                placeholder="Generate chart to view written instructions..."
-                style="width: 100%; height: 200px; border: 1px solid var(--color-border); border-radius: var(--border-radius-sm); padding: 12px; font-family: 'Courier New', Courier, monospace; font-size: 0.85rem; line-height: 1.5; background-color: var(--color-input-bg); color: var(--color-text); resize: vertical; box-sizing: border-box;"></textarea>
+            <div class="instructions-body">
+              <textarea id="written-instructions-textarea" readonly placeholder="Generate chart to view written instructions..."></textarea>
             </div>
           </div>
         </div>
